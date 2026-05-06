@@ -1,5 +1,6 @@
 package ru.icc.regtab.itm.atp.spec;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,5 +31,27 @@ public record CompoundContentSpec(
     /** Convenience: compound with no trailing delimiter. */
     public CompoundContentSpec(List<CompoundSegment> segments) {
         this(segments, "");
+    }
+
+    /** A delimiter–spec pair used with the {@link #of} factory. */
+    public record Segment(String delimiter, ContentSpec spec) {
+        public Segment {
+            Objects.requireNonNull(delimiter, "delimiter");
+            Objects.requireNonNull(spec, "spec");
+        }
+
+        public static Segment of(String delimiter, ContentSpec spec) {
+            return new Segment(delimiter, spec);
+        }
+    }
+
+    /** Convenience: build from a leading spec followed by delimited segments. */
+    public static CompoundContentSpec of(ContentSpec first, Segment... rest) {
+        var segs = new ArrayList<CompoundSegment>(1 + rest.length);
+        segs.add(new CompoundSegment("", first));
+        for (var s : rest) {
+            segs.add(new CompoundSegment(s.delimiter(), s.spec()));
+        }
+        return new CompoundContentSpec(List.copyOf(segs));
     }
 }

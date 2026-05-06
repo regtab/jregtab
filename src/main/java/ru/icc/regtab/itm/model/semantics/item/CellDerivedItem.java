@@ -39,6 +39,12 @@ public final class CellDerivedItem implements Item {
         this(str, List.of(), index, cell, type);
     }
 
+    public boolean sameCol(CellDerivedItem anchor) { return is.in.sameCol(anchor); }
+    public boolean sameRow(CellDerivedItem anchor) { return is.in.sameRow(anchor); }
+    public boolean sameCell(CellDerivedItem anchor) { return is.in.sameCell(anchor); }
+    public boolean sameSubtable(CellDerivedItem anchor) { return is.in.sameSubtable(anchor); }
+    public boolean sameSubrow(CellDerivedItem anchor) { return is.in.sameSubrow(anchor); }
+
     @Override
     public String str() { return str; }
 

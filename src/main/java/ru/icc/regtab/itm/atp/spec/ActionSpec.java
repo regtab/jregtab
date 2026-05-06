@@ -1,5 +1,8 @@
 package ru.icc.regtab.itm.atp.spec;
 
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,9 +32,23 @@ public record ActionSpec(
         return new ActionSpec(OperationType.REC, null, List.of(providers));
     }
 
+    /** Convenience: REC action — all providers share the same cardinality and default traversal. */
+    public static ActionSpec rec(int cardinality, ItemFilterCondition... conditions) {
+        var providers = new ArrayList<ProviderSpec>(conditions.length);
+        for (var c : conditions) {
+            providers.add(ProviderSpec.val(cardinality, c));
+        }
+        return new ActionSpec(OperationType.REC, null, List.copyOf(providers));
+    }
+
     /** Convenience: AVP action with one provider. */
     public static ActionSpec avp(ProviderSpec provider) {
         return new ActionSpec(OperationType.AVP, null, List.of(provider));
+    }
+
+    /** Convenience: AVP action with a literal context-attribute provider. */
+    public static ActionSpec avp(String literal) {
+        return new ActionSpec(OperationType.AVP, null, List.of(ProviderSpec.ctxAttr(literal)));
     }
 
     /** Convenience: CONCAT action with given providers. */

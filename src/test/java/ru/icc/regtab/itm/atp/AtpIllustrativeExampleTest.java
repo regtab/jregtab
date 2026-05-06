@@ -5,7 +5,6 @@ import ru.icc.regtab.itm.InterpretableTable;
 import ru.icc.regtab.itm.atp.spec.*;
 import ru.icc.regtab.itm.interpret.SchemaConstructionStrategy;
 import ru.icc.regtab.itm.interpret.TableInterpreter;
-import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 import ru.icc.regtab.itm.model.syntax.TableSyntax;
 import ru.icc.regtab.itm.recordset.Recordset;
 
@@ -48,62 +47,37 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class AtpIllustrativeExampleTest {
 
-    // S_prov^1: airline code above the ND item, same column, column-major traversal
-    private static final ProviderSpec AIRLINE_SAME_COL =
-            ProviderSpec.val(1, TraversalOrder.COLUMN_MAJOR, (a, c) -> c.is.in.sameCol(a));
-
-    // S_prov^2: airport code left of the ND item, same row, row-major traversal
-    private static final ProviderSpec AIRPORT_SAME_ROW =
-            ProviderSpec.val(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.is.in.sameRow(a));
-
-    // S_prov^3: month in the same compound cell as the ND item
-    private static final ProviderSpec MONTH_SAME_CELL =
-            ProviderSpec.val(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.is.in.sameCell(a));
-
     /**
      * Builds the table pattern P_tbl described in Section VI-A of the paper.
      */
     private TablePattern buildPattern() {
-        // S_atom^1: airline codes — VAL with avp(AIRLINE)
-        var airlineSpec = AtomicContentSpec.val(
-                ActionSpec.avp(ProviderSpec.ctxAttr("AIRLINE"))
-        );
-
-        // S_atom^2: airport codes — VAL with avp(AIRPORT)
-        var airportSpec = AtomicContentSpec.val(
-                ActionSpec.avp(ProviderSpec.ctxAttr("AIRPORT"))
-        );
-
-        // S_atom^3: number of departures — VAL with rec(S_prov^1, S_prov^2, S_prov^3) and avp(ND)
-        var ndSpec = AtomicContentSpec.val(
-                ActionSpec.rec(AIRLINE_SAME_COL, AIRPORT_SAME_ROW, MONTH_SAME_CELL),
-                ActionSpec.avp(ProviderSpec.ctxAttr("ND"))
-        );
-
-        // S_atom^4: months — VAL with avp(MON)
-        var monSpec = AtomicContentSpec.val(
-                ActionSpec.avp(ProviderSpec.ctxAttr("MON"))
-        );
-
-        // S_comp: body cell "ND MON" — compound, space-separated (δ₁ = " ")
-        var bodyCell = new CompoundContentSpec(List.of(
-                new CompoundSegment("", ndSpec),
-                new CompoundSegment(" ", monSpec)
-        ));
-
-        // P_tbl = ⟨P_st^1⟩
-        // P_st^1 = (⊥, 1, ⟨P_row^1, P_row^2⟩)
         return TablePattern.of(
                 SubtablePattern.of(
-                        // P_row^1 = (⊥, 1, ⟨P_sr^1⟩) where P_sr^1 has: skip + one-or-more airline cells
+                        // P_row^1: skip + one-or-more airline cells
                         RowPattern.of(
                                 CellPattern.skip(),
-                                CellPattern.of(Quantifier.oneOrMore(), airlineSpec)
+                                CellPattern.of(Quantifier.oneOrMore(),
+                                        AtomicContentSpec.val(ActionSpec.avp("AIRLINE"))
+                                )
                         ),
-                        // P_row^2 = (⊥, +, ⟨P_sr^2⟩) where P_sr^2 has: airport + one-or-more body cells
+                        // P_row^2 (one-or-more): airport cell + one-or-more "ND MON" body cells
                         RowPattern.of(Quantifier.oneOrMore(),
-                                CellPattern.of(airportSpec),
-                                CellPattern.of(Quantifier.oneOrMore(), bodyCell)
+                                CellPattern.of(AtomicContentSpec.val(ActionSpec.avp("AIRPORT"))),
+                                CellPattern.of(Quantifier.oneOrMore(),
+                                        CompoundContentSpec.of(
+                                                AtomicContentSpec.val(
+                                                        ActionSpec.rec(1,
+                                                                (a, c) -> c.sameCol(a),
+                                                                (a, c) -> c.sameRow(a),
+                                                                (a, c) -> c.sameCell(a)
+                                                        ),
+                                                        ActionSpec.avp("ND")
+                                                ),
+                                                CompoundContentSpec.Segment.of(" ",
+                                                        AtomicContentSpec.val(ActionSpec.avp("MON"))
+                                                )
+                                        )
+                                )
                         )
                 )
         );
