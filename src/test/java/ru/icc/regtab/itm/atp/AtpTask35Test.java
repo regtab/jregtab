@@ -17,7 +17,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask35Test extends AtpTaskBase {
 
     private static final ProviderSpec BELOW_SAME_COL =
-            ProviderSpec.val((a, c) -> c.is.below(a).sameCol() && c.is.in.sameSubtable(a));
+            ProviderSpec.val((a, c) -> c.is.below(a).sameCol() && c.sameSubtable(a));
 
     private static final CellMatchCondition COMPANY_ROW = new CellMatchCondition(c -> c.text().contains("*Company"));
     private static final CellMatchCondition NOT_COMPANY_ROW = new CellMatchCondition(c -> !c.text().contains("*Company"));

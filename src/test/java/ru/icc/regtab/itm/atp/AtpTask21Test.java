@@ -17,7 +17,7 @@ import ru.icc.regtab.itm.recordset.Recordset;
 class AtpTask21Test extends AtpTaskBase {
 
     private static final ProviderSpec BELOW_SAME_COL_SAME_SUBTABLE =
-            ProviderSpec.of((a, c) -> c.is.in.sameSubtable(a) && c.is.below(a).sameCol());
+            ProviderSpec.of((a, c) -> c.sameSubtable(a) && c.is.below(a).sameCol());
 
     @Override
     protected String taskId() {

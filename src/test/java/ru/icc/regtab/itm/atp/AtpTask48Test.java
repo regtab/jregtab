@@ -1,13 +1,10 @@
 package ru.icc.regtab.itm.atp;
 
-import java.util.List;
-
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
 import ru.icc.regtab.itm.atp.spec.CompoundContentSpec;
-import ru.icc.regtab.itm.atp.spec.CompoundSegment;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -23,8 +20,8 @@ class AtpTask48Test extends AtpTaskBase {
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
     private static final ProviderSpec SAME_SUBTABLE_COL1 = ProviderSpec.val((a, c) ->
-            c.is.in.sameSubtable(a) && c.is.in.col(1));
-    private static final ProviderSpec SAME_CELL_ATTR = ProviderSpec.attr((a, c) -> c.is.in.sameCell(a));
+            c.sameSubtable(a) && c.is.in.col(1));
+    private static final ProviderSpec SAME_CELL_ATTR = ProviderSpec.attr((a, c) -> c.sameCell(a));
 
     @Override
     protected String taskId() {
@@ -33,12 +30,9 @@ class AtpTask48Test extends AtpTaskBase {
 
     @Override
     protected TablePattern buildPattern() {
-        CompoundContentSpec telFaxSpec = new CompoundContentSpec(
-                List.of(
-                        new CompoundSegment("", AtomicContentSpec.attr()),
-                        new CompoundSegment(":", AtomicContentSpec.val(ActionSpec.avp(SAME_CELL_ATTR)))
-                ),
-                ""
+        CompoundContentSpec telFaxSpec = CompoundContentSpec.of(
+                AtomicContentSpec.attr(),
+                CompoundContentSpec.Segment.of(":", AtomicContentSpec.val(ActionSpec.avp(SAME_CELL_ATTR)))
         );
 
         return TablePattern.of(
@@ -50,7 +44,7 @@ class AtpTask48Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.avp(ProviderSpec.ctxAttr("")),
+                                        ActionSpec.avp(""),
                                         ActionSpec.rec(SAME_SUBTABLE_COL1)
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), telFaxSpec)

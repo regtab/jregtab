@@ -19,8 +19,8 @@ class AtpTask49Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec FIRST_SAME_ROW = ProviderSpec.val(1, (a, c) -> c.is.in.sameRow(a));
-    private static final ProviderSpec FIRST_SAME_COL = ProviderSpec.val(1, (a, c) -> c.is.in.sameCol(a));
+    private static final ProviderSpec FIRST_SAME_ROW = ProviderSpec.val(1, (a, c) -> c.sameRow(a));
+    private static final ProviderSpec FIRST_SAME_COL = ProviderSpec.val(1, (a, c) -> c.sameCol(a));
 
     @Override
     protected String taskId() {

@@ -16,8 +16,8 @@ import ru.icc.regtab.itm.recordset.Recordset;
  */
 class AtpTask05Test extends AtpTaskBase {
 
-    private static final ProviderSpec UNPIVOT_ROW_KEY = ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a));
-    private static final ProviderSpec UNPIVOT_COL_KEY = ProviderSpec.of(1, (a, c) -> c.is.in.sameCol(a));
+    private static final ProviderSpec UNPIVOT_ROW_KEY = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
+    private static final ProviderSpec UNPIVOT_COL_KEY = ProviderSpec.of(1, (a, c) -> c.sameCol(a));
 
     @Override
     protected String taskId() {

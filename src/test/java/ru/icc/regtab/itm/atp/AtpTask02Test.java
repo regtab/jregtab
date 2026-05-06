@@ -22,9 +22,9 @@ class AtpTask02Test extends AtpTaskBase {
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
     private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.of((a, c) ->
-            c.is.in.sameSubtable(a) && (c.has.hasTag("#L1") || c.has.hasTag("#L2")));
+            c.sameSubtable(a) && (c.has.hasTag("#L1") || c.has.hasTag("#L2")));
 
-    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a));
+    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
 
     @Override
     protected String taskId() {

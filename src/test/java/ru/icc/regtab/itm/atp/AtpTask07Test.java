@@ -16,8 +16,8 @@ import ru.icc.regtab.itm.recordset.Recordset;
  */
 class AtpTask07Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_THREE_IN_SAME_ROW = ProviderSpec.of(3, (a, c) -> c.is.in.sameRow(a));
-    private static final ProviderSpec FIRST_IN_SAME_COLUMN = ProviderSpec.of(1, (a, c) -> c.is.in.sameCol(a));
+    private static final ProviderSpec FIRST_THREE_IN_SAME_ROW = ProviderSpec.of(3, (a, c) -> c.sameRow(a));
+    private static final ProviderSpec FIRST_IN_SAME_COLUMN = ProviderSpec.of(1, (a, c) -> c.sameCol(a));
 
     @Override
     protected String taskId() {

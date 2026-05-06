@@ -19,10 +19,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
 class AtpTask32Test extends AtpTaskBase {
 
     private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val(1, (a, c) -> c.is.in.sameRow(a));
+            ProviderSpec.val(1, (a, c) -> c.sameRow(a));
 
     private static final ProviderSpec FIRST_IN_SAME_COL =
-            ProviderSpec.val(1, (a, c) -> c.is.in.sameCol(a));
+            ProviderSpec.val(1, (a, c) -> c.sameCol(a));
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 

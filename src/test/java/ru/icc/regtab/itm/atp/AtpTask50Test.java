@@ -17,8 +17,8 @@ class AtpTask50Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.is.in.sameRow(a));
-    private static final ProviderSpec SAME_ROW_ATTR = ProviderSpec.attr((a, c) -> c.is.in.sameRow(a));
+    private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.sameRow(a));
+    private static final ProviderSpec SAME_ROW_ATTR = ProviderSpec.attr((a, c) -> c.sameRow(a));
     private static final ProviderSpec SAME_YEAR_BELOW = ProviderSpec.val((a, c) ->
             c.is.below(a).sameCol() && c.has.sameStr(a));
 
@@ -33,7 +33,7 @@ class AtpTask50Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.one(),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.avp(ProviderSpec.ctxAttr("")),
+                                        ActionSpec.avp(""),
                                         ActionSpec.rec(SAME_ROW),
                                         ActionSpec.concat(SAME_YEAR_BELOW)
                                 )),

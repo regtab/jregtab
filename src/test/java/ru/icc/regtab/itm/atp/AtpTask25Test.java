@@ -25,7 +25,7 @@ class AtpTask25Test extends AtpTaskBase {
             ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a));
 
     private static final ProviderSpec SAME_ROW_AFTER_ACCOUNT =
-            ProviderSpec.of((a, c) -> c.is.in.sameRow(a) && c.cell().col() > a.cell().col() + 1);
+            ProviderSpec.of((a, c) -> c.sameRow(a) && c.cell().col() > a.cell().col() + 1);
 
     @Override
     protected String taskId() {

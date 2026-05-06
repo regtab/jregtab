@@ -1,13 +1,10 @@
 package ru.icc.regtab.itm.atp;
 
-import java.util.List;
-
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
 import ru.icc.regtab.itm.atp.spec.CompoundContentSpec;
-import ru.icc.regtab.itm.atp.spec.CompoundSegment;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -22,7 +19,7 @@ class AtpTask41Test extends AtpTaskBase {
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec SAME_CELL = ProviderSpec.val((a, c) -> c.is.in.sameCell(a));
+    private static final ProviderSpec SAME_CELL = ProviderSpec.val((a, c) -> c.sameCell(a));
     private static final ProviderSpec RIGHT_SAME_ROW = ProviderSpec.val((a, c) -> c.is.rightOf(a).sameRow());
 
     @Override
@@ -32,12 +29,9 @@ class AtpTask41Test extends AtpTaskBase {
 
     @Override
     protected TablePattern buildPattern() {
-        CompoundContentSpec pairValSpec = new CompoundContentSpec(
-                List.of(
-                        new CompoundSegment("", AtomicContentSpec.val(ActionSpec.fill("",ProviderSpec.ctxAux("")),ActionSpec.rec(SAME_CELL,RIGHT_SAME_ROW))),
-                        new CompoundSegment("", AtomicContentSpec.val())
-                ),
-                ""
+        CompoundContentSpec pairValSpec = CompoundContentSpec.of(
+                AtomicContentSpec.val(ActionSpec.fill("",ProviderSpec.ctxAux("")),ActionSpec.rec(SAME_CELL,RIGHT_SAME_ROW)),
+                CompoundContentSpec.Segment.of("", AtomicContentSpec.val())
         );
        
         return TablePattern.of(

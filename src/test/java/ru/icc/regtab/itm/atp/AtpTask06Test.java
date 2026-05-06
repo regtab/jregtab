@@ -23,7 +23,7 @@ class AtpTask06Test extends AtpTaskBase {
             AtomicContentSpec.skip(),
             AtomicContentSpec.val());
 
-    private static final ProviderSpec REC_AFTER_ANCHOR = ProviderSpec.of((a, c) -> c.is.in.sameSubtable(a));
+    private static final ProviderSpec REC_AFTER_ANCHOR = ProviderSpec.of((a, c) -> c.sameSubtable(a));
 
     @Override
     protected String taskId() {

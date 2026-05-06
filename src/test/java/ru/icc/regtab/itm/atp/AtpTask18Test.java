@@ -4,7 +4,6 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
 import ru.icc.regtab.itm.atp.spec.CompoundContentSpec;
-import ru.icc.regtab.itm.atp.spec.CompoundSegment;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -12,14 +11,12 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.model.semantics.item.ItemType;
 
-import java.util.List;
-
 /**
  * ATP equivalent of Fluent API Task18.
  */
 class AtpTask18Test extends AtpTaskBase {
 
-    private static final ProviderSpec AVP_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.is.in.sameCell(a));
+    private static final ProviderSpec AVP_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.sameCell(a));
     private static final ProviderSpec REC_VALUES_BELOW =
             ProviderSpec.of((a, c) -> c.is.below(a).sameSubtable() && c.type() == ItemType.VALUE);
 
@@ -30,25 +27,19 @@ class AtpTask18Test extends AtpTaskBase {
 
     @Override
     protected TablePattern buildPattern() {
-        CompoundContentSpec firstRow = new CompoundContentSpec(
-                List.of(
-                        new CompoundSegment("", AtomicContentSpec.attr()),
-                        new CompoundSegment("=", AtomicContentSpec.val(
-                                ActionSpec.rec(REC_VALUES_BELOW),
-                                ActionSpec.avp(AVP_SAME_CELL)
-                        ))
-                ),
-                ""
+        CompoundContentSpec firstRow = CompoundContentSpec.of(
+                AtomicContentSpec.attr(),
+                CompoundContentSpec.Segment.of("=", AtomicContentSpec.val(
+                        ActionSpec.rec(REC_VALUES_BELOW),
+                        ActionSpec.avp(AVP_SAME_CELL)
+                ))
         );
 
-        CompoundContentSpec otherRows = new CompoundContentSpec(
-                List.of(
-                        new CompoundSegment("", AtomicContentSpec.attr()),
-                        new CompoundSegment("=", AtomicContentSpec.val(
-                                ActionSpec.avp(AVP_SAME_CELL)
-                        ))
-                ),
-                ""
+        CompoundContentSpec otherRows = CompoundContentSpec.of(
+                AtomicContentSpec.attr(),
+                CompoundContentSpec.Segment.of("=", AtomicContentSpec.val(
+                        ActionSpec.avp(AVP_SAME_CELL)
+                ))
         );
 
         return TablePattern.of(

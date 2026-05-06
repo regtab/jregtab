@@ -14,16 +14,16 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask13Test extends AtpTaskBase {
 
-    private static final ProviderSpec AVP_SAME_COL = ProviderSpec.one((a, c) -> c.is.in.sameCol(a));
+    private static final ProviderSpec AVP_SAME_COL = ProviderSpec.one((a, c) -> c.sameCol(a));
 
     private static final ProviderSpec SAME_ROW_COL2 =
-            ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a) && c.is.in.col(2));
+            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.is.in.col(2));
     private static final ProviderSpec SAME_ROW_COL4 =
-            ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a) && c.is.in.col(4));
+            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.is.in.col(4));
     private static final ProviderSpec SAME_ROW_COL1 =
-            ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a) && c.is.in.col(1));
+            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.is.in.col(1));
     private static final ProviderSpec SAME_ROW_COL3 =
-            ProviderSpec.of(1, (a, c) -> c.is.in.sameRow(a) && c.is.in.col(3));
+            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.is.in.col(3));
 
 
     @Override

@@ -15,7 +15,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask28Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_REST_OF_SUBTABLE =
-            ProviderSpec.of((a, c) -> c.is.in.sameSubtable(a));
+            ProviderSpec.of((a, c) -> c.sameSubtable(a));
 
     @Override
     protected String taskId() {

@@ -16,13 +16,13 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 class AtpTask23Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_VALUE_COL =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a));
+            ProviderSpec.val((a, c) -> c.sameRow(a));
 
     private static final ProviderSpec SUFFIX_SOFTWARE_RIGHT =
             ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.is.rightOf(a).sameRow());
 
     private static final ProviderSpec SAME_ROW_ATTR =
-            ProviderSpec.attr((a, c) -> c.is.in.sameRow(a));
+            ProviderSpec.attr((a, c) -> c.sameRow(a));
 
     private static final ProviderSpec SAME_ID_BELOW =
             ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a));
@@ -38,7 +38,7 @@ class AtpTask23Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.exactly(3),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ProviderSpec.ctxAttr("")),
+                                        ActionSpec.avp(""),
                                         ActionSpec.rec(REC_VALUE_COL),
                                         ActionSpec.concat(SAME_ID_BELOW)
                                 )),
