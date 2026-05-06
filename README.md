@@ -103,6 +103,22 @@ Recordset result = new TableInterpreter().interpret(itm);
 
 The `ru.icc.regtab.itm.atp.spec` package provides the formal ATP types. Build a `TablePattern` from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances with their content and action specifications, then use the Pattern Matcher to match it against an ITM instance and populate the semantic layer automatically.
 
+### Illustrative example
+
+`AtpIllustrativeExampleTest` implements the worked example from Section VI of the paper — a table class listing the numbers of airline departures from airports by month. The target schema is `⟨ND, AIRLINE, AIRPORT, MON⟩`.
+
+The test covers three cases:
+
+- `paperExample_3x3_table_t0` — matches the 3 × 3 table from Figure 7 and verifies all four extracted records
+- `extendedTable_4airlines_3airports` — matches a 4 × 5 table (4 airlines, 3 airports) and verifies 12 records
+- `malformedTable_bodyCell_missingDelimiter_fails` — verifies that a table with malformed body cells does not match
+
+To run it:
+
+```bash
+mvn test -Dtest="AtpIllustrativeExampleTest"
+```
+
 ---
 
 ## Evaluation
