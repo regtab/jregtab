@@ -15,7 +15,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask19Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_BELOW_SAME_COL =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.sameSubtable(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameSubtable(a));
 
     @Override
     protected String taskId() {

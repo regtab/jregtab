@@ -18,7 +18,7 @@ class AtpTask18Test extends AtpTaskBase {
 
     private static final ProviderSpec AVP_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.sameCell(a));
     private static final ProviderSpec REC_VALUES_BELOW =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameSubtable() && c.type() == ItemType.VALUE);
+            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.type() == ItemType.VALUE);
 
     @Override
     protected String taskId() {

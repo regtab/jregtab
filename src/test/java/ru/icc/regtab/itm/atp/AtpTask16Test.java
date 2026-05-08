@@ -15,10 +15,10 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask16Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_RIGHT =
-            ProviderSpec.of(1, (a, c) -> c.is.rightOf(a).sameRow());
+            ProviderSpec.of(1, (a, c) -> c.rightOf(a).sameRow());
 
     private static final ProviderSpec CONCAT_SAME_LABEL_BELOW =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

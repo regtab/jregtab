@@ -18,10 +18,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
 class AtpTask14Test extends AtpTaskBase {
 
     private static final ProviderSpec FIRST_SAME_SUBTABLE_COL0 =
-            ProviderSpec.of(1, (a, c) -> c.sameSubtable(a) && c.is.in.col(0));
+            ProviderSpec.of(1, (a, c) -> c.sameSubtable(a) && c.col(0));
 
     private static final ProviderSpec FIRST_SAME_SUBTABLE_COL1 =
-            ProviderSpec.of(1, (a, c) -> c.sameSubtable(a) && c.is.in.col(1));
+            ProviderSpec.of(1, (a, c) -> c.sameSubtable(a) && c.col(1));
 
     private static final ProviderSpec SAME_ROW =
             ProviderSpec.of(2, (a, c) -> c.sameRow(a));

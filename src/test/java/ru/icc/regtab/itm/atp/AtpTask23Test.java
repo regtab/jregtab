@@ -19,13 +19,13 @@ class AtpTask23Test extends AtpTaskBase {
             ProviderSpec.val((a, c) -> c.sameRow(a));
 
     private static final ProviderSpec SUFFIX_SOFTWARE_RIGHT =
-            ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.is.rightOf(a).sameRow());
+            ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.rightOf(a).sameRow());
 
     private static final ProviderSpec SAME_ROW_ATTR =
             ProviderSpec.attr((a, c) -> c.sameRow(a));
 
     private static final ProviderSpec SAME_ID_BELOW =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

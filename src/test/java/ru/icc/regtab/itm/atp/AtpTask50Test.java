@@ -20,7 +20,7 @@ class AtpTask50Test extends AtpTaskBase {
     private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.sameRow(a));
     private static final ProviderSpec SAME_ROW_ATTR = ProviderSpec.attr((a, c) -> c.sameRow(a));
     private static final ProviderSpec SAME_YEAR_BELOW = ProviderSpec.val((a, c) ->
-            c.is.below(a).sameCol() && c.has.sameStr(a));
+            c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

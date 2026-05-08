@@ -14,7 +14,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask12Test extends AtpTaskBase {
 
-    private static final ProviderSpec AMOUNT_COLUMN = ProviderSpec.of((a, c) -> c.is.in.col(5));
+    private static final ProviderSpec AMOUNT_COLUMN = ProviderSpec.of((a, c) -> c.col(5));
 
     @Override
     protected String taskId() {

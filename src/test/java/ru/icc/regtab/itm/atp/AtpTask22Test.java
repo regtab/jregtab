@@ -17,7 +17,7 @@ class AtpTask22Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_COLS_2_TO_5_COLUMN_MAJOR =
             ProviderSpec.of(ProviderSpec.UNBOUNDED, TraversalOrder.COLUMN_MAJOR,
-                    (a, c) -> c.sameSubtable(a) && c.is.in.cols.from(2).to(5));
+                    (a, c) -> c.sameSubtable(a) && c.cols.from(2).to(5));
 
     @Override
     protected String taskId() {

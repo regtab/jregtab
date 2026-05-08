@@ -15,7 +15,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask26Test extends AtpTaskBase {
 
     private static final ProviderSpec COL2_IN_SUBTABLE =
-            ProviderSpec.of((a, c) -> c.sameSubtable(a) && c.is.in.col(2));
+            ProviderSpec.of((a, c) -> c.sameSubtable(a) && c.col(2));
 
     private static final ProviderSpec ATTR_IN_SAME_ROW =
             ProviderSpec.attr((a, c) -> c.sameRow(a));

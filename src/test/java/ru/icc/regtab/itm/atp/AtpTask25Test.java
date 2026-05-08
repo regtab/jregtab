@@ -19,10 +19,10 @@ class AtpTask25Test extends AtpTaskBase {
     private static final String SEP = "/";
 
     private static final ProviderSpec RIGHT_SAME_ROW =
-            ProviderSpec.of(1, (a, c) -> c.is.rightOf(a).sameRow());
+            ProviderSpec.of(1, (a, c) -> c.rightOf(a).sameRow());
 
     private static final ProviderSpec SAME_GROUP_BELOW =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameStr(a));
 
     private static final ProviderSpec SAME_ROW_AFTER_ACCOUNT =
             ProviderSpec.of((a, c) -> c.sameRow(a) && c.cell().col() > a.cell().col() + 1);

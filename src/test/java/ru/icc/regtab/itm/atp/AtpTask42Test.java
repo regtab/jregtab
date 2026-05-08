@@ -16,7 +16,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask42Test extends AtpTaskBase {
 
     private static final ProviderSpec RIGHT_OF_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.rightOf(a).sameRow());
+            ProviderSpec.val((a, c) -> c.rightOf(a).sameRow());
 
     private static final ProviderSpec ATTR_SAME_CELL_AS_VALUE =
             ProviderSpec.attr((a, c) -> c.sameCell(a));

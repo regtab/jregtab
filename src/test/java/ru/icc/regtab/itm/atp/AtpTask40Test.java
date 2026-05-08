@@ -19,7 +19,7 @@ class AtpTask40Test extends AtpTaskBase {
             new CellMatchCondition(c -> c.text().contains("Reported crime in"));
 
     private static final ProviderSpec COL1_IN_SUBTABLE =
-            ProviderSpec.val((a, c) -> c.sameSubtable(a) && c.is.in.col(1));
+            ProviderSpec.val((a, c) -> c.sameSubtable(a) && c.col(1));
 
     private static final ProviderSpec ATTR_IN_SAME_ROW =
             ProviderSpec.attr((a, c) -> c.sameRow(a));
