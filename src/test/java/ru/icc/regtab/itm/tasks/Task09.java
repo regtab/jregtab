@@ -20,10 +20,10 @@ import java.util.function.Function;
 public final class Task09 extends TaskBase {
 
     private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a), 1);
+            ProviderSpec.val((a, c) -> c.sameRow(a), 1);
 
     private static final ProviderSpec FIRST_IN_SAME_COLUMN =
-            ProviderSpec.val((a, c) -> c.is.in.sameCol(a), 1);
+            ProviderSpec.val((a, c) -> c.sameCol(a), 1);
 
     /** Header cell text: remove all whitespace (e.g. {@code Subject 1} → {@code Subject1}). */
     private static final Function<Cell, String> HEADER_VALUE_TEXT = 

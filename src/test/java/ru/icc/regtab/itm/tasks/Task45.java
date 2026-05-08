@@ -15,7 +15,7 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task45 extends TaskBase {
 
     private static final ItemFilterCondition SAME_ROW_COL0 = (a, c) ->
-            c.is.in.sameRow(a) && c.is.in.col(0);
+            c.sameRow(a) && c.col(0);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

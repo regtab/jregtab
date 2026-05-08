@@ -20,14 +20,14 @@ public final class Task23 extends TaskBase {
 
     /** Υ<sub>tbl</sub><sup>val</sup>: same-row numeric value (only other VALUE in the row once id anchor is removed). */
     private static final ProviderSpec REC_VALUE_COL =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a));
+            ProviderSpec.val((a, c) -> c.sameRow(a));
 
     private static final ItemFilterCondition SAME_ID_BELOW =
-            (a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a);
+            (a, c) -> c.below(a).sameCol() && c.sameStr(a);
 
     /** Υ<sub>tbl</sub><sup>aux</sup>: software cell is right of product; row-major order yields col 2 before col 3. */
     private static final ProviderSpec SUFFIX_SOFTWARE_RIGHT =
-            ProviderSpec.aux((a, c) -> c.is.rightOf(a).sameRow(), TraversalOrder.ROW_MAJOR, 1);
+            ProviderSpec.aux((a, c) -> c.rightOf(a).sameRow(), TraversalOrder.ROW_MAJOR, 1);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {
@@ -40,7 +40,7 @@ public final class Task23 extends TaskBase {
                 .actions().suffix(SUFFIX_SOFTWARE_RIGHT)
                 .cells().one().aux()
                 .cells().one().val()
-                .actions().avp((a, c) -> c.is.in.sameRow(a))
+                .actions().avp((a, c) -> c.sameRow(a))
                 .apply(syntax);
     }
 }

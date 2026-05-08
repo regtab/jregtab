@@ -16,9 +16,9 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task05 extends TaskBase {
 
     private static final ProviderSpec UNPIVOT_ROW_KEY =
-            ProviderSpec.of((a, c) -> c.is.in.sameRow(a), 1);
+            ProviderSpec.of((a, c) -> c.sameRow(a), 1);
     private static final ProviderSpec UNPIVOT_COL_KEY =
-            ProviderSpec.of((a, c) -> c.is.in.sameCol(a), 1);
+            ProviderSpec.of((a, c) -> c.sameCol(a), 1);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

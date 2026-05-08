@@ -16,7 +16,7 @@ public final class Task31 extends TaskBase {
 
     private static final ProviderSpec BELOW_SAME_COL =
             ProviderSpec.val(
-                    (a, c) -> c.is.below(a).sameCol() && c.is.in.sameSubtable(a));
+                    (a, c) -> c.below(a).sameCol() && c.sameSubtable(a));
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

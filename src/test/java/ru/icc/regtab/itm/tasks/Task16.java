@@ -12,11 +12,11 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
  */
 public final class Task16 extends TaskBase {
 
-    private static final ItemFilterCondition REC_RIGHT = (a, c) -> c.is.rightOf(a).sameRow();
+    private static final ItemFilterCondition REC_RIGHT = (a, c) -> c.rightOf(a).sameRow();
 
     /** Later row, same column (label), same string as anchor — another anchor in the same label run. */
     private static final ItemFilterCondition CONCAT_SAME_LABEL_BELOW =
-            (a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a);
+            (a, c) -> c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

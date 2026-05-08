@@ -9,7 +9,7 @@ public final class IntRangeStart {
 
     private final IntSupplier valueSupplier;
 
-    IntRangeStart(IntSupplier valueSupplier) {
+    public IntRangeStart(IntSupplier valueSupplier) {
         this.valueSupplier = valueSupplier;
     }
 

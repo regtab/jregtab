@@ -17,10 +17,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task37 extends TaskBase {
 
     private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a), 1);
+            ProviderSpec.val((a, c) -> c.sameRow(a), 1);
 
     private static final ProviderSpec FIRST_IN_SAME_COL =
-            ProviderSpec.val((a, c) -> c.is.in.sameCol(a), 1);
+            ProviderSpec.val((a, c) -> c.sameCol(a), 1);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

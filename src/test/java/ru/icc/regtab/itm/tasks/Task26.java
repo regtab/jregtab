@@ -17,10 +17,10 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
 public final class Task26 extends TaskBase {
 
     private static final ItemFilterCondition COL2_IN_SUBTABLE = (a, c) ->
-            c.is.in.sameSubtable(a) && c.is.in.col(2);
+            c.sameSubtable(a) && c.col(2);
 
     private static final ItemFilterCondition ATTR_IN_SAME_ROW = (a, c) ->
-            c.is.in.sameRow(a) && c.type() == ItemType.ATTRIBUTE;
+            c.sameRow(a) && c.type() == ItemType.ATTRIBUTE;
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

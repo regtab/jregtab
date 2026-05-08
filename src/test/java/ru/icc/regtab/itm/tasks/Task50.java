@@ -17,10 +17,10 @@ public final class Task50 extends TaskBase {
                 .cells().one().val()
                 .actions()
                 .avp("")
-                .rec((a,c)->c.is.in.sameRow(a))
-                .concat((a,c)->c.is.below(a).sameCol() && c.has.sameStr(a))
+                .rec((a,c)->c.sameRow(a))
+                .concat((a,c)->c.below(a).sameCol() && c.sameStr(a))
                 .cells().one().attr()
-                .cells().one().val().actions().avp((a,c)->c.is.in.sameRow(a))
+                .cells().one().val().actions().avp((a,c)->c.sameRow(a))
                 .apply(syntax);
     }
 }

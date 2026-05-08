@@ -12,10 +12,10 @@ import ru.icc.regtab.itm.pattern.TablePattern;
  */
 public final class Task33 extends TaskBase {
 
-    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.is.in.sameRow(a);
+    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.sameRow(a);
 
     private static final ItemFilterCondition SAME_GROUP_NEXT_ROWS =
-            (a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a);
+            (a, c) -> c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

@@ -16,7 +16,7 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
 public final class Task06 extends TaskBase {
 
     private static final ProviderSpec REC_AFTER_ANCHOR = 
-        ProviderSpec.val((a, c) -> c.is.in.sameSubtable(a));
+        ProviderSpec.val((a, c) -> c.sameSubtable(a));
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

@@ -14,16 +14,16 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
  */
 public final class Task13 extends TaskBase {
 
-    private static final ItemFilterCondition AVP_SAME_COL = (a, c) -> c.is.in.sameCol(a);
+    private static final ItemFilterCondition AVP_SAME_COL = (a, c) -> c.sameCol(a);
 
     private static final ProviderSpec SAME_ROW_COL2 =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a) && c.is.in.col(2));
+            ProviderSpec.val((a, c) -> c.sameRow(a) && c.col(2));
     private static final ProviderSpec SAME_ROW_COL4 =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a) && c.is.in.col(4));
+            ProviderSpec.val((a, c) -> c.sameRow(a) && c.col(4));
     private static final ProviderSpec SAME_ROW_COL1 =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a) && c.is.in.col(1));
+            ProviderSpec.val((a, c) -> c.sameRow(a) && c.col(1));
     private static final ProviderSpec SAME_ROW_COL3 =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a) && c.is.in.col(3));
+            ProviderSpec.val((a, c) -> c.sameRow(a) && c.col(3));
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

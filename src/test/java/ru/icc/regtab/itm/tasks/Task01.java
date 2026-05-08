@@ -16,7 +16,7 @@ public final class Task01 extends TaskBase {
                 .subtables().oneOrMore()
                 .rows().one()
                 .cells().one().val()
-                .actions().rec((a, c) -> c.is.in.sameSubtable(a))
+                .actions().rec((a, c) -> c.sameSubtable(a))
                 .cells().exactly(2).val()
                 .cells().oneOrMore().skip()
                 .rows().one()

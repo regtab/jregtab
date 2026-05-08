@@ -21,14 +21,14 @@ public final class Task25 extends TaskBase {
 
     /** One value cell immediately to the right of the id anchor on the same row (account). */
     private static final ProviderSpec RIGHT_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.rightOf(a).sameRow(), 1);
+            ProviderSpec.val((a, c) -> c.rightOf(a).sameRow(), 1);
 
     /** Same-row value cells to the right of the account column (keyword + metrics). */
     private static final ItemFilterCondition SAME_ROW_AFTER_ACCOUNT =
-            (a, c) -> c.is.in.sameRow(a) && c.cell().col() > a.cell().col() + 1;
+            (a, c) -> c.sameRow(a) && c.cell().col() > a.cell().col() + 1;
 
     private static final ItemFilterCondition SAME_GROUP_BELOW =
-            (a, c) -> c.is.below(a).sameCol() && c.has.sameStr(a);
+            (a, c) -> c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

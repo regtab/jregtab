@@ -19,7 +19,7 @@ import ru.icc.regtab.itm.pattern.TablePattern;
 public final class Task22 extends TaskBase {
 
     private static final ItemFilterCondition SAME_SUBTABLE_COLS_2_TO_5 =
-            (a, c) -> c.is.in.sameSubtable(a) && c.is.in.cols.from(2).to(5);
+            (a, c) -> c.sameSubtable(a) && c.cols.from(2).to(5);
 
     private static final ProviderSpec REC_COLS_2_TO_5_COLUMN_MAJOR =
             ProviderSpec.val(SAME_SUBTABLE_COLS_2_TO_5, TraversalOrder.COLUMN_MAJOR, CellDerivedItemProvider.UNBOUNDED);

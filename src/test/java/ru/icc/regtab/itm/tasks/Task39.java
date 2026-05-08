@@ -16,7 +16,7 @@ public final class Task39 extends TaskBase {
                 .subtables().one()
                 .rows().oneOrMore()
                 .cells().one().compound()
-                .val().actions().rec((a, c) -> c.is.in.sameCell(a))
+                .val().actions().rec((a, c) -> c.sameCell(a))
                 .sep(" / ")
                 .val()
                 .sep("br")

@@ -17,7 +17,7 @@ public final class DirectionalModifier {
     /** Range check: cols.from(lo).to(hi) yields baseCheck && lo <= col <= hi. */
     public final DirectionalRangeStart cols;
 
-    DirectionalModifier(CellDerivedItem candidate, CellDerivedItem anchor, boolean baseCheck) {
+    public DirectionalModifier(CellDerivedItem candidate, CellDerivedItem anchor, boolean baseCheck) {
         this.candidate = candidate;
         this.anchor = anchor;
         this.baseCheck = baseCheck;

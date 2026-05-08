@@ -14,7 +14,7 @@ import ru.icc.regtab.itm.pattern.TablePattern;
 public final class Task20 extends TaskBase {
 
     private static final ItemFilterCondition REC_REST_OF_SUBTABLE =
-            (a, c) -> c.is.in.sameSubtable(a);
+            (a, c) -> c.sameSubtable(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

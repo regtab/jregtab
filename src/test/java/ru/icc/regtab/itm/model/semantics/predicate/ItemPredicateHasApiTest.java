@@ -11,7 +11,7 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Tests for the fluent predicate API (Has) on CellDerivedItem: formatting and content checks.
+ * Tests for predicate methods on CellDerivedItem: formatting and content checks.
  */
 class ItemPredicateHasApiTest {
 
@@ -27,12 +27,12 @@ class ItemPredicateHasApiTest {
         CellDerivedItem italicOnly = new CellDerivedItem("I", 0, syntax.getCell(0, 1), ItemType.VALUE);
         CellDerivedItem boldItalic = new CellDerivedItem("BI", 0, syntax.getCell(1, 0), ItemType.VALUE);
 
-        assertTrue(boldOnly.has.bold());
-        assertFalse(boldOnly.has.italic());
-        assertTrue(italicOnly.has.italic());
-        assertFalse(italicOnly.has.bold());
-        assertTrue(boldItalic.has.bold());
-        assertTrue(boldItalic.has.italic());
+        assertTrue(boldOnly.bold());
+        assertFalse(boldOnly.italic());
+        assertTrue(italicOnly.italic());
+        assertFalse(italicOnly.bold());
+        assertTrue(boldItalic.bold());
+        assertTrue(boldItalic.italic());
     }
 
     @Test
@@ -46,10 +46,10 @@ class ItemPredicateHasApiTest {
         CellDerivedItem sans = new CellDerivedItem("SS", 0, syntax.getCell(0, 1), ItemType.VALUE);
         CellDerivedItem mono = new CellDerivedItem("M", 0, syntax.getCell(0, 2), ItemType.VALUE);
 
-        assertTrue(serif.has.fontFamily(FontFamily.SERIF));
-        assertTrue(sans.has.fontFamily(FontFamily.SANS_SERIF));
-        assertTrue(mono.has.fontFamily(FontFamily.MONOSPACED));
-        assertFalse(serif.has.fontFamily(FontFamily.SANS_SERIF));
+        assertTrue(serif.fontFamily(FontFamily.SERIF));
+        assertTrue(sans.fontFamily(FontFamily.SANS_SERIF));
+        assertTrue(mono.fontFamily(FontFamily.MONOSPACED));
+        assertFalse(serif.fontFamily(FontFamily.SANS_SERIF));
     }
 
     @Test
@@ -61,10 +61,10 @@ class ItemPredicateHasApiTest {
         CellDerivedItem yellow = new CellDerivedItem("Y", 0, syntax.getCell(0, 0), ItemType.VALUE);
         CellDerivedItem white = new CellDerivedItem("W", 0, syntax.getCell(0, 1), ItemType.VALUE);
 
-        assertTrue(yellow.has.bgColor(255, 255, 0));
-        assertTrue(yellow.has.bgColor(new CellColor(255, 255, 0)));
-        assertTrue(white.has.bgColor(CellColor.WHITE));
-        assertFalse(yellow.has.bgColor(CellColor.WHITE));
+        assertTrue(yellow.bgColor(255, 255, 0));
+        assertTrue(yellow.bgColor(new CellColor(255, 255, 0)));
+        assertTrue(white.bgColor(CellColor.WHITE));
+        assertFalse(yellow.bgColor(CellColor.WHITE));
     }
 
     @Test
@@ -76,9 +76,9 @@ class ItemPredicateHasApiTest {
         CellDerivedItem center = new CellDerivedItem("C", 0, syntax.getCell(0, 0), ItemType.VALUE);
         CellDerivedItem right = new CellDerivedItem("R", 0, syntax.getCell(0, 1), ItemType.VALUE);
 
-        assertTrue(center.has.horzAlign(HorizontalAlignment.CENTER));
-        assertTrue(right.has.horzAlign(HorizontalAlignment.RIGHT));
-        assertFalse(center.has.horzAlign(HorizontalAlignment.RIGHT));
+        assertTrue(center.horzAlign(HorizontalAlignment.CENTER));
+        assertTrue(right.horzAlign(HorizontalAlignment.RIGHT));
+        assertFalse(center.horzAlign(HorizontalAlignment.RIGHT));
     }
 
     @Test
@@ -92,11 +92,11 @@ class ItemPredicateHasApiTest {
         CellDerivedItem empty = new CellDerivedItem("", 0, syntax.getCell(0, 1), ItemType.VALUE);
         CellDerivedItem blanks = new CellDerivedItem("  ", 0, syntax.getCell(1, 0), ItemType.VALUE);
 
-        assertTrue(hello.has.str("Hello"));
-        assertFalse(hello.has.str("World"));
-        assertTrue(empty.has.blankStr());
-        assertTrue(blanks.has.blankStr());
-        assertFalse(hello.has.blankStr());
+        assertTrue(hello.str("Hello"));
+        assertFalse(hello.str("World"));
+        assertTrue(empty.blankStr());
+        assertTrue(blanks.blankStr());
+        assertFalse(hello.blankStr());
     }
 
     @Test
@@ -106,8 +106,8 @@ class ItemPredicateHasApiTest {
 
         CellDerivedItem item = new CellDerivedItem("Header", 0, syntax.getCell(0, 0), ItemType.VALUE);
 
-        assertTrue(item.has.cellText("Header"));
-        assertFalse(item.has.cellText("Other"));
+        assertTrue(item.cellText("Header"));
+        assertFalse(item.cellText("Other"));
     }
 
     @Test
@@ -119,8 +119,8 @@ class ItemPredicateHasApiTest {
         CellDerivedItem nonBlank = new CellDerivedItem("X", 0, syntax.getCell(0, 0), ItemType.VALUE);
         CellDerivedItem blank = new CellDerivedItem("", 0, syntax.getCell(0, 1), ItemType.VALUE);
 
-        assertFalse(nonBlank.has.textBlank());
-        assertTrue(blank.has.textBlank());
+        assertFalse(nonBlank.textBlank());
+        assertTrue(blank.textBlank());
     }
 
     @Test
@@ -134,9 +134,9 @@ class ItemPredicateHasApiTest {
         CellDerivedItem a2 = new CellDerivedItem("Anna", 0, syntax.getCell(1, 0), ItemType.VALUE);
         CellDerivedItem b = new CellDerivedItem("Bob", 0, syntax.getCell(0, 1), ItemType.VALUE);
 
-        assertTrue(a1.has.sameStr(a2));
-        assertTrue(a2.has.sameStr(a1));
-        assertFalse(a1.has.sameStr(b));
+        assertTrue(a1.sameStr(a2));
+        assertTrue(a2.sameStr(a1));
+        assertFalse(a1.sameStr(b));
     }
 
     @Test
@@ -151,8 +151,8 @@ class ItemPredicateHasApiTest {
         CellDerivedItem y2 = new CellDerivedItem("Y2", 0, syntax.getCell(1, 0), ItemType.VALUE);
         CellDerivedItem w = new CellDerivedItem("W", 0, syntax.getCell(0, 1), ItemType.VALUE);
 
-        assertTrue(y1.has.sameBgColor(y2));
-        assertFalse(y1.has.sameBgColor(w));
+        assertTrue(y1.sameBgColor(y2));
+        assertFalse(y1.sameBgColor(w));
     }
 
     @Test
@@ -166,9 +166,9 @@ class ItemPredicateHasApiTest {
         CellDerivedItem letters = new CellDerivedItem("abc", 0, syntax.getCell(0, 1), ItemType.VALUE);
         CellDerivedItem decimal = new CellDerivedItem("12.34", 0, syntax.getCell(0, 2), ItemType.VALUE);
 
-        assertTrue(digits.has.strMatching("\\d+"));
-        assertFalse(letters.has.strMatching("\\d+"));
-        assertTrue(decimal.has.strMatching("\\d+\\.\\d+"));
+        assertTrue(digits.strMatching("\\d+"));
+        assertFalse(letters.strMatching("\\d+"));
+        assertTrue(decimal.strMatching("\\d+\\.\\d+"));
     }
 
     @Test
@@ -185,8 +185,7 @@ class ItemPredicateHasApiTest {
         CellDerivedItem anna2 = new CellDerivedItem("Anna", 0, syntax.getCell(1, 0), ItemType.VALUE);
         CellDerivedItem bob = new CellDerivedItem("Bob", 0, syntax.getCell(2, 0), ItemType.VALUE);
 
-        // Same as SchemaFlexibleTest: cand below anchor, same col, same str
-        assertTrue(anna2.has.sameStr(anna1) && anna2.is.below(anna1).sameCol());
-        assertFalse(bob.has.sameStr(anna1));
+        assertTrue(anna2.sameStr(anna1) && anna2.below(anna1).sameCol());
+        assertFalse(bob.sameStr(anna1));
     }
 }

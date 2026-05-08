@@ -1,9 +1,7 @@
 package ru.icc.regtab.itm.model.semantics.item;
 
 import ru.icc.regtab.itm.model.semantics.predicate.DirectionalModifier;
-import ru.icc.regtab.itm.model.semantics.predicate.Has;
 import ru.icc.regtab.itm.model.semantics.predicate.IntRangeStart;
-import ru.icc.regtab.itm.model.semantics.predicate.Is;
 import ru.icc.regtab.itm.model.syntax.Cell;
 import ru.icc.regtab.itm.model.syntax.CellColor;
 import ru.icc.regtab.itm.model.syntax.FontFamily;
@@ -12,6 +10,7 @@ import ru.icc.regtab.itm.model.syntax.VerticalAlignment;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * A cell-derived item: a triple (s, u_vec, i) where s is a string obtained from
@@ -25,15 +24,11 @@ public final class CellDerivedItem implements Item {
     private final int index;
     private final Cell cell;
     private final ItemType type;
-    /** Entry point for fluent predicate checks on this item as candidate (position). */
-    public final Is is;
-    /** Entry point for fluent predicate checks on this item as candidate (formatting, content). */
-    public final Has has;
-    /** Range check shortcut: rows.from(lo).to(hi). */
+    /** Range check: rows.from(lo).to(hi) yields lo &lt;= row &lt;= hi. */
     public final IntRangeStart rows;
-    /** Range check shortcut: cols.from(lo).to(hi). */
+    /** Range check: cols.from(lo).to(hi) yields lo &lt;= col &lt;= hi. */
     public final IntRangeStart cols;
-    /** Range check shortcut: pos.from(lo).to(hi). */
+    /** Range check: pos.from(lo).to(hi) yields lo &lt;= index &lt;= hi. */
     public final IntRangeStart pos;
 
     public CellDerivedItem(String str, List<String> tags, int index, Cell cell, ItemType type) {
@@ -43,68 +38,91 @@ public final class CellDerivedItem implements Item {
         this.index = index;
         this.cell = Objects.requireNonNull(cell, "cell");
         this.type = Objects.requireNonNull(type, "type");
-        this.is = new Is(this);
-        this.has = new Has(this);
-        this.rows = is.in.rows;
-        this.cols = is.in.cols;
-        this.pos = is.in.pos;
+        this.rows = new IntRangeStart(cell::row);
+        this.cols = new IntRangeStart(cell::col);
+        this.pos = new IntRangeStart(() -> index);
     }
 
     public CellDerivedItem(String str, int index, Cell cell, ItemType type) {
         this(str, List.of(), index, cell, type);
     }
 
-    // --- Position shortcuts (is.in.*) ---
+    // --- Position checks ---
 
-    public boolean sameCol(CellDerivedItem anchor)      { return is.in.sameCol(anchor); }
-    public boolean sameRow(CellDerivedItem anchor)      { return is.in.sameRow(anchor); }
-    public boolean sameCell(CellDerivedItem anchor)     { return is.in.sameCell(anchor); }
-    public boolean sameSubtable(CellDerivedItem anchor) { return is.in.sameSubtable(anchor); }
-    public boolean sameSubrow(CellDerivedItem anchor)   { return is.in.sameSubrow(anchor); }
-    public boolean row(int i)                           { return is.in.row(i); }
-    public boolean col(int j)                           { return is.in.col(j); }
-    public boolean posIndex(int k)                      { return is.in.pos(k); }
+    public boolean sameCol(CellDerivedItem anchor)      { return cell.col() == anchor.cell().col(); }
+    public boolean sameRow(CellDerivedItem anchor)      { return cell.row() == anchor.cell().row(); }
+    public boolean sameCell(CellDerivedItem anchor)     { return cell == anchor.cell(); }
+    public boolean sameSubtable(CellDerivedItem anchor) { return cell.subtable() != null && cell.subtable() == anchor.cell().subtable(); }
+    public boolean sameSubrow(CellDerivedItem anchor)   { return cell.subrow() != null && cell.subrow() == anchor.cell().subrow(); }
+    public boolean row(int i)                           { return cell.row() == i; }
+    public boolean col(int j)                           { return cell.col() == j; }
+    public boolean posIndex(int k)                      { return index == k; }
 
-    // --- Directional shortcuts (is.*) ---
+    // --- Directional checks ---
 
-    public DirectionalModifier above(CellDerivedItem anchor)   { return is.above(anchor); }
-    public DirectionalModifier below(CellDerivedItem anchor)   { return is.below(anchor); }
-    public DirectionalModifier leftOf(CellDerivedItem anchor)  { return is.leftOf(anchor); }
-    public DirectionalModifier rightOf(CellDerivedItem anchor) { return is.rightOf(anchor); }
+    public DirectionalModifier above(CellDerivedItem anchor)   { return new DirectionalModifier(this, anchor, cell.row() < anchor.cell().row()); }
+    public DirectionalModifier below(CellDerivedItem anchor)   { return new DirectionalModifier(this, anchor, cell.row() > anchor.cell().row()); }
+    public DirectionalModifier leftOf(CellDerivedItem anchor)  { return new DirectionalModifier(this, anchor, cell.col() < anchor.cell().col()); }
+    public DirectionalModifier rightOf(CellDerivedItem anchor) { return new DirectionalModifier(this, anchor, cell.col() > anchor.cell().col()); }
 
-    // --- Formatting shortcuts (has.*) ---
+    // --- Formatting checks ---
 
-    public boolean bold()                                { return has.bold(); }
-    public boolean italic()                              { return has.italic(); }
-    public boolean underline()                           { return has.underline(); }
-    public boolean strikeout()                           { return has.strikeout(); }
-    public boolean fontFamily(FontFamily ff)             { return has.fontFamily(ff); }
-    public boolean horzAlign(HorizontalAlignment ha)     { return has.horzAlign(ha); }
-    public boolean vertAlign(VerticalAlignment va)       { return has.vertAlign(va); }
-    public boolean leftBorder()                          { return has.leftBorder(); }
-    public boolean topBorder()                           { return has.topBorder(); }
-    public boolean rightBorder()                         { return has.rightBorder(); }
-    public boolean bottomBorder()                        { return has.bottomBorder(); }
-    public boolean bgColor(int r, int g, int b)          { return has.bgColor(r, g, b); }
-    public boolean bgColor(CellColor color)              { return has.bgColor(color); }
-    public boolean fgColor(int r, int g, int b)          { return has.fgColor(r, g, b); }
-    public boolean fgColor(CellColor color)              { return has.fgColor(color); }
-    public boolean rotation(double degrees)              { return has.rotation(degrees); }
-    public boolean sameBgColor(CellDerivedItem anchor)   { return has.sameBgColor(anchor); }
-    public boolean sameFgColor(CellDerivedItem anchor)   { return has.sameFgColor(anchor); }
-    public boolean sameFont(CellDerivedItem anchor)      { return has.sameFont(anchor); }
-    public boolean sameFormat(CellDerivedItem anchor)    { return has.sameFormat(anchor); }
+    public boolean bold()                                { return cell.fontBold(); }
+    public boolean italic()                              { return cell.fontItalic(); }
+    public boolean underline()                           { return cell.fontUnderline(); }
+    public boolean strikeout()                           { return cell.fontStrikeout(); }
+    public boolean fontFamily(FontFamily ff)             { return cell.fontFamily() == ff; }
+    public boolean horzAlign(HorizontalAlignment ha)     { return cell.horzAlign() == ha; }
+    public boolean vertAlign(VerticalAlignment va)       { return cell.vertAlign() == va; }
+    public boolean leftBorder()                          { return cell.leftBorder(); }
+    public boolean topBorder()                           { return cell.topBorder(); }
+    public boolean rightBorder()                         { return cell.rightBorder(); }
+    public boolean bottomBorder()                        { return cell.bottomBorder(); }
+    public boolean bgColor(int r, int g, int b)          { return cell.bgColor().equals(new CellColor(r, g, b)); }
+    public boolean bgColor(CellColor color)              { return cell.bgColor().equals(color); }
+    public boolean fgColor(int r, int g, int b)          { return cell.fgColor().equals(new CellColor(r, g, b)); }
+    public boolean fgColor(CellColor color)              { return cell.fgColor().equals(color); }
+    public boolean rotation(double degrees)              { return Double.compare(cell.rotation(), degrees) == 0; }
+    public boolean sameBgColor(CellDerivedItem anchor)   { return cell.bgColor().equals(anchor.cell().bgColor()); }
+    public boolean sameFgColor(CellDerivedItem anchor)   { return cell.fgColor().equals(anchor.cell().fgColor()); }
 
-    // --- Content shortcuts (has.*) ---
+    public boolean sameFont(CellDerivedItem anchor) {
+        Cell a = anchor.cell();
+        return cell.fontFamily() == a.fontFamily()
+                && cell.fontBold() == a.fontBold()
+                && cell.fontItalic() == a.fontItalic()
+                && cell.fontUnderline() == a.fontUnderline()
+                && cell.fontStrikeout() == a.fontStrikeout();
+    }
 
-    public boolean textBlank()                           { return has.textBlank(); }
-    public boolean multilineCell()                       { return has.multilineCell(); }
-    public boolean cellText(String text)                 { return has.cellText(text); }
-    public boolean str(String s)                         { return has.str(s); }
-    public boolean blankStr()                            { return has.blankStr(); }
-    public boolean strMatching(String regex)             { return has.strMatching(regex); }
-    public boolean hasTag(String tag)                    { return has.hasTag(tag); }
-    public boolean sameStr(CellDerivedItem anchor)       { return has.sameStr(anchor); }
+    public boolean sameFormat(CellDerivedItem anchor) {
+        Cell a = anchor.cell();
+        return cell.fontFamily() == a.fontFamily()
+                && cell.fontBold() == a.fontBold()
+                && cell.fontItalic() == a.fontItalic()
+                && cell.fontUnderline() == a.fontUnderline()
+                && cell.fontStrikeout() == a.fontStrikeout()
+                && cell.horzAlign() == a.horzAlign()
+                && cell.vertAlign() == a.vertAlign()
+                && cell.leftBorder() == a.leftBorder()
+                && cell.topBorder() == a.topBorder()
+                && cell.rightBorder() == a.rightBorder()
+                && cell.bottomBorder() == a.bottomBorder()
+                && cell.bgColor().equals(a.bgColor())
+                && cell.fgColor().equals(a.fgColor())
+                && Double.compare(cell.rotation(), a.rotation()) == 0;
+    }
+
+    // --- Content checks ---
+
+    public boolean textBlank()                           { return cell.textBlank(); }
+    public boolean multilineCell()                       { return cell.textMultiline(); }
+    public boolean cellText(String text)                 { return cell.text().equals(text); }
+    public boolean str(String s)                         { return str.equals(s); }
+    public boolean blankStr()                            { return str.isBlank(); }
+    public boolean strMatching(String regex)             { return Pattern.matches(regex, str); }
+    public boolean hasTag(String tag)                    { return tags.contains(tag); }
+    public boolean sameStr(CellDerivedItem anchor)       { return str.equals(anchor.str()); }
 
     @Override
     public String str() { return str; }

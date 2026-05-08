@@ -27,9 +27,9 @@ public final class Task40 extends TaskBase {
             c.text().replace("Reported crime in", "").trim();
 
     private static final ItemFilterCondition COL1_IN_SUBTABLE = (a, c) ->
-            c.is.in.sameSubtable(a) && c.is.in.col(1);
+            c.sameSubtable(a) && c.col(1);
 
-    private static final ItemFilterCondition ATTR_IN_SAME_ROW = (a, c) -> c.is.in.sameRow(a);
+    private static final ItemFilterCondition ATTR_IN_SAME_ROW = (a, c) -> c.sameRow(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

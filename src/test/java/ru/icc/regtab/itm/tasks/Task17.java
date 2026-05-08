@@ -15,8 +15,8 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
 public final class Task17 extends TaskBase {
 
     private static final ProviderSpec BELOW_SAME_SUBTABLE =
-            ProviderSpec.of((a, c) -> c.is.below(a).sameSubtable() 
-            && c.is.below(a).sameCol());
+            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() 
+            && c.below(a).sameCol());
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

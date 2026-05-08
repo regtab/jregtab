@@ -59,7 +59,7 @@ class TablePatternApiTest {
                 .subtables().oneOrMore()
                 .rows().one()
                 .cells().one().val()
-                .actions().rec((a, c) -> c.is.in.sameSubtable(a))
+                .actions().rec((a, c) -> c.sameSubtable(a))
                 .cells().exactly(2).val()
                 .cells().oneOrMore().skip()
                 .rows().one()
@@ -137,7 +137,7 @@ class TablePatternApiTest {
                 .subtables().oneOrMore()
                 .rows().one()
                 .cells().one().val()
-                .actions().rec((a, c) -> c.is.in.sameSubtable(a))
+                .actions().rec((a, c) -> c.sameSubtable(a))
                 .cells().exactly(2).val()
                 .cells().oneOrMore().skip()
                 .rows().one()
@@ -166,7 +166,7 @@ class TablePatternApiTest {
                 .rows().one()
                 .cells().one().val()
                 .actions().rec(
-                        ProviderSpec.of((a, c) -> c.is.in.sameSubtable(a)),
+                        ProviderSpec.of((a, c) -> c.sameSubtable(a)),
                         ProviderSpec.of((a, c) -> false))
                 .cells().exactly(2).val()
                 .cells().oneOrMore().skip()
@@ -201,13 +201,13 @@ class TablePatternApiTest {
                 .cells().one()
                 .when(cell -> cell.text() == null || cell.text().isBlank()).skip()
                 .otherwise().val()
-                .actions().rec((a, c) -> c.is.in.sameSubtable(a) && c.is.in.col(1))
+                .actions().rec((a, c) -> c.sameSubtable(a) && c.col(1))
                 .cells().one()
                 .when(cell -> cell.text() == null || cell.text().isBlank()).skip()
                 .otherwise().attr()
                 .sep(":")
                 .val()
-                .actions().avp((a, c) -> c.is.in.sameCell(a))
+                .actions().avp((a, c) -> c.sameCell(a))
                 .apply(syntax);
 
         Recordset result = new TableInterpreter()

@@ -16,7 +16,7 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task15 extends TaskBase {
 
     private static final ProviderSpec FIRST_IN_SAME_CELL =
-            ProviderSpec.of((a, c) -> c.is.in.sameCell(a), 1);
+            ProviderSpec.of((a, c) -> c.sameCell(a), 1);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

@@ -15,14 +15,14 @@ import ru.icc.regtab.itm.pattern.TablePattern;
  */
 public final class Task38 extends TaskBase {
 
-    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.is.in.sameRow(a);
+    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.sameRow(a);
 
     /**
      * {@code O_fill}: one candidate strictly above the anchor in the same column; {@link TraversalOrder#REVERSE_ROW_MAJOR}
      * picks the nearest row above first (same triple as {@code rec} providers).
      */
     private static final ProviderSpec FILL_FROM_ABOVE =
-            ProviderSpec.of((a, c) -> c.is.above(a).sameCol(), TraversalOrder.REVERSE_ROW_MAJOR, 1);
+            ProviderSpec.of((a, c) -> c.above(a).sameCol(), TraversalOrder.REVERSE_ROW_MAJOR, 1);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

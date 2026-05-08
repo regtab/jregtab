@@ -17,11 +17,11 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task29 extends TaskBase {
 
     private static final ProviderSpec FIRST_SIX_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a), 6);
+            ProviderSpec.val((a, c) -> c.sameRow(a), 6);
 
     // All value cells in the same subrow as the rec anchor (anchor excluded by Υ semantics); here that is three per group.
     private static final ProviderSpec SAME_SUBROW =
-            ProviderSpec.val((a, c) -> c.is.in.sameSubrow(a));
+            ProviderSpec.val((a, c) -> c.sameSubrow(a));
 
     @Override
     protected Recordset transformActual(Recordset actual) {

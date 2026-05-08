@@ -15,10 +15,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task11 extends TaskBase {
 
     private static final ItemFilterCondition FIRST_IN_ROW = (a, c) ->
-            c.is.in.sameRow(a);
+            c.sameRow(a);
 
     private static final ItemFilterCondition FIRST_IN_COL = (a, c) ->
-            c.is.in.sameCol(a);
+            c.sameCol(a);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

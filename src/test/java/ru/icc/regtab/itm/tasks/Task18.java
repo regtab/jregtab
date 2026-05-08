@@ -15,10 +15,10 @@ import ru.icc.regtab.itm.pattern.TablePattern;
  */
 public final class Task18 extends TaskBase {
 
-    private static final ItemFilterCondition AVP_SAME_CELL = (a, c) -> c.is.in.sameCell(a);
+    private static final ItemFilterCondition AVP_SAME_CELL = (a, c) -> c.sameCell(a);
 
     private static final ItemFilterCondition REC_VALUES_BELOW = (a, c) ->
-            c.is.below(a).sameSubtable() && c.type() == ItemType.VALUE;
+            c.below(a).sameSubtable() && c.type() == ItemType.VALUE;
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

@@ -17,14 +17,14 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task14 extends TaskBase {
 
     private static final ProviderSpec FIRST_SAME_SUBTABLE_COL0 =
-            ProviderSpec.val((a, c) -> c.is.in.sameSubtable(a) && c.is.in.col(0), 1);
+            ProviderSpec.val((a, c) -> c.sameSubtable(a) && c.col(0), 1);
 
     private static final ProviderSpec FIRST_SAME_SUBTABLE_COL1 =
-            ProviderSpec.val((a, c) -> c.is.in.sameSubtable(a) && c.is.in.col(1), 1);
+            ProviderSpec.val((a, c) -> c.sameSubtable(a) && c.col(1), 1);
 
     /** Product id and name: the two value cells on the same row as the anchor (price), in row-major order. */
     private static final ProviderSpec SAME_ROW =
-            ProviderSpec.val((a, c) -> c.is.in.sameRow(a), 2);
+            ProviderSpec.val((a, c) -> c.sameRow(a), 2);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

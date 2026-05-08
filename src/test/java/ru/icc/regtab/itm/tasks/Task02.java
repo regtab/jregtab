@@ -18,10 +18,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task02 extends TaskBase {
 
     private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.of(
-            (a, c) -> c.is.in.sameSubtable(a) && (c.has.hasTag("#L1") || c.has.hasTag("#L2")));
+            (a, c) -> c.sameSubtable(a) && (c.hasTag("#L1") || c.hasTag("#L2")));
 
     private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(
-            (a, c) -> c.is.in.sameRow(a), 1);
+            (a, c) -> c.sameRow(a), 1);
 
     @Override
     protected Recordset transformActual(Recordset actual) {

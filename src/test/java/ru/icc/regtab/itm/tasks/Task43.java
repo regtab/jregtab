@@ -14,9 +14,9 @@ import ru.icc.regtab.itm.pattern.TablePattern;
  */
 public final class Task43 extends TaskBase {
 
-    private static final ItemFilterCondition RIGHT_OF_SAME_ROW = (a, c) -> c.is.rightOf(a).sameRow();
+    private static final ItemFilterCondition RIGHT_OF_SAME_ROW = (a, c) -> c.rightOf(a).sameRow();
 
-    private static final ItemFilterCondition ATTR_SAME_CELL_AS_VALUE = (a, c) -> c.is.in.sameCell(a);
+    private static final ItemFilterCondition ATTR_SAME_CELL_AS_VALUE = (a, c) -> c.sameCell(a);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

@@ -18,11 +18,11 @@ public final class Task36 extends TaskBase {
 
     /** All grade cells (column 2) in the same subtable as the name anchor. */
     private static final ProviderSpec REC_GRADES_COL2 =
-            ProviderSpec.val((a, c) -> c.is.in.col(2) && c.is.in.sameSubtable(a));
+            ProviderSpec.val((a, c) -> c.col(2) && c.sameSubtable(a));
 
     /** Subject {@code attr} cell immediately to the left of the grade (see {@code O_avp} predicate κ). */
     private static final ItemFilterCondition SUBJECT_LEFT_OF_GRADE =
-            (a, c) -> c.is.leftOf(a).sameRow();
+            (a, c) -> c.leftOf(a).sameRow();
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

@@ -17,14 +17,14 @@ public final class Task44 extends TaskBase {
                 .subtables().oneOrMore()
                 .rows().oneOrMore()
                 .cells().one().check(c -> !c.textBlank()).val()
-                .actions().rec(ProviderSpec.of((a, c) -> c.is.in.sameRow(a), 1))
+                .actions().rec(ProviderSpec.of((a, c) -> c.sameRow(a), 1))
                 .cells().one().check(c -> !c.textBlank()).val()
                 .cells().one().check(Cell::textBlank).skip()
                 .rows().zeroOrOne()
                 .cells().exactly(2).check(Cell::textBlank).skip()
                 .cells().one().check(c -> !c.textBlank()).compound()
                 .val().sep(",").val()
-                .actions().rec((a, c) -> c.is.in.sameCell(a))
+                .actions().rec((a, c) -> c.sameCell(a))
                 .apply(syntax);
     }
 }

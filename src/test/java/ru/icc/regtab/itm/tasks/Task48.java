@@ -12,7 +12,7 @@ import ru.icc.regtab.itm.pattern.TablePattern;
 public final class Task48 extends TaskBase {
 
     private static final ItemFilterCondition SAME_SUBTABLE_COL1 =
-            (a, c) -> c.is.in.sameSubtable(a) && c.is.in.col(1);
+            (a, c) -> c.sameSubtable(a) && c.col(1);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {
@@ -33,7 +33,7 @@ public final class Task48 extends TaskBase {
                 .attr()
                 .sep(":")
                 .val()
-                .actions().avp((a, c) -> c.is.in.sameCell(a))
+                .actions().avp((a, c) -> c.sameCell(a))
                 .apply(syntax);
     }
 }

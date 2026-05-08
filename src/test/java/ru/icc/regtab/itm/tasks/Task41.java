@@ -16,8 +16,8 @@ import ru.icc.regtab.itm.recordset.Recordset;
  */
 public final class Task41 extends TaskBase {
 
-    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.is.in.sameCell(a);
-    private static final ItemFilterCondition RIGHT_SAME_ROW = (a, c) -> c.is.rightOf(a).sameRow();
+    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.sameCell(a);
+    private static final ItemFilterCondition RIGHT_SAME_ROW = (a, c) -> c.rightOf(a).sameRow();
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

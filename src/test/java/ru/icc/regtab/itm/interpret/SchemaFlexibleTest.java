@@ -82,7 +82,7 @@ class SchemaFlexibleTest {
 
         // O_concat: for each name-item, merge records with same value below
         ItemFilterCondition sameNameBelow = (anchor, cand) ->
-                cand.is.below(anchor).sameCol() && cand.has.sameStr(anchor);
+                cand.below(anchor).sameCol() && cand.sameStr(anchor);
         for (int i = 0; i < 5; i++) {
             actions.add(new InterpretationAction(names[i],
                     List.of(new CellDerivedItemProvider(
@@ -170,7 +170,7 @@ class SchemaFlexibleTest {
                     new RecOperation()));
         }
         ItemFilterCondition sameNameBelow = (anchor, cand) ->
-                cand.is.below(anchor).sameCol() && cand.has.sameStr(anchor);
+                cand.below(anchor).sameCol() && cand.sameStr(anchor);
         for (int i = 0; i < 5; i++) {
             actions.add(new InterpretationAction(names[i],
                     List.of(new CellDerivedItemProvider(

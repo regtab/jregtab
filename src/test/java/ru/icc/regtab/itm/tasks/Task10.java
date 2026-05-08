@@ -28,7 +28,7 @@ public final class Task10 extends TaskBase {
                 .cells().exactly(2).skip()
                 .rows().one()
                 .cells().one().val()
-                .actions().rec((a, c) -> c.is.in.sameRow(a))
+                .actions().rec((a, c) -> c.sameRow(a))
                 .cells().oneOrMore().val()
                 .rows().zeroOrOne()
                 .cells().oneOrMore().check(Cell::textBlank).skip()

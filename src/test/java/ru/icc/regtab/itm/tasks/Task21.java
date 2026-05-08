@@ -17,7 +17,7 @@ import ru.icc.regtab.itm.recordset.Recordset;
 public final class Task21 extends TaskBase {
 
     private static final ItemFilterCondition BELOW_SAME_COL_SAME_SUBTABLE =
-            (a, c) -> c.is.in.sameSubtable(a) && c.is.below(a).sameCol();
+            (a, c) -> c.sameSubtable(a) && c.below(a).sameCol();
 
     @Override
     protected Recordset transformActual(Recordset actual) {

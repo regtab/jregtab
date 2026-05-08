@@ -12,7 +12,7 @@ import ru.icc.regtab.itm.model.syntax.TableSyntax;
  */
 public final class Task12 extends TaskBase {
 
-    private static final ItemFilterCondition AMOUNT_COLUMN = (a, c) -> c.is.in.col(5);
+    private static final ItemFilterCondition AMOUNT_COLUMN = (a, c) -> c.col(5);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {

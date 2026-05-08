@@ -14,7 +14,7 @@ import ru.icc.regtab.itm.pattern.TablePattern;
 public final class Task24 extends TaskBase {
 
     private static final ItemFilterCondition BELOW_SAME_COLUMN =
-            (a, c) -> c.is.below(a).sameCol();
+            (a, c) -> c.below(a).sameCol();
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {
