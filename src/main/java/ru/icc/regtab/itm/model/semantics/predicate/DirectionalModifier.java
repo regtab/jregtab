@@ -13,16 +13,16 @@ public final class DirectionalModifier {
     private final CellDerivedItem anchor;
     private final boolean baseCheck;
     /** Range check: rows.from(lo).to(hi) yields baseCheck && lo <= row <= hi. */
-    public final DirectionalRangeStart rows;
+    public final DirectionalRange rows;
     /** Range check: cols.from(lo).to(hi) yields baseCheck && lo <= col <= hi. */
-    public final DirectionalRangeStart cols;
+    public final DirectionalRange cols;
 
     public DirectionalModifier(CellDerivedItem candidate, CellDerivedItem anchor, boolean baseCheck) {
         this.candidate = candidate;
         this.anchor = anchor;
         this.baseCheck = baseCheck;
-        this.rows = new DirectionalRangeStart(baseCheck, () -> candidate.cell().row());
-        this.cols = new DirectionalRangeStart(baseCheck, () -> candidate.cell().col());
+        this.rows = new DirectionalRange(baseCheck, () -> candidate.cell().row());
+        this.cols = new DirectionalRange(baseCheck, () -> candidate.cell().col());
     }
 
     /** Returns the base directional check result (without additional constraints). */

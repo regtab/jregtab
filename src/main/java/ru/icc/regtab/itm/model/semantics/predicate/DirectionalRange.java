@@ -5,12 +5,12 @@ import java.util.function.IntSupplier;
 /**
  * Range chain for directional modifiers: baseCheck && from(lo).to(hi).
  */
-public final class DirectionalRangeStart {
+public final class DirectionalRange {
 
     private final boolean baseCheck;
     private final IntSupplier valueSupplier;
 
-    DirectionalRangeStart(boolean baseCheck, IntSupplier valueSupplier) {
+    DirectionalRange(boolean baseCheck, IntSupplier valueSupplier) {
         this.baseCheck = baseCheck;
         this.valueSupplier = valueSupplier;
     }

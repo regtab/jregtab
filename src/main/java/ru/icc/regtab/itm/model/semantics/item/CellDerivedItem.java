@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm.model.semantics.item;
 
 import ru.icc.regtab.itm.model.semantics.predicate.DirectionalModifier;
-import ru.icc.regtab.itm.model.semantics.predicate.IntRangeStart;
+import ru.icc.regtab.itm.model.semantics.predicate.IntRange;
 import ru.icc.regtab.itm.model.syntax.Cell;
 import ru.icc.regtab.itm.model.syntax.CellColor;
 import ru.icc.regtab.itm.model.syntax.FontFamily;
@@ -25,11 +25,11 @@ public final class CellDerivedItem implements Item {
     private final Cell cell;
     private final ItemType type;
     /** Range check: rows.from(lo).to(hi) yields lo &lt;= row &lt;= hi. */
-    public final IntRangeStart rows;
+    public final IntRange rows;
     /** Range check: cols.from(lo).to(hi) yields lo &lt;= col &lt;= hi. */
-    public final IntRangeStart cols;
+    public final IntRange cols;
     /** Range check: pos.from(lo).to(hi) yields lo &lt;= index &lt;= hi. */
-    public final IntRangeStart pos;
+    public final IntRange pos;
 
     public CellDerivedItem(String str, List<String> tags, int index, Cell cell, ItemType type) {
         this.str = Objects.requireNonNull(str, "str");
@@ -38,9 +38,9 @@ public final class CellDerivedItem implements Item {
         this.index = index;
         this.cell = Objects.requireNonNull(cell, "cell");
         this.type = Objects.requireNonNull(type, "type");
-        this.rows = new IntRangeStart(cell::row);
-        this.cols = new IntRangeStart(cell::col);
-        this.pos = new IntRangeStart(() -> index);
+        this.rows = new IntRange(cell::row);
+        this.cols = new IntRange(cell::col);
+        this.pos = new IntRange(() -> index);
     }
 
     public CellDerivedItem(String str, int index, Cell cell, ItemType type) {
