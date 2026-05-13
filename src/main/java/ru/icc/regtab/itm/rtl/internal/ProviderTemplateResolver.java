@@ -30,6 +30,9 @@ import java.util.List;
  *   <li>row: replaces sameSubrow(a) for LW/RW/RM; replaces sameSubtable(a) for UW/DW/CM;
  *            replaces sameCell(a) for CL</li>
  *   <li>pos: replaces sameCell(a) for CL</li>
+ *   <li>st: replaces sameSubrow(a) with sameSubtable(a) for LW/RW/RM;
+ *           removes sameCol(a) restriction for UW/DW/CM;
+ *           replaces sameCell(a) with sameSubtable(a) for CL</li>
  * </ul>
  * Note: !sameCell(a) in RM/CM is essential and is always included.
  * For LW/RW/UW/DW, spatial direction guarantees different cells so !sameCell is omitted.
@@ -92,6 +95,7 @@ final class ProviderTemplateResolver {
         RTLParser.ColContext colCtx = null;
         RTLParser.RowContext rowCtx = null;
         RTLParser.PosContext posCtx = null;
+        boolean st = false;
         List<ItemFilterCondition> contentParts = new ArrayList<>();
 
         if (constraintsCtx != null) {
@@ -102,6 +106,7 @@ final class ProviderTemplateResolver {
                     if (spat.col() != null) colCtx = spat.col();
                     else if (spat.row() != null) rowCtx = spat.row();
                     else if (spat.pos() != null) posCtx = spat.pos();
+                    else if (spat.st() != null) st = true;
                 } else if (cont != null) {
                     contentParts.add(buildContentConstraint(cont));
                 }
@@ -109,7 +114,7 @@ final class ProviderTemplateResolver {
         }
 
         List<ItemFilterCondition> parts = new ArrayList<>();
-        buildTemplateParts(template, colCtx, rowCtx, posCtx, parts);
+        buildTemplateParts(template, colCtx, rowCtx, posCtx, st, parts);
         parts.addAll(contentParts);
         return andAll(parts);
     }
@@ -119,63 +124,73 @@ final class ProviderTemplateResolver {
             RTLParser.ColContext col,
             RTLParser.RowContext row,
             RTLParser.PosContext pos,
+            boolean st,
             List<ItemFilterCondition> parts) {
 
         switch (t) {
             case LW -> {
-                // sameSubrow (replaced by row constraint if present)
-                if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else             parts.add(rowFilter(row));
-                // col constraint adds on top (direction stays)
+                // st expands scope to sameSubtable; else sameSubrow (replaced by row if present)
+                if (st)               parts.add((a, c) -> c.sameSubtable(a));
+                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
+                else                  parts.add(rowFilter(row));
                 if (col != null) parts.add(colFilter(col));
                 parts.add((a, c) -> c.cell().col() < a.cell().col());
             }
             case RW -> {
-                if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else             parts.add(rowFilter(row));
+                if (st)               parts.add((a, c) -> c.sameSubtable(a));
+                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
+                else                  parts.add(rowFilter(row));
                 if (col != null) parts.add(colFilter(col));
                 parts.add((a, c) -> c.cell().col() > a.cell().col());
             }
             case UW -> {
-                // sameSubtable (replaced by row constraint if present)
                 if (row == null) parts.add((a, c) -> c.sameSubtable(a));
                 else             parts.add(rowFilter(row));
-                // sameCol (replaced by col constraint if present)
-                if (col == null) parts.add((a, c) -> c.sameCol(a));
-                else             parts.add(colFilter(col));
+                // st removes the sameCol restriction; col constraint replaces it if present
+                if (!st) {
+                    if (col == null) parts.add((a, c) -> c.sameCol(a));
+                    else             parts.add(colFilter(col));
+                } else if (col != null) {
+                    parts.add(colFilter(col));
+                }
                 parts.add((a, c) -> c.cell().row() < a.cell().row());
             }
             case DW -> {
                 if (row == null) parts.add((a, c) -> c.sameSubtable(a));
                 else             parts.add(rowFilter(row));
-                if (col == null) parts.add((a, c) -> c.sameCol(a));
-                else             parts.add(colFilter(col));
+                if (!st) {
+                    if (col == null) parts.add((a, c) -> c.sameCol(a));
+                    else             parts.add(colFilter(col));
+                } else if (col != null) {
+                    parts.add(colFilter(col));
+                }
                 parts.add((a, c) -> c.cell().row() > a.cell().row());
             }
             case RM -> {
-                // sameSubrow (replaced by row constraint if present)
-                if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else             parts.add(rowFilter(row));
+                if (st)               parts.add((a, c) -> c.sameSubtable(a));
+                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
+                else                  parts.add(rowFilter(row));
                 if (col != null) parts.add(colFilter(col));
-                // !sameCell is essential for RM
                 parts.add((a, c) -> !c.sameCell(a));
             }
             case CM -> {
-                // sameSubtable (replaced by row constraint if present)
                 if (row == null) parts.add((a, c) -> c.sameSubtable(a));
                 else             parts.add(rowFilter(row));
-                // sameCol (replaced by col constraint if present)
-                if (col == null) parts.add((a, c) -> c.sameCol(a));
-                else             parts.add(colFilter(col));
-                // !sameCell is essential for CM
+                if (!st) {
+                    if (col == null) parts.add((a, c) -> c.sameCol(a));
+                    else             parts.add(colFilter(col));
+                } else if (col != null) {
+                    parts.add(colFilter(col));
+                }
                 parts.add((a, c) -> !c.sameCell(a));
             }
             case CL -> {
                 // Any spatial constraint replaces sameCell(a)
-                boolean hasSpatial = col != null || row != null || pos != null;
+                boolean hasSpatial = col != null || row != null || pos != null || st;
                 if (!hasSpatial) {
                     parts.add((a, c) -> c.sameCell(a));
                 } else {
+                    if (st)          parts.add((a, c) -> c.sameSubtable(a));
                     if (col != null) parts.add(colFilter(col));
                     if (row != null) parts.add(rowFilter(row));
                     if (pos != null) parts.add(posFilter(pos));

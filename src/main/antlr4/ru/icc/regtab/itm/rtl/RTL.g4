@@ -132,12 +132,16 @@ constraints : LPAREN constr ((COMMA constr)*)? RPAREN ;
 constr      : spatConstr | contConstr ;
 
 // Spatial constraints
-spatConstr : col | row | pos ;
+spatConstr : col | row | pos | st ;
 
 // Bug fix: 'COL' keyword is always required; alternatives are grouped under it
 row : 'ROW' (range | offset | INT) ;
 col : 'COL' (range | offset | INT) ;
 pos : 'POS' (range | offset | INT) ;
+
+// Same-subtable scope override
+st : SUBTABLE ;
+SUBTABLE : 'ST' ;
 
 range : start DOUBLE_PERIOD end ;
 start : offset | INT ;
