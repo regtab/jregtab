@@ -305,7 +305,7 @@ final class ProviderTemplateResolver {
         List<String> tags = ctx.TAG().stream()
                 .map(t -> t.getText())
                 .toList();
-        return (a, c) -> tags.stream().allMatch(c::hasTag);
+        return (a, c) -> tags.stream().anyMatch(c::hasTag);
     }
 
     // --- Combining predicates ---
