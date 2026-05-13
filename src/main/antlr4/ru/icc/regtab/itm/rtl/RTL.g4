@@ -150,9 +150,12 @@ end   : offset | INT ;
 offset : (MINUS INT) | (PLUS INT) ;
 
 // Content constraints
-contConstr : regex | blank | tag ;
+contConstr : regex | blank | tag | sameStr ;
 
 tag : 'TAG' TAG+ ;
+
+sameStr : STR ;
+STR : 'STR' ;
 
 regex : EXCLAMATION? STRING ;
 

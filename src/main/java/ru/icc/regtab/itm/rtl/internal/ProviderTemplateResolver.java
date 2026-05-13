@@ -280,9 +280,10 @@ final class ProviderTemplateResolver {
     // --- Content constraint builders ---
 
     private static ItemFilterCondition buildContentConstraint(RTLParser.ContConstrContext ctx) {
-        if (ctx.regex() != null) return regexFilter(ctx.regex());
-        if (ctx.blank() != null) return blankFilter(ctx.blank());
-        if (ctx.tag()   != null) return tagFilter(ctx.tag());
+        if (ctx.regex()   != null) return regexFilter(ctx.regex());
+        if (ctx.blank()   != null) return blankFilter(ctx.blank());
+        if (ctx.tag()     != null) return tagFilter(ctx.tag());
+        if (ctx.sameStr() != null) return (a, c) -> c.sameStr(a);
         throw new RtlCompileException("Unknown content constraint");
     }
 
