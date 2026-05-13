@@ -14,6 +14,7 @@ target/
 # Claude Code local data
 .claude/
 CLAUDE.md
+RTL_PLAN.md
 
 # IntelliJ IDEA
 .idea/
