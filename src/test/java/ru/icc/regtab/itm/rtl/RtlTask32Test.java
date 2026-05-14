@@ -16,7 +16,7 @@ class RtlTask32Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [SKIP] [VAL]+ ] [ [VAL] [(BLANK ? SKIP | VAL : (CL{1}(ROW+0), CL{1}(COL+0))->REC)]+ ]+
+                [ [SKIP] [VAL]+ ] [ [VAL] [(BLANK ? SKIP | VAL : (RM{1}, CM{1})->REC)]+ ]+
                 """;
     }
 

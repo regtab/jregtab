@@ -15,7 +15,7 @@ class RtlTask40Test extends RtlTaskBase {
         return """
                 { [ ['.*Reported crime in.*'? VAL = REPL('Reported crime in ', '') : ('')->AVP, (CL(ST, COL1))->REC] [SKIP] ]
                   [ [SKIP]{2} ]
-                  [ [ATTR] [VAL : (CL{1}(ROW+0))->AVP] ]{5}
+                  [ [ATTR] [VAL : (RM{1})->AVP] ]{5}
                   [ [SKIP]{2} ]? }+
                 """;
     }
