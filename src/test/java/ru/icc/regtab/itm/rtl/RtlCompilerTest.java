@@ -283,7 +283,7 @@ class RtlCompilerTest {
         TablePattern p = compile("""
                 [ [SKIP] [VAL : ('AIRLINE')->AVP]+ ]
                 [ [VAL : ('AIRPORT')->AVP]
-                  [VAL : (UW{1}, LW{1}, CL{1})->REC, ('ND')->AVP " " VAL : ('MON')->AVP]+ ]+
+                  [VAL : (CM{1}, LW{1}, CL{1})->REC, ('ND')->AVP " " VAL : ('MON')->AVP]+ ]+
                 """);
 
         var syntax = buildTable(new String[][]{
