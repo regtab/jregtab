@@ -143,7 +143,7 @@ pos : 'POS' (range | offset | INT) ;
 st : SUBTABLE ;
 SUBTABLE : 'ST' ;
 
-range : start DOUBLE_PERIOD end ;
+range : start DOUBLE_PERIOD end? ;
 start : offset | INT ;
 end   : offset | INT ;
 

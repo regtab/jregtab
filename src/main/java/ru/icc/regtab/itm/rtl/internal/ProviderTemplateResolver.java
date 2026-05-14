@@ -266,10 +266,11 @@ final class ProviderTemplateResolver {
 
     private static ItemFilterCondition rangeFilter(
             RTLParser.RangeContext ctx, IntExtractor candVal, IntExtractor anchorVal) {
+        boolean hiOpen = ctx.end() == null;
         int lo = boundaryValue(ctx.start(), anchorVal, 0);
-        int hi = boundaryValue(ctx.end(),   anchorVal, Integer.MAX_VALUE);
+        int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.end(), anchorVal, Integer.MAX_VALUE);
         boolean loRelative = ctx.start().offset() != null;
-        boolean hiRelative = ctx.end().offset()   != null;
+        boolean hiRelative = !hiOpen && ctx.end().offset() != null;
         int loDelta = loRelative ? parseOffset(ctx.start().offset()) : lo;
         int hiDelta = hiRelative ? parseOffset(ctx.end().offset())   : hi;
         boolean loAbs = !loRelative;
