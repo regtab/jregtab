@@ -50,7 +50,7 @@ public final class ItemLinearization {
                 case ROW_MAJOR -> ar != br ? Integer.compare(ar, br) : Integer.compare(ac, bc);
                 case REVERSE_ROW_MAJOR -> ar != br ? Integer.compare(br, ar) : Integer.compare(ac, bc);
                 case COLUMN_MAJOR -> ac != bc ? Integer.compare(ac, bc) : Integer.compare(ar, br);
-                case REVERSE_COLUMN_MAJOR -> ac != bc ? Integer.compare(bc, ac) : Integer.compare(ar, br);
+                case REVERSE_COLUMN_MAJOR -> ac != bc ? Integer.compare(bc, ac) : Integer.compare(br, ar);
             };
         };
     }
