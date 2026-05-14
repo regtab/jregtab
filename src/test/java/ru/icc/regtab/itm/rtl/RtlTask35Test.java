@@ -13,7 +13,7 @@ class RtlTask35Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ ['.*\\*Company.*' ? VAL = REPL('\\*', '') : (DW(ST))->REC] ] [ [!'.*\\*Company.*' ? VAL] ]+ }+
+                { [ ['.*\\*Company.*' ? VAL = REPL('\\*', '') : DW(ST)->REC] ] [ [!'.*\\*Company.*' ? VAL] ]+ }+
                 """;
     }
 }

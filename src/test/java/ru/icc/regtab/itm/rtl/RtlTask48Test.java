@@ -13,8 +13,8 @@ class RtlTask48Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [SKIP]{2} ]{2}
-                { [ [!BLANK? VAL : ('')->AVP, (CL(ST, C1))->REC] [!BLANK? ATTR ":" VAL : (CL{1})->AVP] ]
-                  [ [BLANK? SKIP] [!BLANK? ATTR ":" VAL : (CL{1})->AVP] ]
+                { [ [!BLANK? VAL : ''->AVP, CL(ST, C1)->REC] [!BLANK? ATTR ":" VAL : CL{1}->AVP] ]
+                  [ [BLANK? SKIP] [!BLANK? ATTR ":" VAL : CL{1}->AVP] ]
                   [ [BLANK? SKIP] [BLANK? SKIP] ]? }+
                 """;
     }

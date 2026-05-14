@@ -13,9 +13,9 @@ class RtlTask40Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ ['.*Reported crime in.*'? VAL = REPL('Reported crime in ', '') : ('')->AVP, (CL(ST, C1))->REC] [SKIP] ]
+                { [ ['.*Reported crime in.*'? VAL = REPL('Reported crime in ', '') : ''->AVP, CL(ST, C1)->REC] [SKIP] ]
                   [ [SKIP]{2} ]
-                  [ [ATTR] [VAL : (RM{1})->AVP] ]{5}
+                  [ [ATTR] [VAL : RM{1}->AVP] ]{5}
                   [ [SKIP]{2} ]? }+
                 """;
     }

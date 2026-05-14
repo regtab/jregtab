@@ -11,7 +11,7 @@ class RtlTask12Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : (CM(C5))->REC] [SKIP]{4} [VAL] ]
+                [ [VAL : CM(C5)->REC] [SKIP]{4} [VAL] ]
                 [ [SKIP]{5} [VAL] ]+
                 """;
     }

@@ -13,7 +13,7 @@ class RtlTask13Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [ATTR]{5} [SKIP]+ ]
-                [ [VAL : (CM{1})->AVP, (RM{1}(C2), RM{1}(C4), RM{1}(C1), RM{1}(C3))->REC] [VAL : (CM{1})->AVP]{4} [SKIP]+ ]+
+                [ [VAL : CM{1}->AVP, (RM{1}(C2), RM{1}(C4), RM{1}(C1), RM{1}(C3))->REC] [VAL : CM{1}->AVP]{4} [SKIP]+ ]+
                 """;
     }
 }
