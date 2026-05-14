@@ -12,7 +12,7 @@ class RtlTask26Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : ('')->AVP, (CL(ST, COL2))->REC] [ATTR] [VAL : (CL(ROW+0))->AVP] ] [ [SKIP] [ATTR] [VAL : (CL(ROW+0))->AVP] ]{5} }+
+                { [ [VAL : ('')->AVP, (CL(ST, COL2))->REC] [ATTR] [VAL : (RM)->AVP] ] [ [SKIP] [ATTR] [VAL : (RM)->AVP] ]{5} }+
                 """;
     }
 }

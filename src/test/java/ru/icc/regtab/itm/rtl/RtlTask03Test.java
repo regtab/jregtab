@@ -13,7 +13,6 @@ class RtlTask03Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        //return "[ [VAL] [VAL : (RM{1}(COL0))->REC]{2} ]+";
         return "[ [VAL] [VAL : (RM{1})->REC]{2} ]+";
     }
 
