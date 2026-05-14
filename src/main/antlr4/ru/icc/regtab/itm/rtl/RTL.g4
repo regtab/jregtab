@@ -39,7 +39,7 @@ explSubrowPattern : LCURLY subrowPatternBody RCURLY quantifier? ;
 subrowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? cellPattern+ ;
 
 // Cell pattern
-cellPattern : LSQUARE cellPatternBody RSQUARE quantifier? ;
+cellPattern : LSQUARE cellPatternBody? RSQUARE quantifier? ;
 cellPatternBody : (cellMatchCond QUESTION)? actSpecs? contSpec;
 
 // Content specification: atomic, delimited, compound, conditional

@@ -14,7 +14,7 @@ class RtlTask04Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [SKIP]+ ]
+                [ []+ ]
                 [ [VAL] [VAL : RM{1}->REC]+ ]+
                 """;
     }

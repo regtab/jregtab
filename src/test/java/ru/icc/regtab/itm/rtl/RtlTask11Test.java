@@ -15,7 +15,7 @@ class RtlTask11Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [SKIP] [VAL]+ ]
+                [ [] [VAL]+ ]
                 [ { [VAL] [(BLANK ? SKIP | VAL : (RM{1}, CM{1})->REC)]+ } ]+
                 """;
     }

@@ -11,7 +11,7 @@ class RtlTask27Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : DW->REC] ] [ [SKIP] ] [ [VAL] ]{9} }+
+                { [ [VAL : DW->REC] ] [ [] ] [ [VAL] ]{9} }+
                 """;
     }
 }
