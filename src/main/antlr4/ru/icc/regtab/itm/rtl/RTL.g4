@@ -53,7 +53,7 @@ itemDerivDir  : ATTRIBUTE | VALUE | AUXILIARY | SKIPPED ;
 ATTRIBUTE : 'ATTR' ;
 VALUE     : 'VAL'  ;
 AUXILIARY : 'AUX'  ;
-SKIPPED   : 'SKIP' ;
+SKIPPED   : 'SKIP' | '_' ;
 
 // User-defined tags
 tags : TAG+ ;

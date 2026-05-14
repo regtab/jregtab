@@ -12,9 +12,9 @@ class RtlTask10Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ []{4} [BLANK ? SKIP] [] []{2} ]*
+                { [ []{4} [BLANK ? _] [] []{2} ]*
                   [ [VAL : RM->REC] [VAL]+ ]
-                  [ [BLANK ? SKIP]+ ]? }+
+                  [ [BLANK ? _]+ ]? }+
                 """;
     }
 }

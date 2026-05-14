@@ -21,7 +21,7 @@ class RtlTask02Test extends RtlTaskBase {
                 { [ [VAL #L1] [] ]
                   [ [VAL #L2] [] ]
                   [ [!BLANK ? VAL : (CL(ST, TAG #L1 #L2), RM{1})->REC] [VAL] ]+
-                  [ [BLANK ? SKIP] [] ]? }+
+                  [ [BLANK ? _] [] ]? }+
                 """;
     }
 
