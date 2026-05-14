@@ -9,7 +9,6 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.item.ItemType;
 
 /**
  * ATP equivalent of Fluent API Task18.
@@ -18,7 +17,6 @@ class AtpTask18Test extends AtpTaskBase {
 
     private static final ProviderSpec AVP_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.sameCell(a));
     private static final ProviderSpec REC_VALUES_BELOW =
-            //ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.type() == ItemType.VALUE);
             ProviderSpec.val((a, c) -> c.below(a).sameSubtable());
 
     @Override
