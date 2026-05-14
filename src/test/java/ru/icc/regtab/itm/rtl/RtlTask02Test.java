@@ -15,10 +15,16 @@ class RtlTask02Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        // return """
+        //         { [ [VAL #L1] [SKIP] ]
+        //           [ [VAL #L2] [SKIP] ]
+        //           [ [!BLANK ? VAL : (CL(ST, TAG #L1 #L2), CL{1}(ROW+0))->REC] [VAL] ]+
+        //           [ [BLANK ? SKIP] [SKIP] ]? }+
+        //         """;
+                return """
                 { [ [VAL #L1] [SKIP] ]
                   [ [VAL #L2] [SKIP] ]
-                  [ [!BLANK ? VAL : (CL(ST, TAG #L1 #L2), CL{1}(ROW+0))->REC] [VAL] ]+
+                  [ [!BLANK ? VAL : (CL(ST, TAG #L1 #L2), RM{1})->REC] [VAL] ]+
                   [ [BLANK ? SKIP] [SKIP] ]? }+
                 """;
     }

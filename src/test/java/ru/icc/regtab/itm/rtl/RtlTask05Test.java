@@ -16,8 +16,9 @@ class RtlTask05Test extends RtlTaskBase {
         return """
                 [ [SKIP] [VAL]+ ]
                 [ [SKIP]+ ]
-                [ [VAL] [VAL : (RM{1}(COL0), CM{1}(ROW0))->REC]+ ]+
+                [ [VAL] [VAL : (RM{1}, CM{1})->REC]+ ]+
                 """;
+                // [ [VAL] [VAL : (RM{1}(COL0), CM{1}(ROW0))->REC]+ ]+
     }
 
     @Override

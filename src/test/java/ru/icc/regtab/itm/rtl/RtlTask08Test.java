@@ -15,7 +15,7 @@ class RtlTask08Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [SKIP]+ ]
-                [ [VAL] [VAL : (RM{1}(COL0))->REC]+ ]+
+                [ [VAL] [VAL : (RM{1})->REC]+ ]+
                 """;
     }
 
