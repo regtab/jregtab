@@ -16,7 +16,7 @@ class RtlTask25Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : (RW{1})->SUFFIX('/'), (RW(COL+2..))->REC, (DW(STR))->CONCAT] [VAL] [VAL]+ ]+
+                [ [VAL : (RW{1})->SUFFIX('/'), (RW(C+2..))->REC, (DW(STR))->CONCAT] [VAL] [VAL]+ ]+
                 """;
     }
 

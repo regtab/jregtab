@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask12: header cell at COL0 collects all COL5 values via CM(COL5).
+ * RTL equivalent of AtpTask12: header cell at C0 collects all C5 values via CM(C5).
  */
 class RtlTask12Test extends RtlTaskBase {
 
@@ -11,7 +11,7 @@ class RtlTask12Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : (CM(COL5))->REC] [SKIP]{4} [VAL] ]
+                [ [VAL : (CM(C5))->REC] [SKIP]{4} [VAL] ]
                 [ [SKIP]{5} [VAL] ]+
                 """;
     }

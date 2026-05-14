@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask22: header uses CM(COL2..5)->REC in column-major order.
+ * RTL equivalent of AtpTask22: header uses CM(C2..5)->REC in column-major order.
  */
 class RtlTask22Test extends RtlTaskBase {
 
@@ -11,7 +11,7 @@ class RtlTask22Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : (CM(COL2..5))->REC] [SKIP] [VAL]+ ] [ [SKIP]{2} [VAL]+ ] }+
+                { [ [VAL : (CM(C2..5))->REC] [SKIP] [VAL]+ ] [ [SKIP]{2} [VAL]+ ] }+
                 """;
     }
 }

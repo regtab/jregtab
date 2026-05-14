@@ -4,7 +4,7 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
- * RTL equivalent of AtpTask07: three row keys at COL0..2, col key at ROW0.
+ * RTL equivalent of AtpTask07: three row keys at C0..2, col key at R0.
  */
 class RtlTask07Test extends RtlTaskBase {
 
@@ -15,7 +15,7 @@ class RtlTask07Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [SKIP]{3} [VAL]+ ]
-                [ [VAL]{3} [VAL : (RM{3}(COL0..2), CM{1})->REC]+ ]+
+                [ [VAL]{3} [VAL : (RM{3}(C0..2), CM{1})->REC]+ ]+
                 """;
     }
 

@@ -5,7 +5,7 @@ import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
  * RTL equivalent of AtpTask14: header row with blank sentinel, data rows look up
- * first items in COL0 and COL1 of same subtable, plus two items from same row.
+ * first items in C0 and C1 of same subtable, plus two items from same row.
  */
 class RtlTask14Test extends RtlTaskBase {
 
@@ -16,7 +16,7 @@ class RtlTask14Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 { [ [!BLANK ? VAL]{2} [BLANK ? SKIP] ]
-                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : (CM{1}(COL0), CM{1}(COL1), RM{2})->REC] ]+ }+
+                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : (CM{1}(C0), CM{1}(C1), RM{2})->REC] ]+ }+
                 """;
     }
 

@@ -135,9 +135,9 @@ constr      : spatConstr | contConstr ;
 spatConstr : col | row | pos | st ;
 
 // Bug fix: 'COL' keyword is always required; alternatives are grouped under it
-row : 'ROW' (range | offset | INT) ;
-col : 'COL' (range | offset | INT) ;
-pos : 'POS' (range | offset | INT) ;
+row : 'R' (range | offset | INT) ;
+col : 'C' (range | offset | INT) ;
+pos : 'P' (range | offset | INT) ;
 
 // Same-subtable scope override
 st : SUBTABLE ;
