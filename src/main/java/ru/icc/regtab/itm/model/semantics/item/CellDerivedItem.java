@@ -54,6 +54,7 @@ public final class CellDerivedItem implements Item {
     public boolean sameCell(CellDerivedItem anchor)     { return cell == anchor.cell(); }
     public boolean sameSubtable(CellDerivedItem anchor) { return cell.subtable() != null && cell.subtable() == anchor.cell().subtable(); }
     public boolean sameSubrow(CellDerivedItem anchor)   { return cell.subrow() != null && cell.subrow() == anchor.cell().subrow(); }
+    public boolean sameSubcol(CellDerivedItem anchor)   { return sameSubtable(anchor) && sameCol(anchor); }
     public boolean row(int i)                           { return cell.row() == i; }
     public boolean col(int j)                           { return cell.col() == j; }
     public boolean posIndex(int k)                      { return index == k; }

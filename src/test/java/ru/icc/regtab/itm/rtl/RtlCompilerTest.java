@@ -102,10 +102,10 @@ class RtlCompilerTest {
 
     @Test
     void parse_spatialConstraints() {
-        compile("[ [VAL : (DW(COL+0))->REC] ]");
-        compile("[ [VAL : (DW(ROW-1))->REC] ]");
-        compile("[ [VAL : (CL(POS0..5))->REC] ]");
-        compile("[ [VAL : (RM(COL+0..-1))->REC] ]");
+        compile("[ [VAL : (DW(C+0))->REC] ]");
+        compile("[ [VAL : (DW(R-1))->REC] ]");
+        compile("[ [VAL : (CL(P0..5))->REC] ]");
+        compile("[ [VAL : (RM(C+0..-1))->REC] ]");
     }
 
     @Test

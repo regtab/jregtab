@@ -19,10 +19,10 @@ import java.util.List;
  * <ul>
  *   <li>LW: sameSubrow(a) &amp;&amp; col(c) &lt; col(a)</li>
  *   <li>RW: sameSubrow(a) &amp;&amp; col(c) &gt; col(a)</li>
- *   <li>UW: sameSubtable(a) &amp;&amp; sameCol(a) &amp;&amp; row(c) &lt; row(a)</li>
- *   <li>DW: sameSubtable(a) &amp;&amp; sameCol(a) &amp;&amp; row(c) &gt; row(a)</li>
+ *   <li>UW: sameSubcol(a) &amp;&amp; row(c) &lt; row(a)</li>
+ *   <li>DW: sameSubcol(a) &amp;&amp; row(c) &gt; row(a)</li>
  *   <li>RM: sameSubrow(a) &amp;&amp; !sameCell(a)</li>
- *   <li>CM: sameSubtable(a) &amp;&amp; sameCol(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>CM: sameSubcol(a) &amp;&amp; !sameCell(a)</li>
  *   <li>CL: sameCell(a)</li>
  * </ul>
  *
@@ -168,25 +168,33 @@ final class ProviderTemplateResolver {
                 parts.add((a, c) -> c.cell().col() > a.cell().col());
             }
             case UW -> {
-                if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                else             parts.add(rowFilter(row));
-                // st removes the sameCol restriction; col constraint replaces it if present
-                if (!st) {
-                    if (col == null) parts.add((a, c) -> c.sameCol(a));
-                    else             parts.add(colFilter(col));
-                } else if (col != null) {
-                    parts.add(colFilter(col));
+                if (!st && row == null && col == null) {
+                    parts.add((a, c) -> c.sameSubcol(a));
+                } else {
+                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
+                    else             parts.add(rowFilter(row));
+                    // st removes the sameCol restriction; col constraint replaces it if present
+                    if (!st) {
+                        if (col == null) parts.add((a, c) -> c.sameCol(a));
+                        else             parts.add(colFilter(col));
+                    } else if (col != null) {
+                        parts.add(colFilter(col));
+                    }
                 }
                 parts.add((a, c) -> c.cell().row() < a.cell().row());
             }
             case DW -> {
-                if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                else             parts.add(rowFilter(row));
-                if (!st) {
-                    if (col == null) parts.add((a, c) -> c.sameCol(a));
-                    else             parts.add(colFilter(col));
-                } else if (col != null) {
-                    parts.add(colFilter(col));
+                if (!st && row == null && col == null) {
+                    parts.add((a, c) -> c.sameSubcol(a));
+                } else {
+                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
+                    else             parts.add(rowFilter(row));
+                    if (!st) {
+                        if (col == null) parts.add((a, c) -> c.sameCol(a));
+                        else             parts.add(colFilter(col));
+                    } else if (col != null) {
+                        parts.add(colFilter(col));
+                    }
                 }
                 parts.add((a, c) -> c.cell().row() > a.cell().row());
             }
@@ -198,13 +206,17 @@ final class ProviderTemplateResolver {
                 parts.add((a, c) -> !c.sameCell(a));
             }
             case CM -> {
-                if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                else             parts.add(rowFilter(row));
-                if (!st) {
-                    if (col == null) parts.add((a, c) -> c.sameCol(a));
-                    else             parts.add(colFilter(col));
-                } else if (col != null) {
-                    parts.add(colFilter(col));
+                if (!st && row == null && col == null) {
+                    parts.add((a, c) -> c.sameSubcol(a));
+                } else {
+                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
+                    else             parts.add(rowFilter(row));
+                    if (!st) {
+                        if (col == null) parts.add((a, c) -> c.sameCol(a));
+                        else             parts.add(colFilter(col));
+                    } else if (col != null) {
+                        parts.add(colFilter(col));
+                    }
                 }
                 parts.add((a, c) -> !c.sameCell(a));
             }
