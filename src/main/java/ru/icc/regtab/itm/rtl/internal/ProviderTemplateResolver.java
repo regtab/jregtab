@@ -1,6 +1,8 @@
 package ru.icc.regtab.itm.rtl.internal;
 
+import ru.icc.regtab.itm.atp.spec.ItemDerivationDirective;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
+import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
 import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 import ru.icc.regtab.itm.rtl.RTLParser;
@@ -68,16 +70,38 @@ final class ProviderTemplateResolver {
 
     /**
      * Builds a {@link ProviderSpec} from an RTL {@code tblProvSpec} context.
-     * The provider type is always UNRESTRICTED (Phase 1 simplification).
+     * The provider kind is inferred from the action type and anchor item type
+     * per Table tab:action-compatibility in the paper:
+     * REC/CONCAT + VAL anchor → VAL kind; AVP + VAL anchor → ATTR kind (cardinality capped to 1).
      */
+    static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx,
+                                RTLParser.OpContext op,
+                                ItemDerivationDirective anchorType) {
+        Template template = parseTemplate(ctx.provTemplate());
+        TraversalOrder order = traversalOrderFor(template);
+        int cardinality = parseCardinality(ctx.cardinality());
+        ItemFilterCondition condition = buildCondition(template, ctx.constraints());
+        CellDerivedProviderKind kind = inferKind(op, anchorType);
+        int actualCardinality = (kind == CellDerivedProviderKind.ATTR) ? 1 : cardinality;
+        return new ProviderSpec(actualCardinality, order, condition, kind, null);
+    }
+
+    /** Builds a {@link ProviderSpec} with UNRESTRICTED kind (for inherited/context action specs). */
     static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx) {
         Template template = parseTemplate(ctx.provTemplate());
         TraversalOrder order = traversalOrderFor(template);
         int cardinality = parseCardinality(ctx.cardinality());
         ItemFilterCondition condition = buildCondition(template, ctx.constraints());
         return new ProviderSpec(cardinality, order, condition,
-                ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind.UNRESTRICTED,
-                null);
+                CellDerivedProviderKind.UNRESTRICTED, null);
+    }
+
+    private static CellDerivedProviderKind inferKind(RTLParser.OpContext op,
+                                                     ItemDerivationDirective anchorType) {
+        if (op == null || anchorType == null) return CellDerivedProviderKind.UNRESTRICTED;
+        if (op.REC() != null || op.CONCAT() != null) return CellDerivedProviderKind.VAL;
+        if (op.AVP() != null)                        return CellDerivedProviderKind.ATTR;
+        return CellDerivedProviderKind.UNRESTRICTED;
     }
 
     // --- Cardinality ---

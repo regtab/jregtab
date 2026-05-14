@@ -153,10 +153,10 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     }
 
     private AtomicContentSpec buildAtomicContentSpec(RTLParser.AtomContSpecContext ctx) {
-        ItemDerivationDirective idd    = buildIdd(ctx.itemDerivDir());
-        List<String>            tags   = ctx.tags()    != null ? buildTags(ctx.tags())                        : List.of();
-        StringExtractor         extr   = ctx.strExtr() != null ? StringExtractorFactory.from(ctx.strExtr())   : null;
-        List<ActionSpec>        local  = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs())               : List.of();
+        ItemDerivationDirective idd  = buildIdd(ctx.itemDerivDir());
+        List<String>            tags = ctx.tags()    != null ? buildTags(ctx.tags())                      : List.of();
+        StringExtractor         extr = ctx.strExtr() != null ? StringExtractorFactory.from(ctx.strExtr()) : null;
+        List<ActionSpec>        local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs(), idd)        : List.of();
         return new AtomicContentSpec(idd, extr, tags, mergeWithInherited(local));
     }
 
@@ -199,6 +199,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     // -------- action specs --------
 
+    /** Used for inherited actSpecs (subtable/row/subrow/cell level) — UNRESTRICTED kind. */
     private List<ActionSpec> buildActSpecs(RTLParser.ActSpecsContext ctx) {
         return ctx.actSpec().stream().map(this::buildActSpec).toList();
     }
@@ -214,6 +215,31 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     private ProviderSpec buildProvSpec(RTLParser.ProvSpecContext ctx) {
         if (ctx.tblProvSpec() != null) return ProviderTemplateResolver.resolve(ctx.tblProvSpec());
+        String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
+        return ProviderSpec.ctxAttr(literal);
+    }
+
+    /** Used for actSpecs directly on an atomContSpec — kind inferred from op + anchor type. */
+    private List<ActionSpec> buildActSpecs(RTLParser.ActSpecsContext ctx, ItemDerivationDirective anchorType) {
+        return ctx.actSpec().stream().map(as -> buildActSpec(as, anchorType)).toList();
+    }
+
+    private ActionSpec buildActSpec(RTLParser.ActSpecContext ctx, ItemDerivationDirective anchorType) {
+        List<ProviderSpec> providers = buildProvSpecs(ctx.provSpecs(), ctx.op(), anchorType);
+        return buildOp(ctx.op(), providers);
+    }
+
+    private List<ProviderSpec> buildProvSpecs(RTLParser.ProvSpecsContext ctx,
+                                              RTLParser.OpContext op,
+                                              ItemDerivationDirective anchorType) {
+        return ctx.provSpec().stream().map(ps -> buildProvSpec(ps, op, anchorType)).toList();
+    }
+
+    private ProviderSpec buildProvSpec(RTLParser.ProvSpecContext ctx,
+                                       RTLParser.OpContext op,
+                                       ItemDerivationDirective anchorType) {
+        if (ctx.tblProvSpec() != null)
+            return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType);
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
         return ProviderSpec.ctxAttr(literal);
     }
