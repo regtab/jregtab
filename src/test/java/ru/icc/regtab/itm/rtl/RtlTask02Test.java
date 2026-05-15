@@ -20,7 +20,7 @@ class RtlTask02Test extends RtlTaskBase {
         return """
                 { [ [VAL] [] ]{2}
                   [ [!BLANK ? VAL : (SC{2}, SR{1})->REC] [VAL] ]+
-                  [ [BLANK ? _] [] ]? }+
+                  [ [BLANK?] [] ]? }+
                 """;
     }
 

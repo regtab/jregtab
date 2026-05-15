@@ -40,7 +40,9 @@ subrowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? cellPattern+ ;
 
 // Cell pattern
 cellPattern : LSQUARE cellPatternBody? RSQUARE quantifier? ;
-cellPatternBody : (cellMatchCond QUESTION)? actSpecs? contSpec;
+cellPatternBody : cellMatchCond QUESTION (actSpecs? contSpec)?
+               | actSpecs? contSpec
+               ;
 
 // Content specification: atomic, delimited, compound, conditional
 contSpec : atomContSpec | delimContSpec | compContSpec | condContSpec ;

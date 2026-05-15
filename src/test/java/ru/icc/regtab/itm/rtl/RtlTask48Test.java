@@ -14,8 +14,8 @@ class RtlTask48Test extends RtlTaskBase {
         return """
                 [ []{2} ]{2}
                 { [ [!BLANK? VAL : ''->AVP, (ST, C1)->REC] [!BLANK? ATTR ":" VAL : CL{1}->AVP] ]
-                  [ [BLANK? _] [!BLANK? ATTR ":" VAL : CL{1}->AVP] ]
-                  [ [BLANK? _]{2} ]? }+
+                  [ [BLANK?] [!BLANK? ATTR ":" VAL : CL{1}->AVP] ]
+                  [ [BLANK?]{2} ]? }+
                 """;
     }
 }

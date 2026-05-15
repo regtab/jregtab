@@ -119,8 +119,8 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     public CellPattern visitCellPattern(RTLParser.CellPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
         var body = ctx.cellPatternBody();
-        // [] (empty body) is shorthand for [SKIP]
-        if (body == null || isSkipAtom(body.contSpec())) {
+        // [] and [BLANK?] (no contSpec) are shorthand for [SKIP]
+        if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
             CellMatchCondition cond = body != null && body.cellMatchCond() != null
                     ? buildCellMatchCondition(body.cellMatchCond()) : null;
             return new CellPattern(null, cond, q, null);
