@@ -15,7 +15,7 @@ class RtlTask07Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ []{3} [VAL]+ ]
-                [ [VAL]{3} [VAL : ((SR, C0..2){3}, ^SC{1})->REC]+ ]+
+                [ [VAL]{3} [VAL : ((SR, C0..2){3}, SC{1})->REC]+ ]+
                 """;
     }
 

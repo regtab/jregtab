@@ -16,7 +16,7 @@ class RtlTask11Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [] [VAL]+ ]
-                [ { [VAL] [(BLANK ? _ | VAL : (SR{1}, ^SC{1})->REC)]+ } ]+
+                [ { [VAL] [(BLANK ? _ | VAL : (SR{1}, SC{1})->REC)]+ } ]+
                 """;
     }
 
