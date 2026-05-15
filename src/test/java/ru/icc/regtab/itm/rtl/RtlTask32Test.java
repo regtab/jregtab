@@ -1,8 +1,5 @@
 package ru.icc.regtab.itm.rtl;
 
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.recordset.Recordset;
-
 /**
  * RTL equivalent of AtpTask32: header row (SKIP, VAL+), data rows (VAL,
  * (BLANK?SKIP|VAL: first-in-row + first-in-col ->REC)+); post-processed by
@@ -16,12 +13,8 @@ class RtlTask32Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                <ANCH(2)>
                 [ [] [VAL]+ ] [ [VAL] [(BLANK ? _ | VAL : (SR{1}, SC{1})->REC)]+ ]+
                 """;
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new AnchorAttributeAtPosition(2).apply(actual);
     }
 }

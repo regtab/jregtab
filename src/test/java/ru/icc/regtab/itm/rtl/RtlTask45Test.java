@@ -1,8 +1,5 @@
 package ru.icc.regtab.itm.rtl;
 
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.recordset.Recordset;
-
 /**
  * RTL equivalent of AtpTask45: NOT_BLANK val + delimited(",") val rec(same-row col0).
  * Post-processed by AnchorAttributeAtPosition(1).
@@ -15,12 +12,8 @@ class RtlTask45Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                <ANCH(1)>
                 [ [!BLANK? VAL] [!BLANK? (VAL : (R+0, C0)->REC){','}] ]+
                 """;
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new AnchorAttributeAtPosition(1).apply(actual);
     }
 }

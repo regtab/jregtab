@@ -12,7 +12,14 @@ oneOrMore  : PLUS ;
 exactly    : LCURLY INT RCURLY ;
 
 // Table pattern
-tablePattern : subtablePattern+ ;
+tablePattern : settings? subtablePattern+ ;
+
+// Optional settings prefix <NORM,ANCH(n),SPLIT("s")>
+settings     : LANGLE setting (COMMA setting)* RANGLE ;
+setting      : normSetting | anchSetting | splitSetting ;
+normSetting  : 'NORM' ;
+anchSetting  : 'ANCH' LPAREN INT RPAREN ;
+splitSetting : 'SPLIT' LPAREN STRING RPAREN ;
 
 // Subtable pattern: implicit or explicit
 subtablePattern : implSubtablePattern | explSubtablePattern ;
@@ -181,6 +188,8 @@ LCURLY  : '{' ;
 RCURLY  : '}' ;
 LSQUARE : '[' ;
 RSQUARE : ']' ;
+LANGLE  : '<' ;
+RANGLE  : '>' ;
 
 COLON       : ':' ;
 COMMA       : ',' ;
