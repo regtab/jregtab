@@ -16,7 +16,7 @@ class RtlTask37Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [] [VAL]+ ] [ [VAL] [(BLANK ? _ | VAL : (RM{1}, CM{1})->REC)]+ ]+
+                [ [] [VAL]+ ] [ [VAL] [(BLANK ? _ | VAL : (SR{1}, ^SC{1})->REC)]+ ]+
                 """;
     }
 

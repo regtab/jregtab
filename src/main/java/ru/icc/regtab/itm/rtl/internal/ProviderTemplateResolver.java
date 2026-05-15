@@ -12,75 +12,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Resolves RTL provider templates (LW/RW/UW/DW/RM/CM/CL) with their spatial
- * and content constraints into a {@link ProviderSpec}.
+ * Resolves RTL provider specifications into {@link ProviderSpec}.
  *
- * <p>Default filter conditions per template (from RTL grammar comments):
+ * <p>Each {@code tblProvSpec} has an optional traversal-order mark and spatial/content constraints:
  * <ul>
- *   <li>LW: sameSubrow(a) &amp;&amp; col(c) &lt; col(a)</li>
- *   <li>RW: sameSubrow(a) &amp;&amp; col(c) &gt; col(a)</li>
- *   <li>UW: sameSubcol(a) &amp;&amp; row(c) &lt; row(a)</li>
- *   <li>DW: sameSubcol(a) &amp;&amp; row(c) &gt; row(a)</li>
- *   <li>RM: sameSubrow(a) &amp;&amp; !sameCell(a)</li>
- *   <li>CM: sameSubcol(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>(no mark) → ROW_MAJOR</li>
+ *   <li>{@code -}  → REVERSE_ROW_MAJOR</li>
+ *   <li>{@code ^}  → COLUMN_MAJOR</li>
+ *   <li>{@code -^} → REVERSE_COLUMN_MAJOR</li>
+ * </ul>
+ *
+ * <p>Named spatial constraints and their base filter conditions:
+ * <ul>
+ *   <li>LT: sameSubrow(a) &amp;&amp; col &lt; col(a)</li>
+ *   <li>RT: sameSubrow(a) &amp;&amp; col &gt; col(a)</li>
+ *   <li>AV: sameSubcol(a) &amp;&amp; row &lt; row(a)</li>
+ *   <li>BW: sameSubcol(a) &amp;&amp; row &gt; row(a)</li>
+ *   <li>ROW: sameRow(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>COL: sameCol(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>SR: sameSubrow(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>SC: sameSubcol(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>ST: sameSubtable(a) &amp;&amp; !sameCell(a)</li>
+ *   <li>TAB: !sameCell(a)</li>
  *   <li>CL: sameCell(a)</li>
  * </ul>
- *
- * <p>Spatial constraints modify the default condition:
- * <ul>
- *   <li>col: replaces sameCol(a) for UW/DW/CM; replaces sameCell(a) for CL</li>
- *   <li>row: replaces sameSubrow(a) for LW/RW/RM; replaces sameSubtable(a) for UW/DW/CM;
- *            replaces sameCell(a) for CL</li>
- *   <li>pos: replaces sameCell(a) for CL</li>
- *   <li>st: replaces sameSubrow(a) with sameSubtable(a) for LW/RW/RM;
- *           removes sameCol(a) restriction for UW/DW/CM;
- *           replaces sameCell(a) with sameSubtable(a) for CL</li>
- * </ul>
- * Note: !sameCell(a) in RM/CM is essential and is always included.
- * For LW/RW/UW/DW, spatial direction guarantees different cells so !sameCell is omitted.
+ * Additional col/row/pos and content constraints are AND-ed with the named base condition.
  */
 final class ProviderTemplateResolver {
 
     private ProviderTemplateResolver() {}
 
-    enum Template { LW, RW, UW, DW, RM, CM, CL }
-
-    static Template parseTemplate(RTLParser.ProvTemplateContext ctx) {
-        if (ctx.LEFTWARD()     != null) return Template.LW;
-        if (ctx.RIGHTWARD()    != null) return Template.RW;
-        if (ctx.UPWARD()       != null) return Template.UW;
-        if (ctx.DOWNWARD()     != null) return Template.DW;
-        if (ctx.ROW_MAJOR()    != null) return Template.RM;
-        if (ctx.COLUMN_MAJOR() != null) return Template.CM;
-        if (ctx.CELL()         != null) return Template.CL;
-        throw new RtlCompileException("Unknown provider template");
-    }
-
-    static TraversalOrder traversalOrderFor(Template t) {
-        return switch (t) {
-            case LW -> TraversalOrder.REVERSE_ROW_MAJOR;
-            case RW -> TraversalOrder.ROW_MAJOR;
-            case UW -> TraversalOrder.REVERSE_COLUMN_MAJOR;
-            case DW -> TraversalOrder.COLUMN_MAJOR;
-            case RM -> TraversalOrder.ROW_MAJOR;
-            case CM -> TraversalOrder.COLUMN_MAJOR;
-            case CL -> TraversalOrder.ROW_MAJOR;
-        };
-    }
-
     /**
      * Builds a {@link ProviderSpec} from an RTL {@code tblProvSpec} context.
-     * The provider kind is inferred from the action type and anchor item type
-     * per Table tab:action-compatibility in the paper:
-     * REC/CONCAT + VAL anchor → VAL kind; AVP + VAL anchor → ATTR kind (cardinality capped to 1).
+     * The provider kind is inferred from the action type and anchor item type.
      */
     static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx,
                                 RTLParser.OpContext op,
                                 ItemDerivationDirective anchorType) {
-        Template template = parseTemplate(ctx.provTemplate());
-        TraversalOrder order = traversalOrderFor(template);
+        TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
         int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterCondition condition = buildCondition(template, ctx.constraints());
+        ItemFilterCondition condition = buildCondition(ctx);
         CellDerivedProviderKind kind = inferKind(op, anchorType);
         int actualCardinality = (kind == CellDerivedProviderKind.ATTR) ? 1 : cardinality;
         return new ProviderSpec(actualCardinality, order, condition, kind, null);
@@ -88,13 +59,24 @@ final class ProviderTemplateResolver {
 
     /** Builds a {@link ProviderSpec} with UNRESTRICTED kind (for inherited/context action specs). */
     static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx) {
-        Template template = parseTemplate(ctx.provTemplate());
-        TraversalOrder order = traversalOrderFor(template);
+        TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
         int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterCondition condition = buildCondition(template, ctx.constraints());
+        ItemFilterCondition condition = buildCondition(ctx);
         return new ProviderSpec(cardinality, order, condition,
                 CellDerivedProviderKind.UNRESTRICTED, null);
     }
+
+    // --- Traversal order ---
+
+    private static TraversalOrder parseTraversalOrder(RTLParser.TraversalOrderMarkContext ctx) {
+        if (ctx == null)                          return TraversalOrder.ROW_MAJOR;
+        if (ctx.columnMajor()        != null)     return TraversalOrder.COLUMN_MAJOR;
+        if (ctx.reverseRowMajor()    != null)     return TraversalOrder.REVERSE_ROW_MAJOR;
+        if (ctx.reverseColumnMajor() != null)     return TraversalOrder.REVERSE_COLUMN_MAJOR;
+        throw new RtlCompileException("Unknown traversal order mark");
+    }
+
+    // --- Kind inference ---
 
     private static CellDerivedProviderKind inferKind(RTLParser.OpContext op,
                                                      ItemDerivationDirective anchorType) {
@@ -113,126 +95,51 @@ final class ProviderTemplateResolver {
 
     // --- Condition building ---
 
-    private static ItemFilterCondition buildCondition(
-            Template template, RTLParser.ConstraintsContext constraintsCtx) {
+    private static ItemFilterCondition buildCondition(RTLParser.TblProvSpecContext ctx) {
+        List<ItemFilterCondition> parts = new ArrayList<>();
 
-        RTLParser.ColContext colCtx = null;
-        RTLParser.RowContext rowCtx = null;
-        RTLParser.PosContext posCtx = null;
-        boolean st = false;
-        List<ItemFilterCondition> contentParts = new ArrayList<>();
+        // Single bare spatConstr form
+        if (ctx.spatConstr() != null) {
+            addSpatConstrParts(ctx.spatConstr(), parts);
+        }
 
-        if (constraintsCtx != null) {
-            for (var constr : constraintsCtx.constr()) {
-                var spat = constr.spatConstr();
-                var cont = constr.contConstr();
-                if (spat != null) {
-                    if (spat.col() != null) colCtx = spat.col();
-                    else if (spat.row() != null) rowCtx = spat.row();
-                    else if (spat.pos() != null) posCtx = spat.pos();
-                    else if (spat.st() != null) st = true;
-                } else if (cont != null) {
-                    contentParts.add(buildContentConstraint(cont));
-                }
+        // Parenthesized multi-constraint form
+        if (ctx.constraints() != null) {
+            for (var constr : ctx.constraints().constr()) {
+                if (constr.spatConstr() != null) addSpatConstrParts(constr.spatConstr(), parts);
+                else if (constr.contConstr() != null) parts.add(buildContentConstraint(constr.contConstr()));
             }
         }
 
-        List<ItemFilterCondition> parts = new ArrayList<>();
-        buildTemplateParts(template, colCtx, rowCtx, posCtx, st, parts);
-        parts.addAll(contentParts);
         return andAll(parts);
     }
 
-    private static void buildTemplateParts(
-            Template t,
-            RTLParser.ColContext col,
-            RTLParser.RowContext row,
-            RTLParser.PosContext pos,
-            boolean st,
-            List<ItemFilterCondition> parts) {
+    private static void addSpatConstrParts(RTLParser.SpatConstrContext ctx,
+                                           List<ItemFilterCondition> parts) {
+        // Named spatial constraint → base condition
+        ItemFilterCondition named = namedSpatCondition(ctx);
+        if (named != null) parts.add(named);
 
-        switch (t) {
-            case LW -> {
-                // st expands scope to sameSubtable; else sameSubrow (replaced by row if present)
-                if (st)               parts.add((a, c) -> c.sameSubtable(a));
-                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else                  parts.add(rowFilter(row));
-                if (col != null) parts.add(colFilter(col));
-                parts.add((a, c) -> c.cell().col() < a.cell().col());
-            }
-            case RW -> {
-                if (st)               parts.add((a, c) -> c.sameSubtable(a));
-                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else                  parts.add(rowFilter(row));
-                if (col != null) parts.add(colFilter(col));
-                parts.add((a, c) -> c.cell().col() > a.cell().col());
-            }
-            case UW -> {
-                if (!st && row == null && col == null) {
-                    parts.add((a, c) -> c.sameSubcol(a));
-                } else {
-                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                    else             parts.add(rowFilter(row));
-                    // st removes the sameCol restriction; col constraint replaces it if present
-                    if (!st) {
-                        if (col == null) parts.add((a, c) -> c.sameCol(a));
-                        else             parts.add(colFilter(col));
-                    } else if (col != null) {
-                        parts.add(colFilter(col));
-                    }
-                }
-                parts.add((a, c) -> c.cell().row() < a.cell().row());
-            }
-            case DW -> {
-                if (!st && row == null && col == null) {
-                    parts.add((a, c) -> c.sameSubcol(a));
-                } else {
-                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                    else             parts.add(rowFilter(row));
-                    if (!st) {
-                        if (col == null) parts.add((a, c) -> c.sameCol(a));
-                        else             parts.add(colFilter(col));
-                    } else if (col != null) {
-                        parts.add(colFilter(col));
-                    }
-                }
-                parts.add((a, c) -> c.cell().row() > a.cell().row());
-            }
-            case RM -> {
-                if (st)               parts.add((a, c) -> c.sameSubtable(a));
-                else if (row == null) parts.add((a, c) -> c.sameSubrow(a));
-                else                  parts.add(rowFilter(row));
-                if (col != null) parts.add(colFilter(col));
-                parts.add((a, c) -> !c.sameCell(a));
-            }
-            case CM -> {
-                if (!st && row == null && col == null) {
-                    parts.add((a, c) -> c.sameSubcol(a));
-                } else {
-                    if (row == null) parts.add((a, c) -> c.sameSubtable(a));
-                    else             parts.add(rowFilter(row));
-                    if (!st) {
-                        if (col == null) parts.add((a, c) -> c.sameCol(a));
-                        else             parts.add(colFilter(col));
-                    } else if (col != null) {
-                        parts.add(colFilter(col));
-                    }
-                }
-                parts.add((a, c) -> !c.sameCell(a));
-            }
-            case CL -> {
-                // Any spatial constraint replaces sameCell(a)
-                boolean hasSpatial = col != null || row != null || pos != null || st;
-                if (!hasSpatial) {
-                    parts.add((a, c) -> c.sameCell(a));
-                } else {
-                    if (st)          parts.add((a, c) -> c.sameSubtable(a));
-                    if (col != null) parts.add(colFilter(col));
-                    if (row != null) parts.add(rowFilter(row));
-                    if (pos != null) parts.add(posFilter(pos));
-                }
-            }
-        }
+        // Positional constraints
+        if (ctx.col() != null) parts.add(colFilter(ctx.col()));
+        if (ctx.row() != null) parts.add(rowFilter(ctx.row()));
+        if (ctx.pos() != null) parts.add(posFilter(ctx.pos()));
+    }
+
+    /** Returns the base filter condition for a named spatial constraint token, or null for col/row/pos. */
+    private static ItemFilterCondition namedSpatCondition(RTLParser.SpatConstrContext ctx) {
+        if (ctx.LEFT_OF()   != null) return (a, c) -> c.sameSubrow(a)   && c.cell().col() < a.cell().col();
+        if (ctx.RIGHT_OF()  != null) return (a, c) -> c.sameSubrow(a)   && c.cell().col() > a.cell().col();
+        if (ctx.ABOVE()     != null) return (a, c) -> c.sameSubcol(a)   && c.cell().row() < a.cell().row();
+        if (ctx.BELOW()     != null) return (a, c) -> c.sameSubcol(a)   && c.cell().row() > a.cell().row();
+        if (ctx.ROW()       != null) return (a, c) -> c.sameRow(a)      && !c.sameCell(a);
+        if (ctx.COLUMN()    != null) return (a, c) -> c.sameCol(a)      && !c.sameCell(a);
+        if (ctx.SUBROW()    != null) return (a, c) -> c.sameSubrow(a)   && !c.sameCell(a);
+        if (ctx.SUBCOLUMN() != null) return (a, c) -> c.sameSubcol(a)   && !c.sameCell(a);
+        if (ctx.SUBTABLE()  != null) return (a, c) -> c.sameSubtable(a) && !c.sameCell(a);
+        if (ctx.TABLE()     != null) return (a, c) -> !c.sameCell(a);
+        if (ctx.CELL()      != null) return (a, c) -> c.sameCell(a);
+        return null; // col/row/pos — no named base condition
     }
 
     // --- Spatial filter builders ---
@@ -279,8 +186,8 @@ final class ProviderTemplateResolver {
     private static ItemFilterCondition rangeFilter(
             RTLParser.RangeContext ctx, IntExtractor candVal, IntExtractor anchorVal) {
         boolean hiOpen = ctx.end() == null;
-        int lo = boundaryValue(ctx.start(), anchorVal, 0);
-        int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.end(), anchorVal, Integer.MAX_VALUE);
+        int lo = boundaryValue(ctx.start(), 0);
+        int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.end(), Integer.MAX_VALUE);
         boolean loRelative = ctx.start().offset() != null;
         boolean hiRelative = !hiOpen && ctx.end().offset() != null;
         int loDelta = loRelative ? parseOffset(ctx.start().offset()) : lo;
@@ -295,15 +202,13 @@ final class ProviderTemplateResolver {
         };
     }
 
-    private static int boundaryValue(RTLParser.StartContext ctx,
-                                     IntExtractor anchor, int defaultVal) {
+    private static int boundaryValue(RTLParser.StartContext ctx, int defaultVal) {
         if (ctx.offset() != null) return parseOffset(ctx.offset());
         if (ctx.INT()    != null) return Integer.parseInt(ctx.INT().getText());
         return defaultVal;
     }
 
-    private static int boundaryValue(RTLParser.EndContext ctx,
-                                     IntExtractor anchor, int defaultVal) {
+    private static int boundaryValue(RTLParser.EndContext ctx, int defaultVal) {
         if (ctx.offset() != null) return parseOffset(ctx.offset());
         if (ctx.INT()    != null) return Integer.parseInt(ctx.INT().getText());
         return defaultVal;
