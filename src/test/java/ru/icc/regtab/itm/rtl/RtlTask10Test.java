@@ -12,7 +12,7 @@ class RtlTask10Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ []{4} [BLANK ? _] [] []{2} ]*
+                { [ []{4} [BLANK ? _] []{3} ]*
                   [ [VAL : SR->REC] [VAL]+ ]
                   [ [BLANK ? _]+ ]? }+
                 """;
