@@ -36,7 +36,7 @@ public final class RtlCompiler {
      * @return compiled table pattern
      * @throws RtlCompileException if the string cannot be parsed or compiled
      */
-    public static RtlProgram compile(String rtl) {
+    public static TablePattern compile(String rtl) {
         var lexer  = new RTLLexer(CharStreams.fromString(rtl));
         var tokens = new CommonTokenStream(lexer);
         var parser = new RTLParser(tokens);
@@ -52,7 +52,8 @@ public final class RtlCompiler {
 
         List<RecordsetTransformation> transforms = buildTransformations(tree.settings());
         TablePattern tablePattern = new ATPBuilder().visitTablePattern(tree);
-        return new RtlProgram(tablePattern, transforms);
+        if (transforms.isEmpty()) return tablePattern;
+        return new TablePattern(tablePattern.subtablePatterns(), transforms);
     }
 
     private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx) {

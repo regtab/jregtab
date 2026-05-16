@@ -9,7 +9,6 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
  * ATP equivalent of Fluent API Task07.
@@ -39,11 +38,6 @@ class AtpTask07Test extends AtpTaskBase {
                                 ))
                         )
                 )
-        );
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new AnchorAttributeAtPosition(4).apply(actual);
+        ).withTransformations(new AnchorAttributeAtPosition(4));
     }
 }

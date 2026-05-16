@@ -9,7 +9,6 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
-import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
  * ATP equivalent of Fluent API Task21.
@@ -37,11 +36,6 @@ class AtpTask21Test extends AtpTaskBase {
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )
                 )
-        );
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new WhitespaceNormalization().apply(actual);
+        ).withTransformations(new WhitespaceNormalization());
     }
 }

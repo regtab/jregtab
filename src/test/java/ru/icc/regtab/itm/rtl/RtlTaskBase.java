@@ -27,12 +27,12 @@ abstract class RtlTaskBase {
         Path taskDir = Path.of("src/test/resources/tasks/task_" + taskId());
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
-        RtlProgram program = RtlCompiler.compile(buildRtl());
-        InterpretableTable itm = AtpMatcher.match(program.tablePattern(), syntax)
+        var pattern = RtlCompiler.compile(buildRtl());
+        InterpretableTable itm = AtpMatcher.match(pattern, syntax)
                 .orElseThrow(() -> new AssertionError(
                         "RTL Task" + taskId() + " pattern did not match variant " + variantId));
 
-        Recordset actual = program.transform(new TableInterpreter()
+        Recordset actual = pattern.transform(new TableInterpreter()
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 

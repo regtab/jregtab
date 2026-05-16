@@ -26,10 +26,12 @@ abstract class AtpTaskBase {
         Path taskDir = Path.of("src/test/resources/tasks/task_" + taskId());
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
-        InterpretableTable itm = AtpMatcher.match(buildPattern(), syntax)
+        var pattern = buildPattern();
+
+        InterpretableTable itm = AtpMatcher.match(pattern, syntax)
                 .orElseThrow(() -> new AssertionError("ATP Task" + taskId() + " pattern did not match variant " + variantId));
 
-        Recordset actual = transformActual(new TableInterpreter()
+        Recordset actual = pattern.transform(new TableInterpreter()
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 
@@ -41,8 +43,4 @@ abstract class AtpTaskBase {
     protected abstract String taskId();
 
     protected abstract ru.icc.regtab.itm.atp.spec.TablePattern buildPattern();
-
-    protected Recordset transformActual(Recordset actual) {
-        return actual;
-    }
 }
