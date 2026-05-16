@@ -13,8 +13,7 @@ class RtlTask32Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                <ANCH(2)>
-                [ [] [VAL]+ ] [ [VAL] [(BLANK ? _ | VAL : (SR{1}, SC{1})->REC)]+ ]+
+                [ [] [VAL]+ ] [ [VAL] [(BLANK ? _ | VAL : (SR{1}, SC{1})->REC(2))]+ ]+
                 """;
     }
 }
