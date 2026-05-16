@@ -9,7 +9,6 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.DelimitedFieldSplit;
-import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
  * ATP equivalent of Fluent API Task25.
@@ -46,11 +45,6 @@ class AtpTask25Test extends AtpTaskBase {
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )
                 )
-        );
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new DelimitedFieldSplit(SEP).apply(actual);
+        ).withTransformations(new DelimitedFieldSplit(SEP));
     }
 }

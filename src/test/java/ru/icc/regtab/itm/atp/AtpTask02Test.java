@@ -11,7 +11,6 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
-import ru.icc.regtab.itm.recordset.Recordset;
 
 /**
  * ATP equivalent of Fluent API Task02.
@@ -54,12 +53,6 @@ class AtpTask02Test extends AtpTaskBase {
                                 CellPattern.skip()
                         )
                 )
-        );
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        Recordset normalized = new WhitespaceNormalization().apply(actual);
-        return new AnchorAttributeAtPosition(2).apply(normalized);
+        ).withTransformations(new WhitespaceNormalization(), new AnchorAttributeAtPosition(2));
     }
 }
