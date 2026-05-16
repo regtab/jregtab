@@ -247,7 +247,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     private static ActionSpec buildOp(RTLParser.OpContext ctx, List<ProviderSpec> providers) {
         if (ctx.AVP()    != null) return new ActionSpec(OperationType.AVP,    null, providers);
-        if (ctx.REC()    != null) return new ActionSpec(OperationType.REC,    null, providers);
+        if (ctx.recOp()  != null) return new ActionSpec(OperationType.REC,    null, providers);
         if (ctx.CONCAT() != null) return new ActionSpec(OperationType.CONCAT, null, providers);
         if (ctx.fillOp() != null) {
             String d = ctx.fillOp().STRING() != null

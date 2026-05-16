@@ -12,9 +12,8 @@ class RtlTask14Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                <ANCH(4)>
                 { [ [!BLANK ? VAL]{2} [BLANK?] ]
-                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST, C0){1}, (ST, C1){1}, SR{2})->REC] ]+ }+
+                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST, C0){1}, (ST, C1){1}, SR{2})->REC(4)] ]+ }+
                 """;
     }
 }

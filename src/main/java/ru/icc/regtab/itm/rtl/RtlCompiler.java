@@ -12,6 +12,8 @@ import ru.icc.regtab.itm.interpret.RecordsetTransformation;
 import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
 import ru.icc.regtab.itm.rtl.internal.ATPBuilder;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 /**
@@ -50,24 +52,77 @@ public final class RtlCompiler {
         var tree = parser.tablePattern();
         errors.throwIfAny();
 
-        List<RecordsetTransformation> transforms = buildTransformations(tree.settings());
+        InlineRecParams inline = extractInlineRecParams(tree);
+        List<RecordsetTransformation> transforms = buildTransformations(tree.settings(), inline);
         TablePattern tablePattern = new ATPBuilder().visitTablePattern(tree);
         if (transforms.isEmpty()) return tablePattern;
         return new TablePattern(tablePattern.subtablePatterns(), transforms);
     }
 
-    private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx) {
-        if (ctx == null) return List.of();
-        return ctx.setting().stream().map(RtlCompiler::buildSetting).toList();
+    private record InlineRecParams(Integer anchorPos, String splitDelimiter) {}
+
+    private static InlineRecParams extractInlineRecParams(RTLParser.TablePatternContext tree) {
+        List<Integer> anchors = new ArrayList<>();
+        List<String>  splits  = new ArrayList<>();
+        collectRecParams(tree, anchors, splits);
+        if (new LinkedHashSet<>(anchors).size() > 1)
+            throw new RtlCompileException("Conflicting REC(n) anchor positions: " + anchors);
+        if (new LinkedHashSet<>(splits).size() > 1)
+            throw new RtlCompileException("Conflicting REC('s') split delimiters: " + splits);
+        return new InlineRecParams(
+                anchors.isEmpty() ? null : anchors.get(0),
+                splits.isEmpty()  ? null : splits.get(0));
     }
 
-    private static RecordsetTransformation buildSetting(RTLParser.SettingContext ctx) {
-        if (ctx.normSetting()  != null) return new WhitespaceNormalization();
-        if (ctx.anchSetting()  != null)
-            return new AnchorAttributeAtPosition(Integer.parseInt(ctx.anchSetting().INT().getText()));
-        if (ctx.splitSetting() != null)
-            return new DelimitedFieldSplit(stripQuotes(ctx.splitSetting().STRING().getText()));
-        throw new RtlCompileException("Unknown setting");
+    private static void collectRecParams(org.antlr.v4.runtime.tree.ParseTree node,
+                                         List<Integer> anchors, List<String> splits) {
+        if (node instanceof RTLParser.RecOpContext rec) {
+            if (rec.INT()    != null) anchors.add(Integer.parseInt(rec.INT().getText()));
+            if (rec.STRING() != null) splits.add(stripQuotes(rec.STRING().getText()));
+        }
+        for (int i = 0; i < node.getChildCount(); i++)
+            collectRecParams(node.getChild(i), anchors, splits);
+    }
+
+    private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx,
+                                                                       InlineRecParams inline) {
+        List<RecordsetTransformation> result = new ArrayList<>();
+        Integer settingAnchor = null;
+        String  settingSplit  = null;
+
+        if (ctx != null) {
+            for (var s : ctx.setting()) {
+                if (s.normSetting() != null) {
+                    result.add(new WhitespaceNormalization());
+                } else if (s.anchSetting() != null) {
+                    settingAnchor = Integer.parseInt(s.anchSetting().INT().getText());
+                    result.add(new AnchorAttributeAtPosition(settingAnchor));
+                } else if (s.splitSetting() != null) {
+                    settingSplit = stripQuotes(s.splitSetting().STRING().getText());
+                    result.add(new DelimitedFieldSplit(settingSplit));
+                } else {
+                    throw new RtlCompileException("Unknown setting");
+                }
+            }
+        }
+
+        if (inline.anchorPos() != null) {
+            if (settingAnchor != null && !settingAnchor.equals(inline.anchorPos()))
+                throw new RtlCompileException(
+                        "Conflicting ANCH(" + settingAnchor + ") and REC(" + inline.anchorPos() + ")");
+            if (settingAnchor == null)
+                result.add(new AnchorAttributeAtPosition(inline.anchorPos()));
+        }
+
+        if (inline.splitDelimiter() != null) {
+            if (settingSplit != null && !settingSplit.equals(inline.splitDelimiter()))
+                throw new RtlCompileException(
+                        "Conflicting SPLIT(\"" + settingSplit + "\") and REC('" + inline.splitDelimiter() + "')");
+            if (settingSplit == null)
+                result.add(new DelimitedFieldSplit(inline.splitDelimiter()));
+        }
+
+        return List.copyOf(result);
     }
 
     private static String stripQuotes(String s) {

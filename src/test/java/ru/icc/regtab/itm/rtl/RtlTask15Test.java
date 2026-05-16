@@ -11,8 +11,7 @@ class RtlTask15Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                <ANCH(1)>
-                [ [VAL ' ' VAL : CL{1}->REC ' ' VAL : CL{1}->REC ' ' VAL : CL{1}->REC] ]+
+                [ [VAL ' ' VAL : CL{1}->REC(1) ' ' VAL : CL{1}->REC(1) ' ' VAL : CL{1}->REC(1)] ]+
                 """;
     }
 }

@@ -12,9 +12,8 @@ class RtlTask09Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                <ANCH(2)>
                 [ [] [VAL = REPL('\\s+', '')]{5} ]
-                [ { [VAL] [(BLANK? _ | VAL : (SR{1}, SC{1})->REC)]+ } ]+
+                [ { [VAL] [(BLANK? _ | VAL : (SR{1}, SC{1})->REC(2))]+ } ]+
                 """;
     }
 }
