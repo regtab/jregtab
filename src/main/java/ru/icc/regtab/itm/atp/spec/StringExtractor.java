@@ -36,4 +36,9 @@ public interface StringExtractor {
     static StringExtractor trim() {
         return String::trim;
     }
+
+    /** Whitespace-normalising extractor: trims and collapses internal whitespace to a single space. */
+    static StringExtractor norm() {
+        return s -> s.strip().replaceAll("\\s+", " ");
+    }
 }

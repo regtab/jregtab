@@ -11,6 +11,7 @@ final class StringExtractorFactory {
     static StringExtractor from(RTLParser.StrExtrContext ctx) {
         if (ctx.substr() != null)    return fromSubstr(ctx.substr());
         if (ctx.replace() != null)   return fromReplace(ctx.replace());
+        if (ctx.norm()    != null)   return StringExtractor.norm();
         if (ctx.upperCase() != null) return String::toUpperCase;
         if (ctx.lowerCase() != null) return String::toLowerCase;
         throw new IllegalStateException("Unknown strExtr alternative");
