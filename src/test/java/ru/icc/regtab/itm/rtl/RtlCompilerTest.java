@@ -330,7 +330,7 @@ class RtlCompilerTest {
     // -------- helpers --------
 
     private static TablePattern compile(String rtl) {
-        return RtlCompiler.compile(rtl).tablePattern();
+        return RtlCompiler.compile(rtl);
     }
 
     private static RowPattern row(TablePattern p, int subtable, int row) {
