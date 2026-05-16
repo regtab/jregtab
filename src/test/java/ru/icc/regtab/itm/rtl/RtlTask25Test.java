@@ -1,8 +1,5 @@
 package ru.icc.regtab.itm.rtl;
 
-import ru.icc.regtab.itm.interpret.DelimitedFieldSplit;
-import ru.icc.regtab.itm.recordset.Recordset;
-
 /**
  * RTL equivalent of AtpTask25: each row has ID cell (SUFFIX+REC+CONCAT), account cell,
  * and one-or-more data cells; rows with same ID are grouped via CONCAT.
@@ -16,12 +13,8 @@ class RtlTask25Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : RW{1}->SUFFIX('/'), RW(C+2..)->REC, DW(STR)->CONCAT] [VAL] [VAL]+ ]+
+                <SPLIT("/")>
+                [ [VAL : RT{1}->SUFFIX('/'), (RT, C+2..)->REC, (BW, STR)->CONCAT] [VAL]+ ]+
                 """;
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        return new DelimitedFieldSplit("/").apply(actual);
     }
 }

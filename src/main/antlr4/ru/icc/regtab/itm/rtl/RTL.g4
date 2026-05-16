@@ -12,7 +12,14 @@ oneOrMore  : PLUS ;
 exactly    : LCURLY INT RCURLY ;
 
 // Table pattern
-tablePattern : subtablePattern+ ;
+tablePattern : settings? subtablePattern+ ;
+
+// Optional settings prefix <NORM,ANCH(n),SPLIT("s")>
+settings     : LANGLE setting (COMMA setting)* RANGLE ;
+setting      : normSetting | anchSetting | splitSetting ;
+normSetting  : 'NORM' ;
+anchSetting  : 'ANCH' LPAREN INT RPAREN ;
+splitSetting : 'SPLIT' LPAREN STRING RPAREN ;
 
 // Subtable pattern: implicit or explicit
 subtablePattern : implSubtablePattern | explSubtablePattern ;
@@ -40,7 +47,9 @@ subrowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? cellPattern+ ;
 
 // Cell pattern
 cellPattern : LSQUARE cellPatternBody? RSQUARE quantifier? ;
-cellPatternBody : (cellMatchCond QUESTION)? actSpecs? contSpec;
+cellPatternBody : cellMatchCond QUESTION (actSpecs? contSpec)?
+               | actSpecs? contSpec
+               ;
 
 // Content specification: atomic, delimited, compound, conditional
 contSpec : atomContSpec | delimContSpec | compContSpec | condContSpec ;
@@ -108,40 +117,47 @@ cellMatchConstr : regex | blank ;
 provSpec : tblProvSpec | ctxProvSpec ;
 
 // Cell derived item provider specification
-tblProvSpec : provTemplate cardinality? constraints? ;
+// Single bare form: spatConstr only (avoids ambiguity with ctxProvSpec STRING).
+// Multiple or content constraints require parentheses.
+tblProvSpec : traversalOrderMark? (spatConstr | LPAREN constraints RPAREN) cardinality? ;
+
+// Traversal order mark (absence = ROW_MAJOR)
+traversalOrderMark : reverseRowMajor | columnMajor | reverseColumnMajor ;
+reverseRowMajor    : MINUS ;
+columnMajor        : CARET ;
+reverseColumnMajor : MINUS CARET ;
 
 // Context derived item provider specification
 ctxProvSpec : STRING ;
-
-// Provider templates
-provTemplate : LEFTWARD | RIGHTWARD | UPWARD | DOWNWARD | ROW_MAJOR | COLUMN_MAJOR | CELL ;
-
-LEFTWARD     : 'LW' ;
-RIGHTWARD    : 'RW' ;
-UPWARD       : 'UW' ;
-DOWNWARD     : 'DW' ;
-ROW_MAJOR    : 'RM' ;
-COLUMN_MAJOR : 'CM' ;
-CELL         : 'CL' ;
 
 // Cardinality k
 cardinality : LCURLY INT RCURLY ;
 
 // Constraints
-constraints : LPAREN constr ((COMMA constr)*)? RPAREN ;
+constraints : constr (COMMA constr)* ;
 constr      : spatConstr | contConstr ;
 
 // Spatial constraints
-spatConstr : col | row | pos | st ;
+spatConstr : LEFT_OF | RIGHT_OF | ABOVE | BELOW | ROW | COLUMN
+           | SUBROW | SUBCOLUMN | SUBTABLE | TABLE | CELL
+           | col | row | pos ;
 
-// Bug fix: 'COL' keyword is always required; alternatives are grouped under it
+LEFT_OF   : 'LT'  ;   // sameSubrow(a) && col < col(a)
+RIGHT_OF  : 'RT'  ;   // sameSubrow(a) && col > col(a)
+ABOVE     : 'AV'  ;   // sameSubcol(a) && row < row(a)
+BELOW     : 'BW'  ;   // sameSubcol(a) && row > row(a)
+ROW       : 'ROW' ;   // sameRow(a) && !sameCell(a)
+COLUMN    : 'COL' ;   // sameCol(a) && !sameCell(a)
+SUBROW    : 'SR'  ;   // sameSubrow(a) && !sameCell(a)
+SUBCOLUMN : 'SC'  ;   // sameSubcol(a) && !sameCell(a)
+SUBTABLE  : 'ST'  ;   // sameSubtable(a) && !sameCell(a)
+TABLE     : 'TAB' ;   // !sameCell(a)
+CELL      : 'CL'  ;   // sameCell(a)
+
+// Positional constraints
 row : 'R' (range | offset | INT) ;
 col : 'C' (range | offset | INT) ;
 pos : 'P' (range | offset | INT) ;
-
-// Same-subtable scope override
-st : SUBTABLE ;
-SUBTABLE : 'ST' ;
 
 range : start DOUBLE_PERIOD end? ;
 start : offset | INT ;
@@ -163,6 +179,7 @@ blank : EXCLAMATION? 'BLANK' ;
 
 PLUS  : '+' ;
 MINUS : '-' ;
+CARET : '^' ;
 MULT  : '*' ;
 
 LPAREN  : '(' ;
@@ -171,6 +188,8 @@ LCURLY  : '{' ;
 RCURLY  : '}' ;
 LSQUARE : '[' ;
 RSQUARE : ']' ;
+LANGLE  : '<' ;
+RANGLE  : '>' ;
 
 COLON       : ':' ;
 COMMA       : ',' ;

@@ -11,7 +11,7 @@ class RtlTask22Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : CM(C2..5)->REC] [] [VAL]+ ] [ []{2} [VAL]+ ] }+
+                { [ [VAL : ^(ST, C2..5)->REC] [] [VAL]+ ] [ []{2} [VAL]+ ] }+
                 """;
     }
 }

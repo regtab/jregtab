@@ -5,7 +5,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import ru.icc.regtab.itm.InterpretableTable;
 import ru.icc.regtab.itm.atp.AtpMatcher;
-import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.SchemaConstructionStrategy;
 import ru.icc.regtab.itm.interpret.TableInterpreter;
 import ru.icc.regtab.itm.model.syntax.TableSyntax;
@@ -28,12 +27,12 @@ abstract class RtlTaskBase {
         Path taskDir = Path.of("src/test/resources/tasks/task_" + taskId());
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
-        TablePattern pattern = RtlCompiler.compile(buildRtl());
-        InterpretableTable itm = AtpMatcher.match(pattern, syntax)
+        RtlProgram program = RtlCompiler.compile(buildRtl());
+        InterpretableTable itm = AtpMatcher.match(program.tablePattern(), syntax)
                 .orElseThrow(() -> new AssertionError(
                         "RTL Task" + taskId() + " pattern did not match variant " + variantId));
 
-        Recordset actual = transformActual(new TableInterpreter()
+        Recordset actual = program.transform(new TableInterpreter()
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 
@@ -45,8 +44,4 @@ abstract class RtlTaskBase {
     protected abstract String taskId();
 
     protected abstract String buildRtl();
-
-    protected Recordset transformActual(Recordset actual) {
-        return actual;
-    }
 }

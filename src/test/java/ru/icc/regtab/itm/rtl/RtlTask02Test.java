@@ -1,9 +1,5 @@
 package ru.icc.regtab.itm.rtl;
 
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
-import ru.icc.regtab.itm.recordset.Recordset;
-
 /**
  * RTL equivalent of AtpTask02: two header rows (#L1, #L2), data rows look up
  * both headers via CL(ST, TAG #L1 #L2) and same-row anchor via CL{1}(ROW+0).
@@ -18,16 +14,10 @@ class RtlTask02Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL #L1] [] ]
-                  [ [VAL #L2] [] ]
-                  [ [!BLANK ? VAL : (CL(ST, TAG #L1 #L2), RM{1})->REC] [VAL] ]+
-                  [ [BLANK ? _] [] ]? }+
+                <NORM,ANCH(2)>
+                { [ [VAL] [] ]{2}
+                  [ [!BLANK ? VAL : (SC{2}, SR{1})->REC] [VAL] ]+
+                  [ [BLANK?] [] ]? }+
                 """;
-    }
-
-    @Override
-    protected Recordset transformActual(Recordset actual) {
-        Recordset normalized = new WhitespaceNormalization().apply(actual);
-        return new AnchorAttributeAtPosition(2).apply(normalized);
     }
 }
