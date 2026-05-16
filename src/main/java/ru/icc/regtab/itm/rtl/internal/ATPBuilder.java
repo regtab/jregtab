@@ -22,7 +22,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         List<SubtablePattern> subtables = ctx.subtablePattern().stream()
                 .map(sp -> (SubtablePattern) visit(sp))
                 .toList();
-        return new TablePattern(subtables);
+        return new TablePattern(subtables, List.of());
     }
 
     // -------- subtable --------

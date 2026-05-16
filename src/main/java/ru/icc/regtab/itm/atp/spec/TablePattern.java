@@ -37,7 +37,8 @@ public record TablePattern(
 
     /** Applies all transformations in order to the given recordset. */
     public Recordset transform(Recordset rs) {
-        for (var t : transformations) rs = t.apply(rs);
+        for (var t : transformations)
+            rs = t.withAnonymousAttributeTemplate("$a_%i").apply(rs);
         return rs;
     }
 }
