@@ -68,11 +68,12 @@ SKIPPED   : 'SKIP' | '_' ;
 tags : TAG+ ;
 
 // Item string extractor
-strExtr : substr | replace | upperCase | lowerCase ;
+strExtr : substr | replace | norm | upperCase | lowerCase ;
 
 // String processing
 substr    : 'SUBSTR' LPAREN INT COMMA INT RPAREN ;
 replace   : 'REPL'   LPAREN STRING COMMA STRING RPAREN ;
+norm      : 'NORM' ;
 upperCase : 'UC' ;
 lowerCase : 'LC' ;
 
