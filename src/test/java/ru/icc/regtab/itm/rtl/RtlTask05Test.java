@@ -13,7 +13,7 @@ class RtlTask05Test extends RtlTaskBase {
         return """
                 [ [] [VAL]+ ]
                 [ []+ ]
-                [ [VAL] [VAL : (SR{1}, SC{1})->REC(2)]+ ]+
+                [ [VAL] [VAL : (SR{1}, SC)->REC(2)]+ ]+
                 """;
     }
 }

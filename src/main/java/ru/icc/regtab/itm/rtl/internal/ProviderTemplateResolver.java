@@ -89,7 +89,8 @@ final class ProviderTemplateResolver {
     // --- Cardinality ---
 
     private static int parseCardinality(RTLParser.CardinalityContext ctx) {
-        if (ctx == null) return ProviderSpec.UNBOUNDED;
+        if (ctx == null)              return 1;
+        if (ctx.MULT() != null)       return ProviderSpec.UNBOUNDED;
         return Integer.parseInt(ctx.INT().getText());
     }
 

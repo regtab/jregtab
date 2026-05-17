@@ -12,7 +12,7 @@ class RtlTask34Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : ^ST->REC] ] 
+                { [ [VAL : ^ST*->REC] ] 
                   [ [VAL] ]{4} }+
                 """;
     }

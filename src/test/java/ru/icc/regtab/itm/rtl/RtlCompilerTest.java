@@ -117,7 +117,7 @@ class RtlCompilerTest {
 
     @Test
     void parse_multipleProviders() {
-        TablePattern p = compile("[ [VAL : (-^AV{1}, -LT{1}, CL{1})->REC] ]");
+        TablePattern p = compile("[ [VAL : (-^AV, -LT, CL)->REC] ]");
         var a = assertAtom(cell(row(p, 0, 0), 0, 0)).actions().get(0);
         assertEquals(OperationType.REC, a.operationType());
         assertEquals(3, a.providers().size());
@@ -268,14 +268,14 @@ class RtlCompilerTest {
      * <pre>
      *   [ [SKIP] [VAL : 'AIRLINE'->AVP]+ ]
      *   [ [VAL : 'AIRPORT'->AVP]
-     *     [VAL : (^SC{1}, -LT{1}, CL{1})->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+     *     [VAL : (^SC, -LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
      * </pre>
      *
      * Providers per ND item:
      * <ul>
-     *   <li>^SC{1}: first val in same subcol scanning top-down → airline code from header</li>
-     *   <li>-LT{1}: first val to the left in same subrow → airport code</li>
-     *   <li>CL{1}: val item in same cell → month</li>
+     *   <li>^SC: first val in same subcol scanning top-down → airline code from header</li>
+     *   <li>-LT: first val to the left in same subrow → airport code</li>
+     *   <li>CL: val item in same cell → month</li>
      * </ul>
      */
     @Test
@@ -283,7 +283,7 @@ class RtlCompilerTest {
         TablePattern p = compile("""
                 [ [SKIP] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
-                  [VAL : (^SC{1}, -LT{1}, CL{1})->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+                  [VAL : (^SC, -LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
                 """);
 
         var syntax = buildTable(new String[][]{

@@ -11,7 +11,7 @@ class RtlTask21Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL=NORM : BW->REC]+ ] [ [VAL=NORM]+ ]{2} }+
+                { [ [VAL=NORM : BW*->REC]+ ] [ [VAL=NORM]+ ]{2} }+
                 """;
     }
 }
