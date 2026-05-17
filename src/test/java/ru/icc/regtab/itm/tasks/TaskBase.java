@@ -61,8 +61,10 @@ public abstract class TaskBase {
         InterpretableTable itm = buildItm(syntax);
         Recordset actual = transformActual(newTableInterpreter().interpret(itm));
         if (Files.exists(expectedPath)) {
-            Recordset expected = CsvRecordsetLoader.load(expectedPath);
             RecordsetMatchOptions matchOpts = TaskMatchOptionsLoader.load(tasksRoot, tid);
+            Recordset expected = matchOpts.expectedHasHeader()
+                    ? CsvRecordsetLoader.load(expectedPath)
+                    : CsvRecordsetLoader.load(expectedPath, actual.schema());
             RecordsetAssert.assertMatches(actual, expected, matchOpts);
         }
     }

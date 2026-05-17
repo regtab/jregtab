@@ -1,9 +1,18 @@
 {
   "attributeOrder": "STRICT",
   "recordOrder": "STRICT",
+  "expectedHasHeader": false,
   "tasks": {
-    "05": {
-      "attributeOrder": "STRICT"
-    }
+    "13": { "expectedHasHeader": true },
+    "18": { "expectedHasHeader": true },
+    "23": { "expectedHasHeader": true },
+    "26": { "expectedHasHeader": true },
+    "36": { "expectedHasHeader": true },
+    "40": { "expectedHasHeader": true },
+    "42": { "expectedHasHeader": true },
+    "43": { "expectedHasHeader": true },
+    "46": { "expectedHasHeader": true },
+    "48": { "expectedHasHeader": true },
+    "50": { "expectedHasHeader": true }
   }
 }

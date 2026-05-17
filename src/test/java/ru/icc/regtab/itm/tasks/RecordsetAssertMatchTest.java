@@ -16,6 +16,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class RecordsetAssertMatchTest {
@@ -118,6 +119,41 @@ class RecordsetAssertMatchTest {
         RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tmp, "07");
         assertEquals(OrderPolicy.STRICT, o.attributeOrder());
         assertEquals(OrderPolicy.FLEXIBLE, o.recordOrder());
+    }
+
+    @Test
+    void taskMatchOptionsLoader_expectedHasHeader_false_perTask(@TempDir Path tmp) throws IOException {
+        Path taskDir = Files.createDirectories(tmp.resolve("task_01"));
+        Files.writeString(taskDir.resolve("task_match_options.json"),
+                "{ \"expectedHasHeader\": false }");
+        RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tmp, "01");
+        assertFalse(o.expectedHasHeader());
+    }
+
+    @Test
+    void taskMatchOptionsLoader_expectedHasHeader_false_global(@TempDir Path tmp) throws IOException {
+        Files.writeString(tmp.resolve("task_match_options.json"),
+                "{ \"expectedHasHeader\": false }");
+        RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tmp, "01");
+        assertFalse(o.expectedHasHeader());
+    }
+
+    @Test
+    void taskMatchOptionsLoader_expectedHasHeader_realFilePath() throws IOException {
+        Path tasksRoot = Path.of("src/test/resources/tasks");
+        RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tasksRoot, "01");
+        assertFalse(o.expectedHasHeader());
+    }
+
+    @Test
+    void csvRecordsetLoader_headerless(@TempDir Path tmp) throws IOException {
+        Path csv = tmp.resolve("data.csv");
+        Files.writeString(csv, "\"a\",\"b\"\n\"c\",\"d\"\n");
+        Schema schema = new Schema(List.of("x", "y"));
+        Recordset rs = CsvRecordsetLoader.load(csv, schema);
+        assertEquals(2, rs.size());
+        assertEquals("a", rs.get(0).get("x"));
+        assertEquals("d", rs.get(1).get("y"));
     }
 
     private static Recordset rs(List<String> attrs, List<Map<String, String>> rows) {

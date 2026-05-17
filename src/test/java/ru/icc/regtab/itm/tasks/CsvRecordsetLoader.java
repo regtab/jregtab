@@ -31,6 +31,27 @@ public final class CsvRecordsetLoader {
             .build();
 
     /**
+     * Loads Recordset from a header-less CSV. All rows are data rows; attribute names
+     * are taken from the provided schema (positional mapping).
+     */
+    public static Recordset load(Path path, Schema schema) throws IOException {
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+             CSVParser parser = new CSVParser(reader, FORMAT)) {
+            List<String> attributes = schema.attributes();
+            List<Record> recordList = new ArrayList<>();
+            for (CSVRecord rec : parser.getRecords()) {
+                Map<String, String> values = new LinkedHashMap<>();
+                for (int j = 0; j < attributes.size(); j++) {
+                    String val = j < rec.size() ? rec.get(j) : null;
+                    values.put(attributes.get(j), val != null ? val : "");
+                }
+                recordList.add(new Record(schema, values));
+            }
+            return new Recordset(schema, recordList);
+        }
+    }
+
+    /**
      * Loads Recordset from path. First row = schema (attribute names), rest = records.
      */
     public static Recordset load(Path path) throws IOException {
