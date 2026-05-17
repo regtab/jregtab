@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask15: compound spec with three CL{1}->REC segments.
+ * RTL equivalent of AtpTask15: compound spec with three CL->REC segments.
  */
 class RtlTask15Test extends RtlTaskBase {
 
@@ -11,7 +11,7 @@ class RtlTask15Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL ' ' VAL : CL{1}->REC(1) ' ' VAL : CL{1}->REC(1) ' ' VAL : CL{1}->REC(1)] ]+
+                [ [VAL ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1)] ]+
                 """;
     }
 }

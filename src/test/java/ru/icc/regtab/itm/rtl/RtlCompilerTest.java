@@ -102,22 +102,30 @@ class RtlCompilerTest {
 
     @Test
     void parse_spatialConstraints() {
-        compile("[ [VAL : ^(BW, C+0)->REC] ]");
-        compile("[ [VAL : ^(BW, R-1)->REC] ]");
-        compile("[ [VAL : (CL, P0..5)->REC] ]");
-        compile("[ [VAL : (SR, C+0..-1)->REC] ]");
+        compile("[ [VAL : ^(BW & C+0)->REC] ]");
+        compile("[ [VAL : ^(BW & R-1)->REC] ]");
+        compile("[ [VAL : (CL & P0..5)->REC] ]");
+        compile("[ [VAL : (SR & C+0..-1)->REC] ]");
     }
 
     @Test
     void parse_contentConstraints() {
-        compile("[ [VAL : (SR, \"pattern\")->REC] ]");
-        compile("[ [VAL : (SR, BLANK)->REC] ]");
-        compile("[ [VAL : (SR, TAG #t1 #t2)->REC] ]");
+        compile("[ [VAL : (SR & \"pattern\")->REC] ]");
+        compile("[ [VAL : (SR & BLANK)->REC] ]");
+        compile("[ [VAL : (SR & TAG #t1 #t2)->REC] ]");
+    }
+
+    @Test
+    void parse_orConstraints() {
+        compile("[ [VAL : (LT | RT)->REC] ]");
+        compile("[ [VAL : (SR & C2 | SR & C5)->REC] ]");
+        compile("[ [VAL : (SR & (C2 | C4 | C1 | C3))->REC] ]");
+        compile("[ [VAL : (BLANK | SR & C0)->REC] ]");
     }
 
     @Test
     void parse_multipleProviders() {
-        TablePattern p = compile("[ [VAL : (-^AV{1}, -LT{1}, CL{1})->REC] ]");
+        TablePattern p = compile("[ [VAL : (-^AV, -LT, CL)->REC] ]");
         var a = assertAtom(cell(row(p, 0, 0), 0, 0)).actions().get(0);
         assertEquals(OperationType.REC, a.operationType());
         assertEquals(3, a.providers().size());
@@ -268,14 +276,14 @@ class RtlCompilerTest {
      * <pre>
      *   [ [SKIP] [VAL : 'AIRLINE'->AVP]+ ]
      *   [ [VAL : 'AIRPORT'->AVP]
-     *     [VAL : (^SC{1}, -LT{1}, CL{1})->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+     *     [VAL : (^SC, -LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
      * </pre>
      *
      * Providers per ND item:
      * <ul>
-     *   <li>^SC{1}: first val in same subcol scanning top-down → airline code from header</li>
-     *   <li>-LT{1}: first val to the left in same subrow → airport code</li>
-     *   <li>CL{1}: val item in same cell → month</li>
+     *   <li>^SC: first val in same subcol scanning top-down → airline code from header</li>
+     *   <li>-LT: first val to the left in same subrow → airport code</li>
+     *   <li>CL: val item in same cell → month</li>
      * </ul>
      */
     @Test
@@ -283,7 +291,7 @@ class RtlCompilerTest {
         TablePattern p = compile("""
                 [ [SKIP] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
-                  [VAL : (^SC{1}, -LT{1}, CL{1})->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+                  [VAL : (^SC, -LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
                 """);
 
         var syntax = buildTable(new String[][]{
