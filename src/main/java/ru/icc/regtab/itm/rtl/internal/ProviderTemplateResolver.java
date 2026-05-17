@@ -97,21 +97,32 @@ final class ProviderTemplateResolver {
     // --- Condition building ---
 
     private static ItemFilterCondition buildCondition(RTLParser.TblProvSpecContext ctx) {
-        List<ItemFilterCondition> parts = new ArrayList<>();
-
-        // Single bare spatConstr form
         if (ctx.spatConstr() != null) {
+            List<ItemFilterCondition> parts = new ArrayList<>();
             addSpatConstrParts(ctx.spatConstr(), parts);
+            return andAll(parts);
         }
+        if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
+        return (a, c) -> true;
+    }
 
-        // Parenthesized multi-constraint form
-        if (ctx.constraints() != null) {
-            for (var constr : ctx.constraints().constr()) {
-                if (constr.spatConstr() != null) addSpatConstrParts(constr.spatConstr(), parts);
-                else if (constr.contConstr() != null) parts.add(buildContentConstraint(constr.contConstr()));
-            }
-        }
+    private static ItemFilterCondition buildConstraints(RTLParser.ConstraintsContext ctx) {
+        return orAll(ctx.orGroup().stream().map(ProviderTemplateResolver::buildOrGroup).toList());
+    }
 
+    private static ItemFilterCondition buildOrGroup(RTLParser.OrGroupContext ctx) {
+        return andAll(ctx.baseConstr().stream().map(ProviderTemplateResolver::buildBaseConstr).toList());
+    }
+
+    private static ItemFilterCondition buildBaseConstr(RTLParser.BaseConstrContext ctx) {
+        if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
+        return buildConstr(ctx.constr());
+    }
+
+    private static ItemFilterCondition buildConstr(RTLParser.ConstrContext ctx) {
+        List<ItemFilterCondition> parts = new ArrayList<>();
+        if (ctx.spatConstr() != null) addSpatConstrParts(ctx.spatConstr(), parts);
+        else if (ctx.contConstr() != null) parts.add(buildContentConstraint(ctx.contConstr()));
         return andAll(parts);
     }
 
@@ -262,6 +273,18 @@ final class ProviderTemplateResolver {
             final ItemFilterCondition prev = result;
             final ItemFilterCondition next = parts.get(i);
             result = (a, c) -> prev.test(a, c) && next.test(a, c);
+        }
+        return result;
+    }
+
+    private static ItemFilterCondition orAll(List<ItemFilterCondition> parts) {
+        if (parts.isEmpty()) return (a, c) -> true;
+        if (parts.size() == 1) return parts.get(0);
+        ItemFilterCondition result = parts.get(0);
+        for (int i = 1; i < parts.size(); i++) {
+            final ItemFilterCondition prev = result;
+            final ItemFilterCondition next = parts.get(i);
+            result = (a, c) -> prev.test(a, c) || next.test(a, c);
         }
         return result;
     }

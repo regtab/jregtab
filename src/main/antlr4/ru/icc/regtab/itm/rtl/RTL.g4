@@ -135,8 +135,10 @@ ctxProvSpec : STRING ;
 // Cardinality k: {n} = at most n; * = UNBOUNDED (0..*); absent = at most 1 (default)
 cardinality : LCURLY INT RCURLY | MULT ;
 
-// Constraints
-constraints : constr (AMP constr)* ;
+// Constraints (| has lower precedence than &; parentheses for explicit grouping)
+constraints : orGroup (VBAR orGroup)* ;
+orGroup     : baseConstr (AMP baseConstr)* ;
+baseConstr  : constr | LPAREN constraints RPAREN ;
 constr      : spatConstr | contConstr ;
 
 // Spatial constraints

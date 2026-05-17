@@ -116,6 +116,14 @@ class RtlCompilerTest {
     }
 
     @Test
+    void parse_orConstraints() {
+        compile("[ [VAL : (LT | RT)->REC] ]");
+        compile("[ [VAL : (SR & C2 | SR & C5)->REC] ]");
+        compile("[ [VAL : (SR & (C2 | C4 | C1 | C3))->REC] ]");
+        compile("[ [VAL : (BLANK | SR & C0)->REC] ]");
+    }
+
+    @Test
     void parse_multipleProviders() {
         TablePattern p = compile("[ [VAL : (-^AV, -LT, CL)->REC] ]");
         var a = assertAtom(cell(row(p, 0, 0), 0, 0)).actions().get(0);
