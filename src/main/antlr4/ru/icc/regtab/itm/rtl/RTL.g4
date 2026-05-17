@@ -136,7 +136,7 @@ ctxProvSpec : STRING ;
 cardinality : LCURLY INT RCURLY | MULT ;
 
 // Constraints
-constraints : constr (COMMA constr)* ;
+constraints : constr (AMP constr)* ;
 constr      : spatConstr | contConstr ;
 
 // Spatial constraints
@@ -183,6 +183,7 @@ PLUS  : '+' ;
 MINUS : '-' ;
 CARET : '^' ;
 MULT  : '*' ;
+AMP   : '&' ;
 
 LPAREN  : '(' ;
 RPAREN  : ')' ;

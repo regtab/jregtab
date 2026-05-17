@@ -12,7 +12,7 @@ class RtlTask33Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : SR*->REC, (BW, STR)*->CONCAT] [VAL]+ ]+
+                [ [VAL : SR*->REC, (BW & STR)*->CONCAT] [VAL]+ ]+
                 """;
     }
 }

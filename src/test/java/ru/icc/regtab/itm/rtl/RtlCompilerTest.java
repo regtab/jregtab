@@ -102,17 +102,17 @@ class RtlCompilerTest {
 
     @Test
     void parse_spatialConstraints() {
-        compile("[ [VAL : ^(BW, C+0)->REC] ]");
-        compile("[ [VAL : ^(BW, R-1)->REC] ]");
-        compile("[ [VAL : (CL, P0..5)->REC] ]");
-        compile("[ [VAL : (SR, C+0..-1)->REC] ]");
+        compile("[ [VAL : ^(BW & C+0)->REC] ]");
+        compile("[ [VAL : ^(BW & R-1)->REC] ]");
+        compile("[ [VAL : (CL & P0..5)->REC] ]");
+        compile("[ [VAL : (SR & C+0..-1)->REC] ]");
     }
 
     @Test
     void parse_contentConstraints() {
-        compile("[ [VAL : (SR, \"pattern\")->REC] ]");
-        compile("[ [VAL : (SR, BLANK)->REC] ]");
-        compile("[ [VAL : (SR, TAG #t1 #t2)->REC] ]");
+        compile("[ [VAL : (SR & \"pattern\")->REC] ]");
+        compile("[ [VAL : (SR & BLANK)->REC] ]");
+        compile("[ [VAL : (SR & TAG #t1 #t2)->REC] ]");
     }
 
     @Test
