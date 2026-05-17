@@ -12,6 +12,8 @@ import ru.icc.regtab.itm.recordset.Recordset;
 import ru.icc.regtab.itm.tasks.CsvRecordsetLoader;
 import ru.icc.regtab.itm.tasks.CsvTableLoader;
 import ru.icc.regtab.itm.tasks.RecordsetAssert;
+import ru.icc.regtab.itm.tasks.RecordsetMatchOptions;
+import ru.icc.regtab.itm.tasks.TaskMatchOptionsLoader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -36,8 +38,13 @@ abstract class RtlTaskBase {
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 
-        Recordset expected = CsvRecordsetLoader.load(taskDir.resolve("expected_" + variantId + ".csv"));
-        RecordsetAssert.assertMatches(actual, expected);
+        Path tasksRoot = Path.of("src/test/resources/tasks");
+        RecordsetMatchOptions matchOpts = TaskMatchOptionsLoader.load(tasksRoot, taskId());
+        Path expectedPath = taskDir.resolve("expected_" + variantId + ".csv");
+        Recordset expected = matchOpts.expectedHasHeader()
+                ? CsvRecordsetLoader.load(expectedPath)
+                : CsvRecordsetLoader.load(expectedPath, actual.schema());
+        RecordsetAssert.assertMatches(actual, expected, matchOpts);
         assertTrue(actual.size() > 0);
     }
 

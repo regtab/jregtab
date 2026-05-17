@@ -82,7 +82,8 @@ public final class TaskMatchOptionsLoader {
     private static RecordsetMatchOptions optionsFromTopLevel(RootOptionsFile root) {
         OrderPolicy ao = parsePolicyOrDefault(root.attributeOrder, OrderPolicy.STRICT);
         OrderPolicy ro = parsePolicyOrDefault(root.recordOrder, OrderPolicy.STRICT);
-        return new RecordsetMatchOptions(ao, ro);
+        boolean hdr = root.expectedHasHeader != null ? root.expectedHasHeader : true;
+        return new RecordsetMatchOptions(ao, ro, hdr);
     }
 
     private static RecordsetMatchOptions mergePartial(RecordsetMatchOptions base, PartialOptions patch) {
@@ -95,7 +96,8 @@ public final class TaskMatchOptionsLoader {
         OrderPolicy ro = patch.recordOrder != null && !patch.recordOrder.isBlank()
                 ? parsePolicy(patch.recordOrder)
                 : base.recordOrder();
-        return new RecordsetMatchOptions(ao, ro);
+        boolean hdr = patch.expectedHasHeader != null ? patch.expectedHasHeader : base.expectedHasHeader();
+        return new RecordsetMatchOptions(ao, ro, hdr);
     }
 
     private static OrderPolicy parsePolicyOrDefault(String raw, OrderPolicy defaultPolicy) {
@@ -119,6 +121,7 @@ public final class TaskMatchOptionsLoader {
     private static final class RootOptionsFile {
         public String attributeOrder;
         public String recordOrder;
+        public Boolean expectedHasHeader;
         public Map<String, PartialOptions> tasks;
     }
 
@@ -126,6 +129,7 @@ public final class TaskMatchOptionsLoader {
     private static final class PartialOptions {
         public String attributeOrder;
         public String recordOrder;
+        public Boolean expectedHasHeader;
     }
 
 }
