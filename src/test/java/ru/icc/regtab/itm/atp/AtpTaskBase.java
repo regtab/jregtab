@@ -11,6 +11,8 @@ import ru.icc.regtab.itm.recordset.Recordset;
 import ru.icc.regtab.itm.tasks.CsvRecordsetLoader;
 import ru.icc.regtab.itm.tasks.CsvTableLoader;
 import ru.icc.regtab.itm.tasks.RecordsetAssert;
+import ru.icc.regtab.itm.tasks.RecordsetMatchOptions;
+import ru.icc.regtab.itm.tasks.TaskMatchOptionsLoader;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,7 +25,8 @@ abstract class AtpTaskBase {
     @ValueSource(ints = {1, 2, 3, 4, 5})
     @DisplayName("ATP task matches Fluent API fixtures")
     final void runTaskVariants(int variantId) throws IOException {
-        Path taskDir = Path.of("src/test/resources/tasks/task_" + taskId());
+        Path tasksRoot = Path.of("src/test/resources/tasks");
+        Path taskDir = tasksRoot.resolve("task_" + taskId());
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
         var pattern = buildPattern();
@@ -35,8 +38,12 @@ abstract class AtpTaskBase {
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 
-        Recordset expected = CsvRecordsetLoader.load(taskDir.resolve("expected_" + variantId + ".csv"));
-        RecordsetAssert.assertMatches(actual, expected);
+        RecordsetMatchOptions matchOpts = TaskMatchOptionsLoader.load(tasksRoot, taskId());
+        Path expectedPath = taskDir.resolve("expected_" + variantId + ".csv");
+        Recordset expected = matchOpts.expectedHasHeader()
+                ? CsvRecordsetLoader.load(expectedPath)
+                : CsvRecordsetLoader.load(expectedPath, actual.schema());
+        RecordsetAssert.assertMatches(actual, expected, matchOpts);
         assertTrue(actual.size() > 0);
     }
 
