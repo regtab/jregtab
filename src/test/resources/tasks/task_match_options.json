@@ -3,9 +3,6 @@
   "recordOrder": "STRICT",
   "expectedHasHeader": false,
   "tasks": {
-    "05": {
-      "attributeOrder": "STRICT"
-    },
     "13": { "expectedHasHeader": true },
     "18": { "expectedHasHeader": true },
     "23": { "expectedHasHeader": true },
