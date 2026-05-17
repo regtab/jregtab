@@ -122,11 +122,26 @@ class RecordsetAssertMatchTest {
     }
 
     @Test
-    void taskMatchOptionsLoader_expectedHasHeader_false(@TempDir Path tmp) throws IOException {
+    void taskMatchOptionsLoader_expectedHasHeader_false_perTask(@TempDir Path tmp) throws IOException {
         Path taskDir = Files.createDirectories(tmp.resolve("task_01"));
         Files.writeString(taskDir.resolve("task_match_options.json"),
                 "{ \"expectedHasHeader\": false }");
         RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tmp, "01");
+        assertFalse(o.expectedHasHeader());
+    }
+
+    @Test
+    void taskMatchOptionsLoader_expectedHasHeader_false_global(@TempDir Path tmp) throws IOException {
+        Files.writeString(tmp.resolve("task_match_options.json"),
+                "{ \"expectedHasHeader\": false }");
+        RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tmp, "01");
+        assertFalse(o.expectedHasHeader());
+    }
+
+    @Test
+    void taskMatchOptionsLoader_expectedHasHeader_realFilePath() throws IOException {
+        Path tasksRoot = Path.of("src/test/resources/tasks");
+        RecordsetMatchOptions o = TaskMatchOptionsLoader.load(tasksRoot, "01");
         assertFalse(o.expectedHasHeader());
     }
 
