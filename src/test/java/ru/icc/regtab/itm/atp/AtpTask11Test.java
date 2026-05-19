@@ -18,8 +18,8 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask11Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_IN_SAME_ROW = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
-    private static final ProviderSpec FIRST_IN_SAME_COL = ProviderSpec.of(1, (a, c) -> c.sameCol(a));
+    private static final ProviderSpec FIRST_IN_SAME_ROW = ProviderSpec.of(1, (a, c) -> c.sameSubrow(a));
+    private static final ProviderSpec FIRST_IN_SAME_COL = ProviderSpec.of(1, (a, c) -> c.sameSubcol(a));
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 

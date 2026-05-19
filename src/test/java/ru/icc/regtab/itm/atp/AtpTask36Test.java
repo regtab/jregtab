@@ -20,7 +20,7 @@ class AtpTask36Test extends AtpTaskBase {
             ProviderSpec.val((a, c) -> c.col(2) && c.sameSubtable(a));
 
     private static final ProviderSpec ATTR_LEFT_OF_GRADE =
-            ProviderSpec.attr((a, c) -> c.leftOf(a).sameRow());
+            ProviderSpec.attr((a, c) -> c.leftOf(a).sameSubrow());
 
     @Override
     protected String taskId() {

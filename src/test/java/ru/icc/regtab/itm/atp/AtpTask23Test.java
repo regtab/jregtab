@@ -16,16 +16,16 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 class AtpTask23Test extends AtpTaskBase {
 
     private static final ProviderSpec REC_VALUE_COL =
-            ProviderSpec.val((a, c) -> c.sameRow(a));
+            ProviderSpec.val((a, c) -> c.sameSubrow(a));
 
     private static final ProviderSpec SUFFIX_SOFTWARE_RIGHT =
-            ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.rightOf(a).sameRow());
+            ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.rightOf(a).sameSubrow());
 
     private static final ProviderSpec SAME_ROW_ATTR =
-            ProviderSpec.attr((a, c) -> c.sameRow(a));
+            ProviderSpec.attr((a, c) -> c.sameSubrow(a));
 
     private static final ProviderSpec SAME_ID_BELOW =
-            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameStr(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

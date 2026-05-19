@@ -18,10 +18,10 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
  */
 class AtpTask38Test extends AtpTaskBase {
 
-    private static final ProviderSpec SAME_ROW = ProviderSpec.of((a, c) -> c.sameRow(a));
+    private static final ProviderSpec SAME_ROW = ProviderSpec.of((a, c) -> c.sameSubrow(a));
 
     private static final ProviderSpec FILL_FROM_ABOVE =
-            ProviderSpec.of(1, TraversalOrder.REVERSE_ROW_MAJOR, (a, c) -> c.above(a).sameCol());
+            ProviderSpec.of(1, TraversalOrder.REVERSE_ROW_MAJOR, (a, c) -> c.above(a).sameSubtable() && c.above(a).sameCol());
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 

@@ -18,7 +18,7 @@ class AtpTask16Test extends AtpTaskBase {
             ProviderSpec.of(1, (a, c) -> c.rightOf(a).sameRow());
 
     private static final ProviderSpec CONCAT_SAME_LABEL_BELOW =
-            ProviderSpec.of((a, c) -> c.below(a).sameCol() && c.sameStr(a));
+            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

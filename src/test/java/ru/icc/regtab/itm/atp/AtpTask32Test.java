@@ -18,10 +18,10 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 class AtpTask32Test extends AtpTaskBase {
 
     private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val(1, (a, c) -> c.sameRow(a));
+            ProviderSpec.val(1, (a, c) -> c.sameSubrow(a));
 
     private static final ProviderSpec FIRST_IN_SAME_COL =
-            ProviderSpec.val(1, (a, c) -> c.sameCol(a));
+            ProviderSpec.val(1, (a, c) -> c.sameSubcol(a));
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 

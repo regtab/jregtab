@@ -15,7 +15,7 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask03Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_IN_SAME_ROW = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
+    private static final ProviderSpec FIRST_IN_SAME_ROW = ProviderSpec.of(1, (a, c) -> c.sameSubrow(a));
 
     @Override
     protected String taskId() {

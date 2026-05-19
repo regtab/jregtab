@@ -23,7 +23,7 @@ class AtpTask02Test extends AtpTaskBase {
     private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.of((a, c) ->
             c.sameSubtable(a) && (c.hasTag("#L1") || c.hasTag("#L2")));
 
-    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
+    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(1, (a, c) -> c.sameSubrow(a));
 
     @Override
     protected String taskId() {

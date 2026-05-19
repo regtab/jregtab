@@ -22,7 +22,7 @@ class AtpTask40Test extends AtpTaskBase {
             ProviderSpec.val((a, c) -> c.sameSubtable(a) && c.col(1));
 
     private static final ProviderSpec ATTR_IN_SAME_ROW =
-            ProviderSpec.attr((a, c) -> c.sameRow(a));
+            ProviderSpec.attr((a, c) -> c.sameSubrow(a));
 
     @Override
     protected String taskId() {

@@ -17,9 +17,9 @@ class AtpTask47Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.sameRow(a));
+    private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.sameSubrow(a));
     private static final ProviderSpec SAME_SURNAME_BELOW = ProviderSpec.val((a, c) ->
-            c.below(a).sameCol() && c.sameStr(a));
+            c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
 
     @Override
     protected String taskId() {

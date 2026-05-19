@@ -23,7 +23,7 @@ class AtpTask14Test extends AtpTaskBase {
             ProviderSpec.of(1, (a, c) -> c.sameSubtable(a) && c.col(1));
 
     private static final ProviderSpec SAME_ROW =
-            ProviderSpec.of(2, (a, c) -> c.sameRow(a));
+            ProviderSpec.of(2, (a, c) -> c.sameSubrow(a));
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());

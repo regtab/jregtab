@@ -15,8 +15,8 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask05Test extends AtpTaskBase {
 
-    private static final ProviderSpec UNPIVOT_ROW_KEY = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
-    private static final ProviderSpec UNPIVOT_COL_KEY = ProviderSpec.of(1, (a, c) -> c.sameCol(a));
+    private static final ProviderSpec UNPIVOT_ROW_KEY = ProviderSpec.of(1, (a, c) -> c.sameSubrow(a));
+    private static final ProviderSpec UNPIVOT_COL_KEY = ProviderSpec.of(1, (a, c) -> c.sameSubcol(a));
 
     @Override
     protected String taskId() {

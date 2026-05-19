@@ -18,7 +18,7 @@ class AtpTask26Test extends AtpTaskBase {
             ProviderSpec.of((a, c) -> c.sameSubtable(a) && c.col(2));
 
     private static final ProviderSpec ATTR_IN_SAME_ROW =
-            ProviderSpec.attr((a, c) -> c.sameRow(a));
+            ProviderSpec.attr((a, c) -> c.sameSubrow(a));
 
     @Override
     protected String taskId() {
