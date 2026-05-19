@@ -9,6 +9,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task39: compound cell — price VAL (rec same-cell),
@@ -16,7 +17,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask39Test extends AtpTaskBase {
 
-    private static final ProviderSpec SAME_CELL = ProviderSpec.of((a, c) -> c.sameCell(a));
+    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.sameCell(a);
 
     @Override
     protected String taskId() {
@@ -26,7 +27,7 @@ class AtpTask39Test extends AtpTaskBase {
     @Override
     protected TablePattern buildPattern() {
         CompoundContentSpec priceBedroomSpec = CompoundContentSpec.of(
-                AtomicContentSpec.val(ActionSpec.rec(SAME_CELL)),
+                AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.of(SAME_CELL))),
                 CompoundContentSpec.Segment.of(" / ", AtomicContentSpec.val()),
                 CompoundContentSpec.Segment.of("br", AtomicContentSpec.skip())
         );

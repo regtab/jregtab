@@ -8,6 +8,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
@@ -15,17 +16,9 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
  */
 class AtpTask23Test extends AtpTaskBase {
 
-    private static final ProviderSpec REC_VALUE_COL =
-            ProviderSpec.val((a, c) -> c.sameSubrow(a));
-
-    private static final ProviderSpec SUFFIX_SOFTWARE_RIGHT =
-            ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, (a, c) -> c.rightOf(a).sameSubrow());
-
-    private static final ProviderSpec SAME_ROW_ATTR =
-            ProviderSpec.attr((a, c) -> c.sameSubrow(a));
-
-    private static final ProviderSpec SAME_ID_BELOW =
-            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
+    private static final ItemFilterCondition SAME_SUBROW = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition RIGHT_OF    = (a, c) -> c.rightOf(a).sameSubrow();
+    private static final ItemFilterCondition BELOW_STR   = (a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected String taskId() {
@@ -39,15 +32,15 @@ class AtpTask23Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.exactly(3),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(REC_VALUE_COL),
-                                        ActionSpec.concat(SAME_ID_BELOW)
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBROW)),
+                                        ActionSpec.concat(ProviderSpec.of(BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr(
-                                        ActionSpec.suffix("", SUFFIX_SOFTWARE_RIGHT)
+                                        ActionSpec.suffix("", ProviderSpec.aux(1, TraversalOrder.ROW_MAJOR, RIGHT_OF))
                                 )),
                                 CellPattern.of(AtomicContentSpec.aux()),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(SAME_ROW_ATTR)
+                                        ActionSpec.avp(ProviderSpec.attr(SAME_SUBROW))
                                 ))
                         )
                 )

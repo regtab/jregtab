@@ -9,6 +9,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task47.
@@ -17,9 +18,8 @@ class AtpTask47Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec SAME_ROW = ProviderSpec.val((a, c) -> c.sameSubrow(a));
-    private static final ProviderSpec SAME_SURNAME_BELOW = ProviderSpec.val((a, c) ->
-            c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
+    private static final ItemFilterCondition SAME_SUBROW = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition BELOW_STR   = (a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected String taskId() {
@@ -32,8 +32,8 @@ class AtpTask47Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(SAME_ROW),
-                                        ActionSpec.concat(SAME_SURNAME_BELOW)
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBROW)),
+                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val())
                         )

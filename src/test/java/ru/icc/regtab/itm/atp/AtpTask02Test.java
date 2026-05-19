@@ -4,6 +4,7 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -19,10 +20,10 @@ import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
 class AtpTask02Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec FIRST_TWO_IN_SAME_SUBCOL = ProviderSpec.of(2, (a, c) -> c.sameSubcol(a));
-    private static final ProviderSpec FIRST_IN_SAME_SUBROW = ProviderSpec.of(1, (a, c) -> c.sameSubrow(a));
+    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
+    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
 
     @Override
     protected String taskId() {
@@ -39,7 +40,7 @@ class AtpTask02Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(FIRST_TWO_IN_SAME_SUBCOL, FIRST_IN_SAME_SUBROW)
+                                        ActionSpec.rec(ProviderSpec.of(2, SAME_SUBCOLUMN), ProviderSpec.of(1, SAME_SUBROW))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         ),

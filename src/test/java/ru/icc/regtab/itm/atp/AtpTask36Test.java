@@ -8,6 +8,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task36: pivot student blocks (12 rows × 3 cols).
@@ -16,11 +17,8 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask36Test extends AtpTaskBase {
 
-    private static final ProviderSpec REC_GRADES_COL2 =
-            ProviderSpec.val((a, c) -> c.col(2) && c.sameSubtable(a));
-
-    private static final ProviderSpec ATTR_LEFT_OF_GRADE =
-            ProviderSpec.attr((a, c) -> c.leftOf(a).sameSubrow());
+    private static final ItemFilterCondition SAME_SUBTABLE_COL2 = (a, c) -> c.sameSubtable(a) && c.col(2);
+    private static final ItemFilterCondition LEFT_OF             = (a, c) -> c.leftOf(a).sameSubrow();
 
     @Override
     protected String taskId() {
@@ -34,18 +32,18 @@ class AtpTask36Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(REC_GRADES_COL2)
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL2))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr()),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ATTR_LEFT_OF_GRADE)
+                                        ActionSpec.avp(ProviderSpec.attr(LEFT_OF))
                                 ))
                         ),
                         RowPattern.of(Quantifier.exactly(11),
                                 CellPattern.skip(),
                                 CellPattern.of(AtomicContentSpec.attr()),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ATTR_LEFT_OF_GRADE)
+                                        ActionSpec.avp(ProviderSpec.attr(LEFT_OF))
                                 ))
                         )
                 )

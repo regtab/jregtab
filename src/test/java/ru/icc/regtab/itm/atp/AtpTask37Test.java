@@ -11,6 +11,7 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task37: corner skip + qual-header row, then per-person rows
@@ -18,11 +19,8 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask37Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val(1, (a, c) -> c.sameSubrow(a));
-
-    private static final ProviderSpec FIRST_IN_SAME_COL =
-            ProviderSpec.val(1, (a, c) -> c.sameSubcol(a));
+    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
@@ -45,7 +43,7 @@ class AtpTask37Test extends AtpTaskBase {
                         new ConditionalContentSpec(
                                 BLANK,
                                 AtomicContentSpec.skip(),
-                                AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_ROW, FIRST_IN_SAME_COL))))
+                                AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(1, SAME_SUBROW), ProviderSpec.val(1, SAME_SUBCOLUMN)))))
                         )
                 )
         ).withTransformations(new AnchorAttributeAtPosition(2));

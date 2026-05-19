@@ -8,17 +8,15 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task16.
  */
 class AtpTask16Test extends AtpTaskBase {
 
-    private static final ProviderSpec REC_RIGHT =
-            ProviderSpec.of(1, (a, c) -> c.rightOf(a).sameRow());
-
-    private static final ProviderSpec CONCAT_SAME_LABEL_BELOW =
-            ProviderSpec.of((a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a));
+    private static final ItemFilterCondition RIGHT_OF  = (a, c) -> c.rightOf(a).sameRow();
+    private static final ItemFilterCondition BELOW_STR = (a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol() && c.sameStr(a);
 
     @Override
     protected String taskId() {
@@ -31,8 +29,8 @@ class AtpTask16Test extends AtpTaskBase {
                 SubtablePattern.of(
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(REC_RIGHT),
-                                        ActionSpec.concat(CONCAT_SAME_LABEL_BELOW)
+                                        ActionSpec.rec(ProviderSpec.of(1, RIGHT_OF)),
+                                        ActionSpec.concat(ProviderSpec.of(BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         )

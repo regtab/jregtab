@@ -10,6 +10,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task41.
@@ -17,10 +18,10 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask41Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec SAME_CELL = ProviderSpec.val((a, c) -> c.sameCell(a));
-    private static final ProviderSpec RIGHT_SAME_ROW = ProviderSpec.val((a, c) -> c.rightOf(a).sameRow());
+    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.sameCell(a);
+    private static final ItemFilterCondition RIGHT_OF  = (a, c) -> c.rightOf(a).sameRow();
 
     @Override
     protected String taskId() {
@@ -30,10 +31,10 @@ class AtpTask41Test extends AtpTaskBase {
     @Override
     protected TablePattern buildPattern() {
         CompoundContentSpec pairValSpec = CompoundContentSpec.of(
-                AtomicContentSpec.val(ActionSpec.fill("",ProviderSpec.ctxAux("")),ActionSpec.rec(SAME_CELL,RIGHT_SAME_ROW)),
+                AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.ctxAux("")), ActionSpec.rec(ProviderSpec.val(SAME_CELL), ProviderSpec.val(RIGHT_OF))),
                 CompoundContentSpec.Segment.of("", AtomicContentSpec.val())
         );
-       
+
         return TablePattern.of(
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.zeroOrOne(),
@@ -41,9 +42,9 @@ class AtpTask41Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val())
                         ),
                         RowPattern.of(Quantifier.zeroOrOne(),
-                                CellPattern.of(NOT_BLANK, Quantifier.one(), 
+                                CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         AtomicContentSpec.val(
-                                                ActionSpec.rec(RIGHT_SAME_ROW, ProviderSpec.ctxAux(""))
+                                                ActionSpec.rec(ProviderSpec.val(RIGHT_OF), ProviderSpec.ctxAux(""))
                                         )
                                 ),
                                 CellPattern.of(BLANK, Quantifier.one(), null)

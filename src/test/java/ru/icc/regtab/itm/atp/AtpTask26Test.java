@@ -8,17 +8,15 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task26.
  */
 class AtpTask26Test extends AtpTaskBase {
 
-    private static final ProviderSpec COL2_IN_SUBTABLE =
-            ProviderSpec.of((a, c) -> c.sameSubtable(a) && c.col(2));
-
-    private static final ProviderSpec ATTR_IN_SAME_ROW =
-            ProviderSpec.attr((a, c) -> c.sameSubrow(a));
+    private static final ItemFilterCondition SAME_SUBTABLE_COL2 = (a, c) -> c.sameSubtable(a) && c.col(2);
+    private static final ItemFilterCondition SAME_SUBROW        = (a, c) -> c.sameSubrow(a);
 
     @Override
     protected String taskId() {
@@ -32,18 +30,18 @@ class AtpTask26Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(COL2_IN_SUBTABLE)
+                                        ActionSpec.rec(ProviderSpec.of(SAME_SUBTABLE_COL2))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr()),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ATTR_IN_SAME_ROW)
+                                        ActionSpec.avp(ProviderSpec.attr(SAME_SUBROW))
                                 ))
                         ),
                         RowPattern.of(Quantifier.exactly(5),
                                 CellPattern.skip(),
                                 CellPattern.of(AtomicContentSpec.attr()),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ATTR_IN_SAME_ROW)
+                                        ActionSpec.avp(ProviderSpec.attr(SAME_SUBROW))
                                 ))
                         )
                 )

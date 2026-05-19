@@ -4,6 +4,7 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -17,7 +18,7 @@ class AtpTask10Test extends AtpTaskBase {
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of((a, c) -> c.sameSubrow(a));
+    private static final ItemFilterCondition SAME_SUBROW = (a, c) -> c.sameSubrow(a);
 
     @Override
     protected String taskId() {
@@ -36,7 +37,7 @@ class AtpTask10Test extends AtpTaskBase {
                         ),
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(SAME_ROW_REST)
+                                        ActionSpec.rec(ProviderSpec.of(SAME_SUBROW))
                                 )),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         ),

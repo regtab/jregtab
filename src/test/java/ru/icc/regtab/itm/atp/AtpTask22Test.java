@@ -8,6 +8,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
@@ -15,9 +16,8 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
  */
 class AtpTask22Test extends AtpTaskBase {
 
-    private static final ProviderSpec REC_COLS_2_TO_5_COLUMN_MAJOR =
-            ProviderSpec.of(ProviderSpec.UNBOUNDED, TraversalOrder.COLUMN_MAJOR,
-                    (a, c) -> c.sameSubtable(a) && c.cols.from(2).to(5));
+    private static final ItemFilterCondition SAME_SUBTABLE_COLS2_5 =
+            (a, c) -> c.sameSubtable(a) && c.cols.from(2).to(5);
 
     @Override
     protected String taskId() {
@@ -30,7 +30,7 @@ class AtpTask22Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(REC_COLS_2_TO_5_COLUMN_MAJOR)
+                                        ActionSpec.rec(ProviderSpec.of(ProviderSpec.UNBOUNDED, TraversalOrder.COLUMN_MAJOR, SAME_SUBTABLE_COLS2_5))
                                 )),
                                 CellPattern.skip(),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())

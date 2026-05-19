@@ -10,6 +10,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
@@ -18,10 +19,8 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
  */
 class AtpTask38Test extends AtpTaskBase {
 
-    private static final ProviderSpec SAME_ROW = ProviderSpec.of((a, c) -> c.sameSubrow(a));
-
-    private static final ProviderSpec FILL_FROM_ABOVE =
-            ProviderSpec.of(1, TraversalOrder.REVERSE_ROW_MAJOR, (a, c) -> c.above(a).sameSubtable() && c.above(a).sameCol());
+    private static final ItemFilterCondition SAME_SUBROW = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition ABOVE       = (a, c) -> c.above(a).sameSubtable() && c.above(a).sameCol();
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
@@ -35,11 +34,11 @@ class AtpTask38Test extends AtpTaskBase {
         return TablePattern.of(
                 SubtablePattern.of(
                         RowPattern.of(Quantifier.oneOrMore(),
-                                CellPattern.of(AtomicContentSpec.val(ActionSpec.rec(SAME_ROW))),
+                                CellPattern.of(AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.of(SAME_SUBROW)))),
                                 CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.of(new ConditionalContentSpec(
                                         BLANK,
-                                        AtomicContentSpec.val(ActionSpec.fill("", FILL_FROM_ABOVE)),
+                                        AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.of(1, TraversalOrder.REVERSE_ROW_MAJOR, ABOVE))),
                                         AtomicContentSpec.val()))
                         )
                 )
