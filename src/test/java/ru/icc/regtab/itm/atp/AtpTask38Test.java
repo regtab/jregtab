@@ -25,12 +25,6 @@ class AtpTask38Test extends AtpTaskBase {
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ConditionalContentSpec BLANK_FILL_OTHERWISE_VAL =
-            new ConditionalContentSpec(
-                    BLANK,
-                    AtomicContentSpec.val(ActionSpec.fill("", FILL_FROM_ABOVE)),
-                    AtomicContentSpec.val());
-
     @Override
     protected String taskId() {
         return "38";
@@ -43,7 +37,10 @@ class AtpTask38Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(ActionSpec.rec(SAME_ROW))),
                                 CellPattern.of(AtomicContentSpec.val()),
-                                CellPattern.of(BLANK_FILL_OTHERWISE_VAL)
+                                CellPattern.of(new ConditionalContentSpec(
+                                        BLANK,
+                                        AtomicContentSpec.val(ActionSpec.fill("", FILL_FROM_ABOVE)),
+                                        AtomicContentSpec.val()))
                         )
                 )
         );

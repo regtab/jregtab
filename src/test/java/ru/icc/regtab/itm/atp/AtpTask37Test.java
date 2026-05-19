@@ -26,12 +26,6 @@ class AtpTask37Test extends AtpTaskBase {
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ConditionalContentSpec BLANK_SKIP_OTHERWISE_VAL_WITH_REC =
-            new ConditionalContentSpec(
-                    BLANK,
-                    AtomicContentSpec.skip(),
-                    AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_ROW, FIRST_IN_SAME_COL)));
-
     @Override
     protected String taskId() {
         return "37";
@@ -47,7 +41,11 @@ class AtpTask37Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val()),
-                                CellPattern.of(Quantifier.oneOrMore(), BLANK_SKIP_OTHERWISE_VAL_WITH_REC)
+                                CellPattern.of(Quantifier.oneOrMore(),
+                        new ConditionalContentSpec(
+                                BLANK,
+                                AtomicContentSpec.skip(),
+                                AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_ROW, FIRST_IN_SAME_COL))))
                         )
                 )
         ).withTransformations(new AnchorAttributeAtPosition(2));

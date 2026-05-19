@@ -18,11 +18,6 @@ class AtpTask06Test extends AtpTaskBase {
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ConditionalContentSpec BLANK_SKIP_OTHERWISE_VAL = new ConditionalContentSpec(
-            BLANK,
-            AtomicContentSpec.skip(),
-            AtomicContentSpec.val());
-
     private static final ProviderSpec REC_AFTER_ANCHOR = ProviderSpec.of((a, c) -> c.sameSubtable(a));
 
     @Override
@@ -38,10 +33,12 @@ class AtpTask06Test extends AtpTaskBase {
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.rec(REC_AFTER_ANCHOR)
                                 )),
-                                CellPattern.of(Quantifier.oneOrMore(), BLANK_SKIP_OTHERWISE_VAL)
+                                CellPattern.of(Quantifier.oneOrMore(),
+                                        new ConditionalContentSpec(BLANK, AtomicContentSpec.skip(), AtomicContentSpec.val()))
                         ),
                         RowPattern.of(Quantifier.exactly(4),
-                                CellPattern.of(Quantifier.oneOrMore(), BLANK_SKIP_OTHERWISE_VAL)
+                                CellPattern.of(Quantifier.oneOrMore(),
+                                        new ConditionalContentSpec(BLANK, AtomicContentSpec.skip(), AtomicContentSpec.val()))
                         )
                 )
         );
