@@ -8,14 +8,14 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task31.
  */
 class AtpTask31Test extends AtpTaskBase {
 
-    private static final ProviderSpec BELOW_SAME_COL =
-            ProviderSpec.val((a, c) -> c.below(a).sameCol() && c.sameSubtable(a));
+    private static final ItemFilterCondition BELOW = (a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol();
 
     @Override
     protected String taskId() {
@@ -28,7 +28,7 @@ class AtpTask31Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(BELOW_SAME_COL)
+                                        ActionSpec.rec(ProviderSpec.val(BELOW))
                                 ))
                         ),
                         RowPattern.of(Quantifier.exactly(4),

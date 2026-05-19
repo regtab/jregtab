@@ -9,17 +9,15 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task42.
  */
 class AtpTask42Test extends AtpTaskBase {
 
-    private static final ProviderSpec RIGHT_OF_SAME_ROW =
-            ProviderSpec.val((a, c) -> c.rightOf(a).sameRow());
-
-    private static final ProviderSpec ATTR_SAME_CELL_AS_VALUE =
-            ProviderSpec.attr((a, c) -> c.sameCell(a));
+    private static final ItemFilterCondition RIGHT_OF  = (a, c) -> c.rightOf(a).sameRow();
+    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.sameCell(a);
 
     @Override
     protected String taskId() {
@@ -31,7 +29,7 @@ class AtpTask42Test extends AtpTaskBase {
         CompoundContentSpec subjectValue = CompoundContentSpec.of(
                 AtomicContentSpec.attr(),
                 CompoundContentSpec.Segment.of(":", AtomicContentSpec.val(
-                        ActionSpec.avp(ATTR_SAME_CELL_AS_VALUE)
+                        ActionSpec.avp(ProviderSpec.attr(SAME_CELL))
                 ))
         );
 
@@ -40,7 +38,7 @@ class AtpTask42Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(RIGHT_OF_SAME_ROW)
+                                        ActionSpec.rec(ProviderSpec.val(RIGHT_OF))
                                 )),
                                 CellPattern.of(Quantifier.exactly(2), subjectValue)
                         )

@@ -11,6 +11,7 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task37: corner skip + qual-header row, then per-person rows
@@ -18,19 +19,10 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask37Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_IN_SAME_ROW =
-            ProviderSpec.val(1, (a, c) -> c.sameRow(a));
-
-    private static final ProviderSpec FIRST_IN_SAME_COL =
-            ProviderSpec.val(1, (a, c) -> c.sameCol(a));
+    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
 
     private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
-
-    private static final ConditionalContentSpec BLANK_SKIP_OTHERWISE_VAL_WITH_REC =
-            new ConditionalContentSpec(
-                    BLANK,
-                    AtomicContentSpec.skip(),
-                    AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_ROW, FIRST_IN_SAME_COL)));
 
     @Override
     protected String taskId() {
@@ -47,7 +39,11 @@ class AtpTask37Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val()),
-                                CellPattern.of(Quantifier.oneOrMore(), BLANK_SKIP_OTHERWISE_VAL_WITH_REC)
+                                CellPattern.of(Quantifier.oneOrMore(),
+                        new ConditionalContentSpec(
+                                BLANK,
+                                AtomicContentSpec.skip(),
+                                AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(1, SAME_SUBROW), ProviderSpec.val(1, SAME_SUBCOLUMN)))))
                         )
                 )
         ).withTransformations(new AnchorAttributeAtPosition(2));

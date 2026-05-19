@@ -10,13 +10,14 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task15.
  */
 class AtpTask15Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_IN_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.sameCell(a));
+    private static final ItemFilterCondition SAME_CELL = (a, c) -> c.sameCell(a);
 
     @Override
     protected String taskId() {
@@ -27,9 +28,9 @@ class AtpTask15Test extends AtpTaskBase {
     protected TablePattern buildPattern() {
         CompoundContentSpec compoundSpec = CompoundContentSpec.of(
                 AtomicContentSpec.val(),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_CELL))),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_CELL))),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(FIRST_IN_SAME_CELL)))
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.of(1, SAME_CELL)))),
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.of(1, SAME_CELL)))),
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.of(1, SAME_CELL))))
         );
 
         return TablePattern.of(

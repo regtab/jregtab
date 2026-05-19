@@ -4,6 +4,7 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -13,17 +14,16 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
 
 /**
- * ATP equivalent of Fluent API Task02.
+ * ATP equivalent of RTL Task02: two generic header rows, data rows look up
+ * both headers via sameSubcol (card 2) and same-row value via sameSubrow (card 1).
  */
 class AtpTask02Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.of((a, c) ->
-            c.sameSubtable(a) && (c.hasTag("#L1") || c.hasTag("#L2")));
-
-    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
+    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
+    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
 
     @Override
     protected String taskId() {
@@ -34,17 +34,13 @@ class AtpTask02Test extends AtpTaskBase {
     protected TablePattern buildPattern() {
         return TablePattern.of(
                 SubtablePattern.of(Quantifier.oneOrMore(),
-                        RowPattern.of(
-                                CellPattern.of(AtomicContentSpec.valTagged("#L1")),
-                                CellPattern.skip()
-                        ),
-                        RowPattern.of(
-                                CellPattern.of(AtomicContentSpec.valTagged("#L2")),
+                        RowPattern.of(Quantifier.exactly(2),
+                                CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.skip()
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(L1_L2_SAME_SUBTABLE, SAME_ROW_REST)
+                                        ActionSpec.rec(ProviderSpec.of(2, SAME_SUBCOLUMN), ProviderSpec.of(1, SAME_SUBROW))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         ),

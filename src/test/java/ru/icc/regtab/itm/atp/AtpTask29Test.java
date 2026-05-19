@@ -10,17 +10,15 @@ import ru.icc.regtab.itm.atp.spec.SubrowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task29.
  */
 class AtpTask29Test extends AtpTaskBase {
 
-    private static final ProviderSpec FIRST_SIX_SAME_ROW =
-            ProviderSpec.val(6, (a, c) -> c.sameRow(a));
-
-    private static final ProviderSpec SAME_SUBROW =
-            ProviderSpec.val((a, c) -> c.sameSubrow(a));
+    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.sameRow(a);
+    private static final ItemFilterCondition RIGHT_OF = (a, c) -> c.rightOf(a).sameSubrow();
 
     @Override
     protected String taskId() {
@@ -37,7 +35,7 @@ class AtpTask29Test extends AtpTaskBase {
                                 ),
                                 SubrowPattern.of(Quantifier.oneOrMore(),
                                         CellPattern.of(AtomicContentSpec.val(
-                                                ActionSpec.rec(FIRST_SIX_SAME_ROW, SAME_SUBROW)
+                                                ActionSpec.rec(ProviderSpec.val(6, SAME_ROW), ProviderSpec.val(RIGHT_OF))
                                         )),
                                         CellPattern.of(Quantifier.exactly(3), AtomicContentSpec.val())
                                 )

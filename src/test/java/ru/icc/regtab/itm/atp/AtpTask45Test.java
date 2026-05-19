@@ -11,6 +11,7 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task45.
@@ -19,8 +20,7 @@ class AtpTask45Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec SAME_ROW_COL0 = ProviderSpec.val((a, c) ->
-            c.sameRow(a) && c.col(0));
+    private static final ItemFilterCondition SAME_SUBROW_COL0 = (a, c) -> c.sameSubrow(a) && c.col(0);
 
     @Override
     protected String taskId() {
@@ -35,7 +35,7 @@ class AtpTask45Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val()),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         new DelimitedContentSpec(",", AtomicContentSpec.val(
-                                                ActionSpec.rec(SAME_ROW_COL0)
+                                                ActionSpec.rec(ProviderSpec.val(SAME_SUBROW_COL0))
                                         ))
                                 )
                         )

@@ -10,6 +10,7 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task44.
@@ -17,10 +18,10 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 class AtpTask44Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
 
-    private static final ProviderSpec FIRST_IN_SAME_ROW = ProviderSpec.of(1, (a, c) -> c.sameRow(a));
-    private static final ProviderSpec SAME_CELL = ProviderSpec.of((a, c) -> c.sameCell(a));
+    private static final ItemFilterCondition SAME_SUBROW = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition SAME_CELL   = (a, c) -> c.sameCell(a);
 
     @Override
     protected String taskId() {
@@ -32,7 +33,7 @@ class AtpTask44Test extends AtpTaskBase {
         CompoundContentSpec commaPair = CompoundContentSpec.of(
                 AtomicContentSpec.val(),
                 CompoundContentSpec.Segment.of(",", AtomicContentSpec.val(
-                        ActionSpec.rec(SAME_CELL)
+                        ActionSpec.rec(ProviderSpec.of(SAME_CELL))
                 ))
         );
 
@@ -40,7 +41,7 @@ class AtpTask44Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(FIRST_IN_SAME_ROW)
+                                        ActionSpec.rec(ProviderSpec.of(1, SAME_SUBROW))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val()),
                                 CellPattern.of(BLANK, Quantifier.one(), null)

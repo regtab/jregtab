@@ -10,6 +10,7 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task49.
@@ -18,8 +19,8 @@ class AtpTask49Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec FIRST_SAME_ROW = ProviderSpec.val(1, (a, c) -> c.sameRow(a));
-    private static final ProviderSpec FIRST_SAME_COL = ProviderSpec.val(1, (a, c) -> c.sameCol(a));
+    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
 
     @Override
     protected String taskId() {
@@ -37,7 +38,7 @@ class AtpTask49Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val()),
                                 CellPattern.of(NOT_BLANK, Quantifier.oneOrMore(), AtomicContentSpec.val(
-                                        ActionSpec.rec(FIRST_SAME_ROW, FIRST_SAME_COL)
+                                        ActionSpec.rec(ProviderSpec.val(1, SAME_SUBROW), ProviderSpec.val(1, SAME_SUBCOLUMN))
                                 ))
                         )
                 )

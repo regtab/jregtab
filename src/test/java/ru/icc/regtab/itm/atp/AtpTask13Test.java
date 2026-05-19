@@ -8,23 +8,19 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task13.
  */
 class AtpTask13Test extends AtpTaskBase {
 
-    private static final ProviderSpec AVP_SAME_COL = ProviderSpec.one((a, c) -> c.sameCol(a));
+    private static final ItemFilterCondition SAME_SUBCOLUMN    = (a, c) -> c.sameSubcol(a);
 
-    private static final ProviderSpec SAME_ROW_COL2 =
-            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.col(2));
-    private static final ProviderSpec SAME_ROW_COL4 =
-            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.col(4));
-    private static final ProviderSpec SAME_ROW_COL1 =
-            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.col(1));
-    private static final ProviderSpec SAME_ROW_COL3 =
-            ProviderSpec.of(1, (a, c) -> c.sameRow(a) && c.col(3));
-
+    private static final ItemFilterCondition SAME_SUBROW_COL2  = (a, c) -> c.sameSubrow(a) && c.col(2);
+    private static final ItemFilterCondition SAME_SUBROW_COL4  = (a, c) -> c.sameSubrow(a) && c.col(4);
+    private static final ItemFilterCondition SAME_SUBROW_COL1  = (a, c) -> c.sameSubrow(a) && c.col(1);
+    private static final ItemFilterCondition SAME_SUBROW_COL3  = (a, c) -> c.sameSubrow(a) && c.col(3);
 
     @Override
     protected String taskId() {
@@ -41,11 +37,12 @@ class AtpTask13Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(AVP_SAME_COL),
-                                        ActionSpec.rec(SAME_ROW_COL2, SAME_ROW_COL4, SAME_ROW_COL1, SAME_ROW_COL3)
+                                        ActionSpec.avp(ProviderSpec.one(SAME_SUBCOLUMN)),
+                                        ActionSpec.rec(ProviderSpec.of(1, SAME_SUBROW_COL2), ProviderSpec.of(1, SAME_SUBROW_COL4),
+                                                       ProviderSpec.of(1, SAME_SUBROW_COL1), ProviderSpec.of(1, SAME_SUBROW_COL3))
                                 )),
                                 CellPattern.of(Quantifier.exactly(4), AtomicContentSpec.val(
-                                        ActionSpec.avp(AVP_SAME_COL)
+                                        ActionSpec.avp(ProviderSpec.one(SAME_SUBCOLUMN))
                                 )),
                                 CellPattern.skip(Quantifier.oneOrMore())
                         )

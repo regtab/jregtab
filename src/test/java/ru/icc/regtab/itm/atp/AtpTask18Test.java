@@ -9,15 +9,15 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task18.
  */
 class AtpTask18Test extends AtpTaskBase {
 
-    private static final ProviderSpec AVP_SAME_CELL = ProviderSpec.of(1, (a, c) -> c.sameCell(a));
-    private static final ProviderSpec REC_VALUES_BELOW =
-            ProviderSpec.val((a, c) -> c.below(a).sameSubtable());
+    private static final ItemFilterCondition SAME_CELL      = (a, c) -> c.sameCell(a);
+    private static final ItemFilterCondition BELOW_SUBTABLE = (a, c) -> c.below(a).sameSubtable();
 
     @Override
     protected String taskId() {
@@ -29,15 +29,15 @@ class AtpTask18Test extends AtpTaskBase {
         CompoundContentSpec firstRow = CompoundContentSpec.of(
                 AtomicContentSpec.attr(),
                 CompoundContentSpec.Segment.of("=", AtomicContentSpec.val(
-                        ActionSpec.rec(REC_VALUES_BELOW),
-                        ActionSpec.avp(AVP_SAME_CELL)
+                        ActionSpec.rec(ProviderSpec.val(BELOW_SUBTABLE)),
+                        ActionSpec.avp(ProviderSpec.of(1, SAME_CELL))
                 ))
         );
 
         CompoundContentSpec otherRows = CompoundContentSpec.of(
                 AtomicContentSpec.attr(),
                 CompoundContentSpec.Segment.of("=", AtomicContentSpec.val(
-                        ActionSpec.avp(AVP_SAME_CELL)
+                        ActionSpec.avp(ProviderSpec.of(1, SAME_CELL))
                 ))
         );
 

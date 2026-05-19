@@ -10,18 +10,18 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
+import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task48.
  */
 class AtpTask48Test extends AtpTaskBase {
 
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
 
-    private static final ProviderSpec SAME_SUBTABLE_COL1 = ProviderSpec.val((a, c) ->
-            c.sameSubtable(a) && c.col(1));
-    private static final ProviderSpec SAME_CELL_ATTR = ProviderSpec.attr((a, c) -> c.sameCell(a));
+    private static final ItemFilterCondition SAME_SUBTABLE_COL1 = (a, c) -> c.sameSubtable(a) && c.col(1);
+    private static final ItemFilterCondition SAME_CELL          = (a, c) -> c.sameCell(a);
 
     @Override
     protected String taskId() {
@@ -32,7 +32,7 @@ class AtpTask48Test extends AtpTaskBase {
     protected TablePattern buildPattern() {
         CompoundContentSpec telFaxSpec = CompoundContentSpec.of(
                 AtomicContentSpec.attr(),
-                CompoundContentSpec.Segment.of(":", AtomicContentSpec.val(ActionSpec.avp(SAME_CELL_ATTR)))
+                CompoundContentSpec.Segment.of(":", AtomicContentSpec.val(ActionSpec.avp(ProviderSpec.attr(SAME_CELL))))
         );
 
         return TablePattern.of(
@@ -45,7 +45,7 @@ class AtpTask48Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(SAME_SUBTABLE_COL1)
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL1))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), telFaxSpec)
                         ),
