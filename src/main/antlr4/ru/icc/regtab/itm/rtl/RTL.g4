@@ -67,8 +67,9 @@ SKIPPED   : 'SKIP' | '_' ;
 // User-defined tags
 tags : TAG+ ;
 
-// Item string extractor
-strExtr : substr | replace | norm | upperCase | lowerCase ;
+// Item string extractor (supports chains: =REPL("x","").TRIM)
+strExtr     : strExtrStep ('.' strExtrStep)* ;
+strExtrStep : substr | replace | norm | upperCase | lowerCase | trim ;
 
 // String processing
 substr    : 'SUBSTR' LPAREN INT COMMA INT RPAREN ;
@@ -76,6 +77,7 @@ replace   : 'REPL'   LPAREN STRING COMMA STRING RPAREN ;
 norm      : 'NORM' ;
 upperCase : 'UC' ;
 lowerCase : 'LC' ;
+trim      : 'TRIM' ;
 
 // Interpretation action specifications
 actSpecs : actSpec (COMMA actSpec)* ;
@@ -113,7 +115,7 @@ xContSpec    : atomContSpec | delimContSpec | compContSpec ;
 
 // Cell match condition
 cellMatchCond : cellMatchConstr ;
-cellMatchConstr : regex | blank ;
+cellMatchConstr : regex | blank | contains ;
 
 // Item provider specification
 provSpec : tblProvSpec | ctxProvSpec ;
@@ -142,21 +144,21 @@ baseConstr  : constr | LPAREN constraints RPAREN ;
 constr      : spatConstr | contConstr ;
 
 // Spatial constraints
-spatConstr : LEFT_OF | RIGHT_OF | ABOVE | BELOW | ROW | COLUMN
-           | SUBROW | SUBCOLUMN | SUBTABLE | TABLE | CELL
+spatConstr : LEFT_OF | RIGHT_OF | ABOVE | BELOW | SAME_ROW | SAME_COLUMN
+           | SAME_SUBROW | SAME_SUBCOLUMN | SAME_SUBTABLE | NOT_SAME_CELL | SAME_CELL
            | col | row | pos ;
 
 LEFT_OF   : 'LT'  ;   // sameSubrow(a) && col < col(a)
 RIGHT_OF  : 'RT'  ;   // sameSubrow(a) && col > col(a)
 ABOVE     : 'AV'  ;   // sameSubcol(a) && row < row(a)
 BELOW     : 'BW'  ;   // sameSubcol(a) && row > row(a)
-ROW       : 'ROW' ;   // sameRow(a) && !sameCell(a)
-COLUMN    : 'COL' ;   // sameCol(a) && !sameCell(a)
-SUBROW    : 'SR'  ;   // sameSubrow(a) && !sameCell(a)
-SUBCOLUMN : 'SC'  ;   // sameSubcol(a) && !sameCell(a)
-SUBTABLE  : 'ST'  ;   // sameSubtable(a) && !sameCell(a)
-TABLE     : 'TAB' ;   // !sameCell(a)
-CELL      : 'CL'  ;   // sameCell(a)
+SAME_ROW       : 'ROW' ;   // sameRow(a) && !sameCell(a)
+SAME_COLUMN    : 'COL' ;   // sameCol(a) && !sameCell(a)
+SAME_SUBROW    : 'SR'  ;   // sameSubrow(a) && !sameCell(a)
+SAME_SUBCOLUMN : 'SC'  ;   // sameSubcol(a) && !sameCell(a)
+SAME_SUBTABLE  : 'ST'  ;   // sameSubtable(a) && !sameCell(a)
+NOT_SAME_CELL  : 'NCL' ;   // !sameCell(a)
+SAME_CELL      : 'CL'  ;   // sameCell(a)
 
 // Positional constraints
 row : 'R' (range | offset | INT) ;
@@ -170,9 +172,13 @@ end   : offset | INT ;
 offset : (MINUS INT) | (PLUS INT) ;
 
 // Content constraints
-contConstr : regex | blank | tag | sameStr ;
+contConstr : regex | blank | tag | sameStr | contains ;
 
-tag : 'TAG' TAG+ ;
+// Contains constraint
+contains : EXCLAMATION? TILDA STRING ;
+TILDA : '~' ;
+
+tag : EXCLAMATION? 'TAG' TAG+ ;
 
 sameStr : STR ;
 STR : 'STR' ;

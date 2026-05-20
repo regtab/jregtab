@@ -76,21 +76,19 @@ class AtpSpecTest {
 
     @Test
     void stringExtractors() {
-        assertEquals("hello", StringExtractor.identity().apply("hello"));
-        assertEquals("ell", StringExtractor.substring(1, 4).apply("hello"));
-        assertEquals("hXllo", StringExtractor.replace("e", "X").apply("hello"));
-        assertEquals("hello", StringExtractor.trim().apply("  hello  "));
+        assertEquals("hello", StringExtractor.Verbatim.INSTANCE.apply("hello"));
+        assertEquals("ell", new StringExtractor.Substring(1, 4).apply("hello"));
+        assertEquals("hXllo", new StringExtractor.Replaced("e", "X").apply("hello"));
+        assertEquals("hello", StringExtractor.Trimmed.INSTANCE.apply("  hello  "));
     }
 
     @Test
     void cellMatchConditionCombinations() {
-        var cond1 = new CellMatchCondition(c -> c.text().startsWith("A"));
-        var cond2 = new CellMatchCondition(c -> c.text().length() > 3);
-        var combined = cond1.and(cond2);
-        var negated = cond1.negate();
+        var cond1 = new CellMatchCondition(new CellPredicate.Custom("startsWith A", c -> c.text().startsWith("A")));
+        var cond2 = new CellMatchCondition(new CellPredicate.Custom("length > 3", c -> c.text().length() > 3));
         // These are just structural tests — predicates tested in matcher tests
-        assertNotNull(combined);
-        assertNotNull(negated);
+        assertNotNull(cond1);
+        assertNotNull(cond2);
     }
 
     @Test
@@ -110,7 +108,7 @@ class AtpSpecTest {
 
     @Test
     void actionSpecConvenience() {
-        var ps = ProviderSpec.of((a, c) -> true);
+        var ps = ProviderSpec.of(new ItemFilterConditionSpec.Custom("always true", (a, c) -> true));
         var rec = ActionSpec.rec(ps);
         assertEquals(OperationType.REC, rec.operationType());
         assertEquals(1, rec.providers().size());

@@ -3,19 +3,19 @@ package ru.icc.regtab.itm.atp;
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task34.
  */
 class AtpTask34Test extends AtpTaskBase {
 
-    private static final ItemFilterCondition BELOW = (a, c) -> c.below(a).sameSubtable() && c.below(a).sameCol();
+    private static final ItemFilterConditionSpec BELOW = ItemFilterConditionSpec.below();
 
     @Override
     protected String taskId() {

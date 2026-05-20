@@ -1,22 +1,23 @@
-package ru.icc.regtab.itm.atp;
+﻿package ru.icc.regtab.itm.atp;
 
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task26.
  */
 class AtpTask26Test extends AtpTaskBase {
 
-    private static final ItemFilterCondition SAME_SUBTABLE_COL2 = (a, c) -> c.sameSubtable(a) && c.col(2);
-    private static final ItemFilterCondition SAME_SUBROW        = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL2 = ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColExact(2));
+    private static final ItemFilterConditionSpec SAME_SUBROW        = ItemFilterConditionSpec.sameSubrow();
 
     @Override
     protected String taskId() {
@@ -30,7 +31,7 @@ class AtpTask26Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(ProviderSpec.of(SAME_SUBTABLE_COL2))
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL2))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr()),
                                 CellPattern.of(AtomicContentSpec.val(

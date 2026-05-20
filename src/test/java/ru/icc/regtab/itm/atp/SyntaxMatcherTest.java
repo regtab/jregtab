@@ -208,7 +208,7 @@ class SyntaxMatcherTest {
     @Test
     void cellMatchCondition_failsOnMismatch() {
         var syntax = table(new String[][]{{"A", "B"}});
-        var cond = new CellMatchCondition(c -> c.text().equals("X"));
+        var cond = new CellMatchCondition(new CellPredicate.Custom("equalsX", c -> c.text().equals("X")));
 
         var atp = TablePattern.of(
                 SubtablePattern.of(
@@ -287,7 +287,7 @@ class SyntaxMatcherTest {
         var syntax = table(new String[][]{{"ABC", ""}});
 
         var cond = new ConditionalContentSpec(
-                new CellMatchCondition(c -> !c.text().isEmpty()),
+                new CellMatchCondition(new CellPredicate.Custom("notEmpty", c -> !c.text().isEmpty())),
                 AtomicContentSpec.val(),
                 AtomicContentSpec.skip()
         );

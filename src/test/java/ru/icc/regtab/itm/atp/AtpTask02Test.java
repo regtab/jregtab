@@ -1,10 +1,11 @@
-package ru.icc.regtab.itm.atp;
+﻿package ru.icc.regtab.itm.atp;
 
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
+import ru.icc.regtab.itm.atp.spec.CellPredicate;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -19,11 +20,11 @@ import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
  */
 class AtpTask02Test extends AtpTaskBase {
 
-    private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
-    private static final CellMatchCondition BLANK     = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+    private static final CellMatchCondition BLANK     = new CellMatchCondition(CellPredicate.Blank.INSTANCE);
 
-    private static final ItemFilterCondition SAME_SUBCOLUMN = (a, c) -> c.sameSubcol(a);
-    private static final ItemFilterCondition SAME_SUBROW    = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterConditionSpec SAME_SUBCOLUMN = ItemFilterConditionSpec.sameSubcol();
+    private static final ItemFilterConditionSpec SAME_SUBROW    = ItemFilterConditionSpec.sameSubrow();
 
     @Override
     protected String taskId() {
@@ -40,7 +41,7 @@ class AtpTask02Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.of(2, SAME_SUBCOLUMN), ProviderSpec.of(1, SAME_SUBROW))
+                                        ActionSpec.rec(ProviderSpec.val(2, SAME_SUBCOLUMN), ProviderSpec.val(1, SAME_SUBROW))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         ),

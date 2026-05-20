@@ -67,9 +67,9 @@ class AtpIllustrativeExampleTest {
                                         CompoundContentSpec.of(
                                                 AtomicContentSpec.val(
                                                         ActionSpec.rec(1,
-                                                                (a, c) -> c.sameCol(a),
-                                                                (a, c) -> c.sameRow(a),
-                                                                (a, c) -> c.sameCell(a)
+                                                                ItemFilterConditionSpec.sameCol(),
+                                                                ItemFilterConditionSpec.sameRow(),
+                                                                ItemFilterConditionSpec.sameCell()
                                                         ),
                                                         ActionSpec.avp("ND")
                                                 ),

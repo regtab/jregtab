@@ -3,6 +3,7 @@ package ru.icc.regtab.itm.atp;
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -10,15 +11,14 @@ import ru.icc.regtab.itm.atp.spec.SubrowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task29.
  */
 class AtpTask29Test extends AtpTaskBase {
 
-    private static final ItemFilterCondition SAME_ROW = (a, c) -> c.sameRow(a);
-    private static final ItemFilterCondition RIGHT_OF = (a, c) -> c.rightOf(a).sameSubrow();
+    private static final ItemFilterConditionSpec SAME_ROW = ItemFilterConditionSpec.sameRow();
+    private static final ItemFilterConditionSpec RIGHT_OF = ItemFilterConditionSpec.rightOf();
 
     @Override
     protected String taskId() {
