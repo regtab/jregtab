@@ -3,7 +3,7 @@
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
@@ -18,7 +18,7 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 class AtpTask22Test extends AtpTaskBase {
 
     private static final ItemFilterConditionSpec SAME_SUBTABLE_COLS2_5 =
-            ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColRange(2, 5));
+            ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColRange(2, 5));
 
     @Override
     protected String taskId() {

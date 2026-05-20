@@ -3,7 +3,7 @@
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
@@ -20,8 +20,8 @@ class AtpTask25Test extends AtpTaskBase {
     private static final String SEP = "/";
 
     private static final ItemFilterConditionSpec RIGHT_OF          = ItemFilterConditionSpec.rightOf();
-    private static final ItemFilterConditionSpec BELOW_STR         = ItemFilterConditionSpec.and(Constraint.Below.INSTANCE, Constraint.SameStr.INSTANCE);
-    private static final ItemFilterConditionSpec SUBROW_AFTER_ANCHOR = ItemFilterConditionSpec.and(Constraint.RightOf.INSTANCE, new Constraint.ColRange(2, Integer.MAX_VALUE));
+    private static final ItemFilterConditionSpec BELOW_STR         = ItemFilterConditionSpec.and(FilterTerm.Below.INSTANCE, FilterTerm.SameStr.INSTANCE);
+    private static final ItemFilterConditionSpec SUBROW_AFTER_ANCHOR = ItemFilterConditionSpec.and(FilterTerm.RightOf.INSTANCE, new FilterTerm.ColRange(2, Integer.MAX_VALUE));
 
     @Override
     protected String taskId() {

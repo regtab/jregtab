@@ -34,15 +34,15 @@ public sealed interface ItemFilterConditionSpec permits
     // ---- Sealed variants ----
 
     /** Bare spatConstr — no parentheses. */
-    record Bare(Constraint constraint) implements ItemFilterConditionSpec {
+    record Bare(FilterTerm constraint) implements ItemFilterConditionSpec {
         public String toRtl() { return constraint.toRtl(); }
         public ItemFilterCondition toCondition() { return constraint.toCondition(); }
     }
 
     /** Parenthesized AND of constraints: {@code (c1 & c2 & …)}. */
-    record And(List<Constraint> terms) implements ItemFilterConditionSpec {
+    record And(List<FilterTerm> terms) implements ItemFilterConditionSpec {
         public String toRtl() {
-            return "(" + terms.stream().map(Constraint::toRtl).collect(Collectors.joining(" & ")) + ")";
+            return "(" + terms.stream().map(FilterTerm::toRtl).collect(Collectors.joining(" & ")) + ")";
         }
         public ItemFilterCondition toCondition() {
             return (a, c) -> terms.stream().allMatch(t -> t.toCondition().test(a, c));
@@ -74,22 +74,22 @@ public sealed interface ItemFilterConditionSpec permits
 
     // ---- General factories ----
 
-    static Bare bare(Constraint c) { return new Bare(c); }
+    static Bare bare(FilterTerm c) { return new Bare(c); }
 
-    static And and(Constraint... terms) { return new And(List.of(terms)); }
+    static And and(FilterTerm... terms) { return new And(List.of(terms)); }
 
     static Or or(And... groups) { return new Or(List.of(groups)); }
 
     // ---- Bare shorthands ----
 
-    static Bare sameSubtable() { return new Bare(Constraint.SameSubtable.INSTANCE); }
-    static Bare sameSubrow()   { return new Bare(Constraint.SameSubrow.INSTANCE); }
-    static Bare sameSubcol()   { return new Bare(Constraint.SameSubcol.INSTANCE); }
-    static Bare sameCell()     { return new Bare(Constraint.SameCell.INSTANCE); }
-    static Bare sameRow()      { return new Bare(Constraint.SameRow.INSTANCE); }
-    static Bare sameCol()      { return new Bare(Constraint.SameCol.INSTANCE); }
-    static Bare below()        { return new Bare(Constraint.Below.INSTANCE); }
-    static Bare above()        { return new Bare(Constraint.Above.INSTANCE); }
-    static Bare rightOf()      { return new Bare(Constraint.RightOf.INSTANCE); }
-    static Bare leftOf()       { return new Bare(Constraint.LeftOf.INSTANCE); }
+    static Bare sameSubtable() { return new Bare(FilterTerm.SameSubtable.INSTANCE); }
+    static Bare sameSubrow()   { return new Bare(FilterTerm.SameSubrow.INSTANCE); }
+    static Bare sameSubcol()   { return new Bare(FilterTerm.SameSubcol.INSTANCE); }
+    static Bare sameCell()     { return new Bare(FilterTerm.SameCell.INSTANCE); }
+    static Bare sameRow()      { return new Bare(FilterTerm.SameRow.INSTANCE); }
+    static Bare sameCol()      { return new Bare(FilterTerm.SameCol.INSTANCE); }
+    static Bare below()        { return new Bare(FilterTerm.Below.INSTANCE); }
+    static Bare above()        { return new Bare(FilterTerm.Above.INSTANCE); }
+    static Bare rightOf()      { return new Bare(FilterTerm.RightOf.INSTANCE); }
+    static Bare leftOf()       { return new Bare(FilterTerm.LeftOf.INSTANCE); }
 }

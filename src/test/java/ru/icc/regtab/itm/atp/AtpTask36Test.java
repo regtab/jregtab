@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.atp;
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
@@ -18,7 +18,7 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask36Test extends AtpTaskBase {
 
-    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL2 = ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColExact(2));
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL2 = ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColExact(2));
     private static final ItemFilterConditionSpec LEFT_OF             = ItemFilterConditionSpec.leftOf();
 
     @Override

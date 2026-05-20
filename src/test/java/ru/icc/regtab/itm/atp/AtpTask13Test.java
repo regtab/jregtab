@@ -3,7 +3,7 @@
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
@@ -18,10 +18,10 @@ class AtpTask13Test extends AtpTaskBase {
 
     private static final ItemFilterConditionSpec SAME_SUBCOLUMN    = ItemFilterConditionSpec.sameSubcol();
 
-    private static final ItemFilterConditionSpec SAME_SUBROW_COL2  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(2));
-    private static final ItemFilterConditionSpec SAME_SUBROW_COL4  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(4));
-    private static final ItemFilterConditionSpec SAME_SUBROW_COL1  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(1));
-    private static final ItemFilterConditionSpec SAME_SUBROW_COL3  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(3));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL2  = ItemFilterConditionSpec.and(FilterTerm.SameSubrow.INSTANCE, new FilterTerm.ColExact(2));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL4  = ItemFilterConditionSpec.and(FilterTerm.SameSubrow.INSTANCE, new FilterTerm.ColExact(4));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL1  = ItemFilterConditionSpec.and(FilterTerm.SameSubrow.INSTANCE, new FilterTerm.ColExact(1));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL3  = ItemFilterConditionSpec.and(FilterTerm.SameSubrow.INSTANCE, new FilterTerm.ColExact(3));
 
     @Override
     protected String taskId() {

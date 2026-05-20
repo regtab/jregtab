@@ -5,7 +5,7 @@ import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
 import ru.icc.regtab.itm.atp.spec.CellPredicate;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.DelimitedContentSpec;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
@@ -22,7 +22,7 @@ class AtpTask45Test extends AtpTaskBase {
 
     private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
 
-    private static final ItemFilterConditionSpec SAME_SUBROW_COL0 = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(0));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL0 = ItemFilterConditionSpec.and(FilterTerm.SameSubrow.INSTANCE, new FilterTerm.ColExact(0));
 
     @Override
     protected String taskId() {

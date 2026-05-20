@@ -1,6 +1,6 @@
 package ru.icc.regtab.itm.rtl.internal;
 
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemDerivationDirective;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
@@ -99,12 +99,12 @@ final class ProviderTemplateResolver {
 
     private static ItemFilterConditionSpec buildCondition(RTLParser.TblProvSpecContext ctx) {
         if (ctx.spatConstr() != null) {
-            List<Constraint> parts = new ArrayList<>();
+            List<FilterTerm> parts = new ArrayList<>();
             addSpatConstrParts(ctx.spatConstr(), parts);
             return toSpec(parts);
         }
         if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
-        return ItemFilterConditionSpec.bare(new Constraint.SameCell());
+        return ItemFilterConditionSpec.bare(new FilterTerm.SameCell());
     }
 
     private static ItemFilterConditionSpec buildConstraints(RTLParser.ConstraintsContext ctx) {
@@ -129,21 +129,21 @@ final class ProviderTemplateResolver {
      * And-groups by distributing nested ORs: {@code A & (B|C)} → {@code (A&B)|(A&C)}.
      */
     private static ItemFilterConditionSpec buildOrGroup(RTLParser.OrGroupContext ctx) {
-        List<List<Constraint>> distributed = expandOrGroup(ctx);
+        List<List<FilterTerm>> distributed = expandOrGroup(ctx);
         if (distributed.size() == 1) return toSpec(distributed.get(0));
         return new ItemFilterConditionSpec.Or(
                 distributed.stream().map(ProviderTemplateResolver::toAndSpec).toList());
     }
 
-    private static List<List<Constraint>> expandOrGroup(RTLParser.OrGroupContext ctx) {
-        List<List<Constraint>> result = new ArrayList<>();
+    private static List<List<FilterTerm>> expandOrGroup(RTLParser.OrGroupContext ctx) {
+        List<List<FilterTerm>> result = new ArrayList<>();
         result.add(new ArrayList<>());
         for (RTLParser.BaseConstrContext bc : ctx.baseConstr()) {
-            List<List<Constraint>> alternatives = expandBaseConstr(bc);
-            List<List<Constraint>> next = new ArrayList<>();
-            for (List<Constraint> existing : result) {
-                for (List<Constraint> alt : alternatives) {
-                    List<Constraint> combined = new ArrayList<>(existing);
+            List<List<FilterTerm>> alternatives = expandBaseConstr(bc);
+            List<List<FilterTerm>> next = new ArrayList<>();
+            for (List<FilterTerm> existing : result) {
+                for (List<FilterTerm> alt : alternatives) {
+                    List<FilterTerm> combined = new ArrayList<>(existing);
                     combined.addAll(alt);
                     next.add(combined);
                 }
@@ -153,14 +153,14 @@ final class ProviderTemplateResolver {
         return result;
     }
 
-    private static List<List<Constraint>> expandBaseConstr(RTLParser.BaseConstrContext ctx) {
+    private static List<List<FilterTerm>> expandBaseConstr(RTLParser.BaseConstrContext ctx) {
         if (ctx.constraints() != null) {
             ItemFilterConditionSpec inner = buildConstraints(ctx.constraints());
             return switch (inner) {
                 case ItemFilterConditionSpec.Bare b -> List.of(List.of(b.constraint()));
                 case ItemFilterConditionSpec.And a  -> List.of(new ArrayList<>(a.terms()));
                 case ItemFilterConditionSpec.Or  o  -> o.groups().stream()
-                        .map(g -> (List<Constraint>) new ArrayList<>(g.terms()))
+                        .map(g -> (List<FilterTerm>) new ArrayList<>(g.terms()))
                         .toList();
                 default -> throw new RtlCompileException("Unexpected nested spec type");
             };
@@ -168,116 +168,116 @@ final class ProviderTemplateResolver {
         return List.of(buildConstrConstraints(ctx.constr()));
     }
 
-    private static List<Constraint> buildConstrConstraints(RTLParser.ConstrContext ctx) {
-        List<Constraint> parts = new ArrayList<>();
+    private static List<FilterTerm> buildConstrConstraints(RTLParser.ConstrContext ctx) {
+        List<FilterTerm> parts = new ArrayList<>();
         if (ctx.spatConstr() != null) addSpatConstrParts(ctx.spatConstr(), parts);
         else if (ctx.contConstr() != null) parts.add(buildContentConstraint(ctx.contConstr()));
         return parts;
     }
 
     private static void addSpatConstrParts(RTLParser.SpatConstrContext ctx,
-                                           List<Constraint> parts) {
-        Constraint named = namedSpatConstraint(ctx);
+                                           List<FilterTerm> parts) {
+        FilterTerm named = namedSpatConstraint(ctx);
         if (named != null) parts.add(named);
         if (ctx.col() != null) parts.add(colConstraint(ctx.col()));
         if (ctx.row() != null) parts.add(rowConstraint(ctx.row()));
         if (ctx.pos() != null) parts.add(posConstraint(ctx.pos()));
     }
 
-    private static Constraint namedSpatConstraint(RTLParser.SpatConstrContext ctx) {
-        if (ctx.LEFT_OF()   != null) return Constraint.LeftOf.INSTANCE;
-        if (ctx.RIGHT_OF()  != null) return Constraint.RightOf.INSTANCE;
-        if (ctx.ABOVE()     != null) return Constraint.Above.INSTANCE;
-        if (ctx.BELOW()     != null) return Constraint.Below.INSTANCE;
-        if (ctx.SAME_ROW()       != null) return Constraint.SameRow.INSTANCE;
-        if (ctx.SAME_COLUMN()    != null) return Constraint.SameCol.INSTANCE;
-        if (ctx.SAME_SUBROW()    != null) return Constraint.SameSubrow.INSTANCE;
-        if (ctx.SAME_SUBCOLUMN() != null) return Constraint.SameSubcol.INSTANCE;
-        if (ctx.SAME_SUBTABLE()  != null) return Constraint.SameSubtable.INSTANCE;
-        if (ctx.NOT_SAME_CELL()  != null) return Constraint.NotSameCell.INSTANCE;
-        if (ctx.SAME_CELL()      != null) return Constraint.SameCell.INSTANCE;
+    private static FilterTerm namedSpatConstraint(RTLParser.SpatConstrContext ctx) {
+        if (ctx.LEFT_OF()   != null) return FilterTerm.LeftOf.INSTANCE;
+        if (ctx.RIGHT_OF()  != null) return FilterTerm.RightOf.INSTANCE;
+        if (ctx.ABOVE()     != null) return FilterTerm.Above.INSTANCE;
+        if (ctx.BELOW()     != null) return FilterTerm.Below.INSTANCE;
+        if (ctx.SAME_ROW()       != null) return FilterTerm.SameRow.INSTANCE;
+        if (ctx.SAME_COLUMN()    != null) return FilterTerm.SameCol.INSTANCE;
+        if (ctx.SAME_SUBROW()    != null) return FilterTerm.SameSubrow.INSTANCE;
+        if (ctx.SAME_SUBCOLUMN() != null) return FilterTerm.SameSubcol.INSTANCE;
+        if (ctx.SAME_SUBTABLE()  != null) return FilterTerm.SameSubtable.INSTANCE;
+        if (ctx.NOT_SAME_CELL()  != null) return FilterTerm.NotSameCell.INSTANCE;
+        if (ctx.SAME_CELL()      != null) return FilterTerm.SameCell.INSTANCE;
         return null; // col/row/pos — no named base condition
     }
 
     // --- Spatial constraint builders ---
 
-    private static Constraint colConstraint(RTLParser.ColContext ctx) {
+    private static FilterTerm colConstraint(RTLParser.ColContext ctx) {
         if (ctx.range() != null) return colRangeConstraint(ctx.range());
-        if (ctx.offset() != null) return new Constraint.ColOffset(parseOffset(ctx.offset()));
-        return new Constraint.ColExact(Integer.parseInt(ctx.INT().getText()));
+        if (ctx.offset() != null) return new FilterTerm.ColOffset(parseOffset(ctx.offset()));
+        return new FilterTerm.ColExact(Integer.parseInt(ctx.INT().getText()));
     }
 
-    private static Constraint colRangeConstraint(RTLParser.RangeContext ctx) {
+    private static FilterTerm colRangeConstraint(RTLParser.RangeContext ctx) {
         boolean hiOpen = ctx.end() == null;
         boolean startIsOffset = ctx.start().offset() != null;
         int lo = boundaryValue(ctx.start(), 0);
         int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.end(), Integer.MAX_VALUE);
         // Offset start → relative range (C+n..); INT start → absolute range (Cn..m)
-        return startIsOffset ? new Constraint.ColRange(lo, hi) : new Constraint.ColAbsoluteRange(lo, hi);
+        return startIsOffset ? new FilterTerm.ColRange(lo, hi) : new FilterTerm.ColAbsoluteRange(lo, hi);
     }
 
-    private static Constraint rowConstraint(RTLParser.RowContext ctx) {
+    private static FilterTerm rowConstraint(RTLParser.RowContext ctx) {
         if (ctx.range() != null) {
             int lo = boundaryValue(ctx.range().start(), 0);
-            if (ctx.range().start().offset() != null) return new Constraint.RowOffset(lo);
-            return new Constraint.RowExact(lo);
+            if (ctx.range().start().offset() != null) return new FilterTerm.RowOffset(lo);
+            return new FilterTerm.RowExact(lo);
         }
-        if (ctx.offset() != null) return new Constraint.RowOffset(parseOffset(ctx.offset()));
-        return new Constraint.RowExact(Integer.parseInt(ctx.INT().getText()));
+        if (ctx.offset() != null) return new FilterTerm.RowOffset(parseOffset(ctx.offset()));
+        return new FilterTerm.RowExact(Integer.parseInt(ctx.INT().getText()));
     }
 
-    private static Constraint posConstraint(RTLParser.PosContext ctx) {
+    private static FilterTerm posConstraint(RTLParser.PosContext ctx) {
         if (ctx.range()  != null) {
             int lo = boundaryValue(ctx.range().start(), 0);
             int hi = ctx.range().end() == null ? Integer.MAX_VALUE : boundaryValue(ctx.range().end(), Integer.MAX_VALUE);
-            return new Constraint.PosRange(lo, hi);
+            return new FilterTerm.PosRange(lo, hi);
         }
-        if (ctx.offset() != null) return new Constraint.PosOffset(parseOffset(ctx.offset()));
-        return new Constraint.PosExact(Integer.parseInt(ctx.INT().getText()));
+        if (ctx.offset() != null) return new FilterTerm.PosOffset(parseOffset(ctx.offset()));
+        return new FilterTerm.PosExact(Integer.parseInt(ctx.INT().getText()));
     }
 
     // --- Content constraint builders ---
 
-    private static Constraint buildContentConstraint(RTLParser.ContConstrContext ctx) {
+    private static FilterTerm buildContentConstraint(RTLParser.ContConstrContext ctx) {
         if (ctx.regex()    != null) return regexConstraint(ctx.regex());
         if (ctx.blank()    != null) return blankConstraint(ctx.blank());
         if (ctx.tag()      != null) return tagConstraint(ctx.tag());
-        if (ctx.sameStr()  != null) return Constraint.SameStr.INSTANCE;
+        if (ctx.sameStr()  != null) return FilterTerm.SameStr.INSTANCE;
         if (ctx.contains() != null) return containsConstraint(ctx.contains());
         throw new RtlCompileException("Unknown content constraint");
     }
 
-    private static Constraint regexConstraint(RTLParser.RegexContext ctx) {
+    private static FilterTerm regexConstraint(RTLParser.RegexContext ctx) {
         String pattern = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
         return ctx.EXCLAMATION() != null
-                ? new Constraint.NotRegexMatched(pattern)
-                : new Constraint.RegexMatched(pattern);
+                ? new FilterTerm.NotRegexMatched(pattern)
+                : new FilterTerm.RegexMatched(pattern);
     }
 
-    private static Constraint blankConstraint(RTLParser.BlankContext ctx) {
-        return ctx.EXCLAMATION() != null ? Constraint.NotBlank.INSTANCE : Constraint.Blank.INSTANCE;
+    private static FilterTerm blankConstraint(RTLParser.BlankContext ctx) {
+        return ctx.EXCLAMATION() != null ? FilterTerm.NotBlank.INSTANCE : FilterTerm.Blank.INSTANCE;
     }
 
-    private static Constraint tagConstraint(RTLParser.TagContext ctx) {
+    private static FilterTerm tagConstraint(RTLParser.TagContext ctx) {
         List<String> tags = ctx.TAG().stream().map(t -> t.getText()).toList();
-        return new Constraint.Tagged(tags);
+        return new FilterTerm.Tagged(tags);
     }
 
-    private static Constraint containsConstraint(RTLParser.ContainsContext ctx) {
+    private static FilterTerm containsConstraint(RTLParser.ContainsContext ctx) {
         String substring = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
         return ctx.EXCLAMATION() != null
-                ? new Constraint.NotContains(substring)
-                : new Constraint.Contains(substring);
+                ? new FilterTerm.NotContains(substring)
+                : new FilterTerm.Contains(substring);
     }
 
     // --- Helper: list of constraints → ItemFilterConditionSpec ---
 
-    private static ItemFilterConditionSpec toSpec(List<Constraint> parts) {
+    private static ItemFilterConditionSpec toSpec(List<FilterTerm> parts) {
         if (parts.size() == 1) return new ItemFilterConditionSpec.Bare(parts.get(0));
         return new ItemFilterConditionSpec.And(List.copyOf(parts));
     }
 
-    private static ItemFilterConditionSpec.And toAndSpec(List<Constraint> parts) {
+    private static ItemFilterConditionSpec.And toAndSpec(List<FilterTerm> parts) {
         return new ItemFilterConditionSpec.And(List.copyOf(parts));
     }
 

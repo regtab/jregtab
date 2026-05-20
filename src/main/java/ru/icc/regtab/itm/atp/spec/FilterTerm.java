@@ -10,37 +10,37 @@ import java.util.function.BiPredicate;
  * Atomic constraint — building block of {@link ItemFilterConditionSpec}.
  * Mirrors the RTL grammar's {@code spatConstr} and {@code contConstr} rules.
  */
-public sealed interface Constraint permits
-        Constraint.LeftOf,
-        Constraint.RightOf,
-        Constraint.Above,
-        Constraint.Below,
-        Constraint.SameSubrow,
-        Constraint.SameSubcol,
-        Constraint.SameSubtable,
-        Constraint.SameRow,
-        Constraint.SameCol,
-        Constraint.NotSameCell,
-        Constraint.SameCell,
-        Constraint.ColExact,
-        Constraint.ColOffset,
-        Constraint.ColRange,
-        Constraint.ColAbsoluteRange,
-        Constraint.RowExact,
-        Constraint.RowOffset,
-        Constraint.PosExact,
-        Constraint.PosOffset,
-        Constraint.PosRange,
-        Constraint.RegexMatched,
-        Constraint.NotRegexMatched,
-        Constraint.Contains,
-        Constraint.NotContains,
-        Constraint.Blank,
-        Constraint.NotBlank,
-        Constraint.Tagged,
-        Constraint.NotTagged,
-        Constraint.SameStr,
-        Constraint.Custom {
+public sealed interface FilterTerm permits
+        FilterTerm.LeftOf,
+        FilterTerm.RightOf,
+        FilterTerm.Above,
+        FilterTerm.Below,
+        FilterTerm.SameSubrow,
+        FilterTerm.SameSubcol,
+        FilterTerm.SameSubtable,
+        FilterTerm.SameRow,
+        FilterTerm.SameCol,
+        FilterTerm.NotSameCell,
+        FilterTerm.SameCell,
+        FilterTerm.ColExact,
+        FilterTerm.ColOffset,
+        FilterTerm.ColRange,
+        FilterTerm.ColAbsoluteRange,
+        FilterTerm.RowExact,
+        FilterTerm.RowOffset,
+        FilterTerm.PosExact,
+        FilterTerm.PosOffset,
+        FilterTerm.PosRange,
+        FilterTerm.RegexMatched,
+        FilterTerm.NotRegexMatched,
+        FilterTerm.Contains,
+        FilterTerm.NotContains,
+        FilterTerm.Blank,
+        FilterTerm.NotBlank,
+        FilterTerm.Tagged,
+        FilterTerm.NotTagged,
+        FilterTerm.SameStr,
+        FilterTerm.Custom {
 
     /** RTL token for this constraint (e.g. {@code "ST"}, {@code "BW"}). */
     String toRtl();
@@ -50,7 +50,7 @@ public sealed interface Constraint permits
 
     // ---- Named spatial singletons ----
 
-    record LeftOf() implements Constraint {
+    record LeftOf() implements FilterTerm {
         public static final LeftOf INSTANCE = new LeftOf();
         public String toRtl() { return "LT"; }
         public ItemFilterCondition toCondition() {
@@ -58,7 +58,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record RightOf() implements Constraint {
+    record RightOf() implements FilterTerm {
         public static final RightOf INSTANCE = new RightOf();
         public String toRtl() { return "RT"; }
         public ItemFilterCondition toCondition() {
@@ -66,7 +66,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record Above() implements Constraint {
+    record Above() implements FilterTerm {
         public static final Above INSTANCE = new Above();
         public String toRtl() { return "AV"; }
         public ItemFilterCondition toCondition() {
@@ -74,7 +74,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record Below() implements Constraint {
+    record Below() implements FilterTerm {
         public static final Below INSTANCE = new Below();
         public String toRtl() { return "BW"; }
         public ItemFilterCondition toCondition() {
@@ -82,7 +82,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameSubrow() implements Constraint {
+    record SameSubrow() implements FilterTerm {
         public static final SameSubrow INSTANCE = new SameSubrow();
         public String toRtl() { return "SR"; }
         public ItemFilterCondition toCondition() {
@@ -90,7 +90,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameSubcol() implements Constraint {
+    record SameSubcol() implements FilterTerm {
         public static final SameSubcol INSTANCE = new SameSubcol();
         public String toRtl() { return "SC"; }
         public ItemFilterCondition toCondition() {
@@ -98,7 +98,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameSubtable() implements Constraint {
+    record SameSubtable() implements FilterTerm {
         public static final SameSubtable INSTANCE = new SameSubtable();
         public String toRtl() { return "ST"; }
         public ItemFilterCondition toCondition() {
@@ -106,7 +106,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameRow() implements Constraint {
+    record SameRow() implements FilterTerm {
         public static final SameRow INSTANCE = new SameRow();
         public String toRtl() { return "ROW"; }
         public ItemFilterCondition toCondition() {
@@ -114,7 +114,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameCol() implements Constraint {
+    record SameCol() implements FilterTerm {
         public static final SameCol INSTANCE = new SameCol();
         public String toRtl() { return "COL"; }
         public ItemFilterCondition toCondition() {
@@ -122,7 +122,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record NotSameCell() implements Constraint {
+    record NotSameCell() implements FilterTerm {
         public static final NotSameCell INSTANCE = new NotSameCell();
         public String toRtl() { return "NCL"; }
         public ItemFilterCondition toCondition() {
@@ -130,7 +130,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record SameCell() implements Constraint {
+    record SameCell() implements FilterTerm {
         public static final SameCell INSTANCE = new SameCell();
         public String toRtl() { return "CL"; }
         public ItemFilterCondition toCondition() {
@@ -140,14 +140,14 @@ public sealed interface Constraint permits
 
     // ---- Positional spatial ----
 
-    record ColExact(int n) implements Constraint {
+    record ColExact(int n) implements FilterTerm {
         public String toRtl() { return "C" + n; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.cell().col() == n;
         }
     }
 
-    record ColOffset(int delta) implements Constraint {
+    record ColOffset(int delta) implements FilterTerm {
         public String toRtl() {
             return delta >= 0 ? "C+" + delta : "C" + delta;
         }
@@ -157,7 +157,7 @@ public sealed interface Constraint permits
     }
 
     /** Range C{from}..{to}. Use {@code to = Integer.MAX_VALUE} for an open end (C+n..). */
-    record ColRange(int from, int to) implements Constraint {
+    record ColRange(int from, int to) implements FilterTerm {
         public String toRtl() {
             String loStr = from >= 0 ? "C+" + from : "C" + from;
             return to == Integer.MAX_VALUE ? loStr + ".." : loStr + ".." + to;
@@ -172,7 +172,7 @@ public sealed interface Constraint permits
     }
 
     /** Absolute column range Ca..b — column is between lo and hi (inclusive, 0-based). */
-    record ColAbsoluteRange(int lo, int hi) implements Constraint {
+    record ColAbsoluteRange(int lo, int hi) implements FilterTerm {
         public String toRtl() {
             return hi == Integer.MAX_VALUE ? "C" + lo + ".." : "C" + lo + ".." + hi;
         }
@@ -181,14 +181,14 @@ public sealed interface Constraint permits
         }
     }
 
-    record RowExact(int n) implements Constraint {
+    record RowExact(int n) implements FilterTerm {
         public String toRtl() { return "R" + n; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.cell().row() == n;
         }
     }
 
-    record RowOffset(int delta) implements Constraint {
+    record RowOffset(int delta) implements FilterTerm {
         public String toRtl() {
             return delta >= 0 ? "R+" + delta : "R" + delta;
         }
@@ -197,14 +197,14 @@ public sealed interface Constraint permits
         }
     }
 
-    record PosExact(int n) implements Constraint {
+    record PosExact(int n) implements FilterTerm {
         public String toRtl() { return "P" + n; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.index() == n;
         }
     }
 
-    record PosOffset(int delta) implements Constraint {
+    record PosOffset(int delta) implements FilterTerm {
         public String toRtl() {
             return delta >= 0 ? "P+" + delta : "P" + delta;
         }
@@ -214,7 +214,7 @@ public sealed interface Constraint permits
     }
 
     /** Absolute position range Pa..b — index is between lo and hi (inclusive). */
-    record PosRange(int lo, int hi) implements Constraint {
+    record PosRange(int lo, int hi) implements FilterTerm {
         public String toRtl() {
             return hi == Integer.MAX_VALUE ? "P" + lo + ".." : "P" + lo + ".." + hi;
         }
@@ -225,35 +225,35 @@ public sealed interface Constraint permits
 
     // ---- Content ----
 
-    record RegexMatched(String pattern) implements Constraint {
+    record RegexMatched(String pattern) implements FilterTerm {
         public String toRtl() { return "\"" + pattern + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.str().matches(pattern);
         }
     }
 
-    record NotRegexMatched(String pattern) implements Constraint {
+    record NotRegexMatched(String pattern) implements FilterTerm {
         public String toRtl() { return "!\"" + pattern + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.str().matches(pattern);
         }
     }
 
-    record Contains(String substring) implements Constraint {
+    record Contains(String substring) implements FilterTerm {
         public String toRtl() { return "~\"" + substring + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.str().contains(substring);
         }
     }
 
-    record NotContains(String substring) implements Constraint {
+    record NotContains(String substring) implements FilterTerm {
         public String toRtl() { return "!~\"" + substring + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.str().contains(substring);
         }
     }
 
-    record Blank() implements Constraint {
+    record Blank() implements FilterTerm {
         public static final Blank INSTANCE = new Blank();
         public String toRtl() { return "BLANK"; }
         public ItemFilterCondition toCondition() {
@@ -261,7 +261,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record NotBlank() implements Constraint {
+    record NotBlank() implements FilterTerm {
         public static final NotBlank INSTANCE = new NotBlank();
         public String toRtl() { return "!BLANK"; }
         public ItemFilterCondition toCondition() {
@@ -269,7 +269,7 @@ public sealed interface Constraint permits
         }
     }
 
-    record Tagged(List<String> tags) implements Constraint {
+    record Tagged(List<String> tags) implements FilterTerm {
         public String toRtl() {
             return "TAG " + String.join(" ", tags.stream().map(t -> t.startsWith("#") ? t : "#" + t).toList());
         }
@@ -279,14 +279,14 @@ public sealed interface Constraint permits
     }
 
     /** No RTL analog — {@code toRtl()} throws {@link UnsupportedOperationException}. */
-    record NotTagged(List<String> tags) implements Constraint {
+    record NotTagged(List<String> tags) implements FilterTerm {
         public String toRtl() { throw new UnsupportedOperationException("!TAG has no RTL analog"); }
         public ItemFilterCondition toCondition() {
             return (a, c) -> tags.stream().noneMatch(c::hasTag);
         }
     }
 
-    record SameStr() implements Constraint {
+    record SameStr() implements FilterTerm {
         public static final SameStr INSTANCE = new SameStr();
         public String toRtl() { return "STR"; }
         public ItemFilterCondition toCondition() {
@@ -296,7 +296,7 @@ public sealed interface Constraint permits
 
     /** Escape hatch — {@code toRtl()} throws {@link UnsupportedOperationException}. */
     record Custom(String description,
-                  BiPredicate<CellDerivedItem, CellDerivedItem> predicate) implements Constraint {
+                  BiPredicate<CellDerivedItem, CellDerivedItem> predicate) implements FilterTerm {
         public String toRtl() { throw new UnsupportedOperationException("Custom constraint has no RTL analog"); }
         public ItemFilterCondition toCondition() { return predicate::test; }
     }

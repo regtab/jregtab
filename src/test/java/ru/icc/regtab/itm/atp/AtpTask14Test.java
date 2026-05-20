@@ -5,7 +5,7 @@ import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
 import ru.icc.regtab.itm.atp.spec.CellPredicate;
-import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.FilterTerm;
 import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
@@ -19,8 +19,8 @@ import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
  */
 class AtpTask14Test extends AtpTaskBase {
 
-    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL0 = ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColExact(0));
-    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL1 = ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColExact(1));
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL0 = ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColExact(0));
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL1 = ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColExact(1));
     private static final ItemFilterConditionSpec SAME_SUBROW        = ItemFilterConditionSpec.sameSubrow();
 
     private static final CellMatchCondition BLANK     = new CellMatchCondition(CellPredicate.Blank.INSTANCE);
