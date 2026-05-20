@@ -3,7 +3,6 @@ package ru.icc.regtab.itm.atp.spec;
 import ru.icc.regtab.itm.model.semantics.item.ItemType;
 import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
 import ru.icc.regtab.itm.model.semantics.provider.ContextDerivedProviderKind;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 import java.util.Objects;
@@ -23,7 +22,7 @@ import java.util.Objects;
 public record ProviderSpec(
         int cardinality,
         TraversalOrder traversalOrder,
-        ItemFilterCondition filterCondition,
+        ItemFilterConditionSpec filterCondition,
         CellDerivedProviderKind targetItemKind,
         ContextLiteralSpec contextLiteral
 ) {
@@ -61,53 +60,53 @@ public record ProviderSpec(
     }
 
     /** Convenience: unbounded unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec of(ItemFilterCondition condition) {
+    public static ProviderSpec of(ItemFilterConditionSpec condition) {
         return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Convenience: specified cardinality, unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec of(int cardinality, ItemFilterCondition condition) {
+    public static ProviderSpec of(int cardinality, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Convenience: cardinality 1, unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec one(ItemFilterCondition condition) {
+    public static ProviderSpec one(ItemFilterConditionSpec condition) {
         return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Convenience: full constructor for unrestricted cell-derived provider. */
-    public static ProviderSpec of(int cardinality, TraversalOrder traversalOrder, ItemFilterCondition condition) {
+    public static ProviderSpec of(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, traversalOrder, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Typed value provider Υ_tbl^val. */
-    public static ProviderSpec val(ItemFilterCondition condition) {
+    public static ProviderSpec val(ItemFilterConditionSpec condition) {
         return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.VAL, null);
     }
 
-    public static ProviderSpec val(int cardinality, ItemFilterCondition condition) {
+    public static ProviderSpec val(int cardinality, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.VAL, null);
     }
 
-    public static ProviderSpec val(int cardinality, TraversalOrder traversalOrder, ItemFilterCondition condition) {
+    public static ProviderSpec val(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, traversalOrder, condition, CellDerivedProviderKind.VAL, null);
     }
 
     /** Typed attribute provider Υ_tbl^attr. Always cardinality 1. */
-    public static ProviderSpec attr(ItemFilterCondition condition) {
+    public static ProviderSpec attr(ItemFilterConditionSpec condition) {
         return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.ATTR, null);
     }
 
-    public static ProviderSpec attr(TraversalOrder traversalOrder, ItemFilterCondition condition) {
+    public static ProviderSpec attr(TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
         return new ProviderSpec(1, traversalOrder, condition, CellDerivedProviderKind.ATTR, null);
     }
 
     /** Typed auxiliary provider Υ_tbl^aux. */
-    public static ProviderSpec aux(ItemFilterCondition condition) {
+    public static ProviderSpec aux(ItemFilterConditionSpec condition) {
         return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.AUX, null);
     }
 
-    public static ProviderSpec aux(int cardinality, TraversalOrder traversalOrder, ItemFilterCondition condition) {
+    public static ProviderSpec aux(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, traversalOrder, condition, CellDerivedProviderKind.AUX, null);
     }
 

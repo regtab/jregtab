@@ -1,11 +1,12 @@
-package ru.icc.regtab.itm.atp;
+﻿package ru.icc.regtab.itm.atp;
 
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.CellPredicate;
 import ru.icc.regtab.itm.atp.spec.ConditionalContentSpec;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
@@ -17,9 +18,9 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
  */
 class AtpTask06Test extends AtpTaskBase {
 
-    private static final CellMatchCondition BLANK = new CellMatchCondition(c -> c.textBlank());
+    private static final CellMatchCondition BLANK = new CellMatchCondition(CellPredicate.Blank.INSTANCE);
 
-    private static final ItemFilterCondition SAME_SUBTABLE = (a, c) -> c.sameSubtable(a);
+    private static final ItemFilterConditionSpec SAME_SUBTABLE = ItemFilterConditionSpec.sameSubtable();
 
     @Override
     protected String taskId() {
@@ -32,7 +33,7 @@ class AtpTask06Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.of(SAME_SUBTABLE))
+                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE))
                                 )),
                                 CellPattern.of(Quantifier.oneOrMore(),
                                         new ConditionalContentSpec(BLANK, AtomicContentSpec.skip(), AtomicContentSpec.val()))

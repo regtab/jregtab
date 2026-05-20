@@ -207,7 +207,7 @@ public final class SemanticConstructor {
             return new ContextDerivedItemProvider(List.of(item), spec.contextLiteral().kind());
         }
         return new CellDerivedItemProvider(
-                spec.filterCondition(),
+                spec.filterCondition().toCondition(),
                 spec.traversalOrder(),
                 allItems,
                 spec.cardinality(),

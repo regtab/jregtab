@@ -1,9 +1,10 @@
 package ru.icc.regtab.itm.rtl.internal;
 
+import ru.icc.regtab.itm.atp.spec.Constraint;
 import ru.icc.regtab.itm.atp.spec.ItemDerivationDirective;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 import ru.icc.regtab.itm.rtl.RTLParser;
 import ru.icc.regtab.itm.rtl.RtlCompileException;
@@ -51,7 +52,7 @@ final class ProviderTemplateResolver {
                                 ItemDerivationDirective anchorType) {
         TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
         int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterCondition condition = buildCondition(ctx);
+        ItemFilterConditionSpec condition = buildCondition(ctx);
         CellDerivedProviderKind kind = inferKind(op, anchorType);
         int actualCardinality = (kind == CellDerivedProviderKind.ATTR) ? 1 : cardinality;
         return new ProviderSpec(actualCardinality, order, condition, kind, null);
@@ -61,7 +62,7 @@ final class ProviderTemplateResolver {
     static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx) {
         TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
         int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterCondition condition = buildCondition(ctx);
+        ItemFilterConditionSpec condition = buildCondition(ctx);
         return new ProviderSpec(cardinality, order, condition,
                 CellDerivedProviderKind.UNRESTRICTED, null);
     }
@@ -96,122 +97,195 @@ final class ProviderTemplateResolver {
 
     // --- Condition building ---
 
-    private static ItemFilterCondition buildCondition(RTLParser.TblProvSpecContext ctx) {
+    private static ItemFilterConditionSpec buildCondition(RTLParser.TblProvSpecContext ctx) {
         if (ctx.spatConstr() != null) {
-            List<ItemFilterCondition> parts = new ArrayList<>();
+            List<Constraint> parts = new ArrayList<>();
             addSpatConstrParts(ctx.spatConstr(), parts);
-            return andAll(parts);
+            return toSpec(parts);
         }
         if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
-        return (a, c) -> true;
+        return ItemFilterConditionSpec.bare(new Constraint.SameCell());
     }
 
-    private static ItemFilterCondition buildConstraints(RTLParser.ConstraintsContext ctx) {
-        return orAll(ctx.orGroup().stream().map(ProviderTemplateResolver::buildOrGroup).toList());
+    private static ItemFilterConditionSpec buildConstraints(RTLParser.ConstraintsContext ctx) {
+        List<RTLParser.OrGroupContext> orGroups = ctx.orGroup();
+        if (orGroups.size() == 1) return buildOrGroup(orGroups.get(0));
+        List<ItemFilterConditionSpec.And> allAnds = new ArrayList<>();
+        for (RTLParser.OrGroupContext g : orGroups) {
+            ItemFilterConditionSpec spec = buildOrGroup(g);
+            switch (spec) {
+                case ItemFilterConditionSpec.Bare b ->
+                        allAnds.add(new ItemFilterConditionSpec.And(List.of(b.constraint())));
+                case ItemFilterConditionSpec.And a  -> allAnds.add(a);
+                case ItemFilterConditionSpec.Or o   -> allAnds.addAll(o.groups());
+                default -> throw new RtlCompileException("Unexpected spec type in OR");
+            }
+        }
+        return new ItemFilterConditionSpec.Or(allAnds);
     }
 
-    private static ItemFilterCondition buildOrGroup(RTLParser.OrGroupContext ctx) {
-        return andAll(ctx.baseConstr().stream().map(ProviderTemplateResolver::buildBaseConstr).toList());
+    /**
+     * Expands an orGroup (possibly containing nested parenthesized ORs) into a list of
+     * And-groups by distributing nested ORs: {@code A & (B|C)} → {@code (A&B)|(A&C)}.
+     */
+    private static ItemFilterConditionSpec buildOrGroup(RTLParser.OrGroupContext ctx) {
+        List<List<Constraint>> distributed = expandOrGroup(ctx);
+        if (distributed.size() == 1) return toSpec(distributed.get(0));
+        return new ItemFilterConditionSpec.Or(
+                distributed.stream().map(ProviderTemplateResolver::toAndSpec).toList());
     }
 
-    private static ItemFilterCondition buildBaseConstr(RTLParser.BaseConstrContext ctx) {
-        if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
-        return buildConstr(ctx.constr());
+    private static List<List<Constraint>> expandOrGroup(RTLParser.OrGroupContext ctx) {
+        List<List<Constraint>> result = new ArrayList<>();
+        result.add(new ArrayList<>());
+        for (RTLParser.BaseConstrContext bc : ctx.baseConstr()) {
+            List<List<Constraint>> alternatives = expandBaseConstr(bc);
+            List<List<Constraint>> next = new ArrayList<>();
+            for (List<Constraint> existing : result) {
+                for (List<Constraint> alt : alternatives) {
+                    List<Constraint> combined = new ArrayList<>(existing);
+                    combined.addAll(alt);
+                    next.add(combined);
+                }
+            }
+            result = next;
+        }
+        return result;
     }
 
-    private static ItemFilterCondition buildConstr(RTLParser.ConstrContext ctx) {
-        List<ItemFilterCondition> parts = new ArrayList<>();
+    private static List<List<Constraint>> expandBaseConstr(RTLParser.BaseConstrContext ctx) {
+        if (ctx.constraints() != null) {
+            ItemFilterConditionSpec inner = buildConstraints(ctx.constraints());
+            return switch (inner) {
+                case ItemFilterConditionSpec.Bare b -> List.of(List.of(b.constraint()));
+                case ItemFilterConditionSpec.And a  -> List.of(new ArrayList<>(a.terms()));
+                case ItemFilterConditionSpec.Or  o  -> o.groups().stream()
+                        .map(g -> (List<Constraint>) new ArrayList<>(g.terms()))
+                        .toList();
+                default -> throw new RtlCompileException("Unexpected nested spec type");
+            };
+        }
+        return List.of(buildConstrConstraints(ctx.constr()));
+    }
+
+    private static List<Constraint> buildConstrConstraints(RTLParser.ConstrContext ctx) {
+        List<Constraint> parts = new ArrayList<>();
         if (ctx.spatConstr() != null) addSpatConstrParts(ctx.spatConstr(), parts);
         else if (ctx.contConstr() != null) parts.add(buildContentConstraint(ctx.contConstr()));
-        return andAll(parts);
+        return parts;
     }
 
     private static void addSpatConstrParts(RTLParser.SpatConstrContext ctx,
-                                           List<ItemFilterCondition> parts) {
-        // Named spatial constraint → base condition
-        ItemFilterCondition named = namedSpatCondition(ctx);
+                                           List<Constraint> parts) {
+        Constraint named = namedSpatConstraint(ctx);
         if (named != null) parts.add(named);
-
-        // Positional constraints
-        if (ctx.col() != null) parts.add(colFilter(ctx.col()));
-        if (ctx.row() != null) parts.add(rowFilter(ctx.row()));
-        if (ctx.pos() != null) parts.add(posFilter(ctx.pos()));
+        if (ctx.col() != null) parts.add(colConstraint(ctx.col()));
+        if (ctx.row() != null) parts.add(rowConstraint(ctx.row()));
+        if (ctx.pos() != null) parts.add(posConstraint(ctx.pos()));
     }
 
-    /** Returns the base filter condition for a named spatial constraint token, or null for col/row/pos. */
-    private static ItemFilterCondition namedSpatCondition(RTLParser.SpatConstrContext ctx) {
-        if (ctx.LEFT_OF()   != null) return (a, c) -> c.sameSubrow(a)   && c.cell().col() < a.cell().col();
-        if (ctx.RIGHT_OF()  != null) return (a, c) -> c.sameSubrow(a)   && c.cell().col() > a.cell().col();
-        if (ctx.ABOVE()     != null) return (a, c) -> c.sameSubcol(a)   && c.cell().row() < a.cell().row();
-        if (ctx.BELOW()     != null) return (a, c) -> c.sameSubcol(a)   && c.cell().row() > a.cell().row();
-        if (ctx.ROW()       != null) return (a, c) -> c.sameRow(a)      && !c.sameCell(a);
-        if (ctx.COLUMN()    != null) return (a, c) -> c.sameCol(a)      && !c.sameCell(a);
-        if (ctx.SUBROW()    != null) return (a, c) -> c.sameSubrow(a)   && !c.sameCell(a);
-        if (ctx.SUBCOLUMN() != null) return (a, c) -> c.sameSubcol(a)   && !c.sameCell(a);
-        if (ctx.SUBTABLE()  != null) return (a, c) -> c.sameSubtable(a) && !c.sameCell(a);
-        if (ctx.TABLE()     != null) return (a, c) -> !c.sameCell(a);
-        if (ctx.CELL()      != null) return (a, c) -> c.sameCell(a);
+    private static Constraint namedSpatConstraint(RTLParser.SpatConstrContext ctx) {
+        if (ctx.LEFT_OF()   != null) return Constraint.LeftOf.INSTANCE;
+        if (ctx.RIGHT_OF()  != null) return Constraint.RightOf.INSTANCE;
+        if (ctx.ABOVE()     != null) return Constraint.Above.INSTANCE;
+        if (ctx.BELOW()     != null) return Constraint.Below.INSTANCE;
+        if (ctx.ROW()       != null) return Constraint.SameRow.INSTANCE;
+        if (ctx.COLUMN()    != null) return Constraint.SameCol.INSTANCE;
+        if (ctx.SUBROW()    != null) return Constraint.SameSubrow.INSTANCE;
+        if (ctx.SUBCOLUMN() != null) return Constraint.SameSubcol.INSTANCE;
+        if (ctx.SUBTABLE()  != null) return Constraint.SameSubtable.INSTANCE;
+        if (ctx.TABLE()     != null) return Constraint.NotSameCell.INSTANCE;
+        if (ctx.CELL()      != null) return Constraint.SameCell.INSTANCE;
         return null; // col/row/pos — no named base condition
     }
 
-    // --- Spatial filter builders ---
+    // --- Spatial constraint builders ---
 
-    private static ItemFilterCondition colFilter(RTLParser.ColContext ctx) {
-        if (ctx.range() != null) return rangeFilter(ctx.range(),
-                (a, c) -> c.cell().col(), (a, c) -> a.cell().col());
-        if (ctx.offset() != null) {
-            int delta = parseOffset(ctx.offset());
-            return (a, c) -> c.cell().col() == a.cell().col() + delta;
-        }
-        int abs = Integer.parseInt(ctx.INT().getText());
-        return (a, c) -> c.cell().col() == abs;
+    private static Constraint colConstraint(RTLParser.ColContext ctx) {
+        if (ctx.range() != null) return colRangeConstraint(ctx.range());
+        if (ctx.offset() != null) return new Constraint.ColOffset(parseOffset(ctx.offset()));
+        return new Constraint.ColExact(Integer.parseInt(ctx.INT().getText()));
     }
 
-    private static ItemFilterCondition rowFilter(RTLParser.RowContext ctx) {
-        if (ctx.range() != null) return rangeFilter(ctx.range(),
-                (a, c) -> c.cell().row(), (a, c) -> a.cell().row());
-        if (ctx.offset() != null) {
-            int delta = parseOffset(ctx.offset());
-            return (a, c) -> c.cell().row() == a.cell().row() + delta;
-        }
-        int abs = Integer.parseInt(ctx.INT().getText());
-        return (a, c) -> c.cell().row() == abs;
-    }
-
-    private static ItemFilterCondition posFilter(RTLParser.PosContext ctx) {
-        if (ctx.range() != null) return rangeFilter(ctx.range(),
-                (a, c) -> c.index(), (a, c) -> a.index());
-        if (ctx.offset() != null) {
-            int delta = parseOffset(ctx.offset());
-            return (a, c) -> c.index() == a.index() + delta;
-        }
-        int abs = Integer.parseInt(ctx.INT().getText());
-        return (a, c) -> c.index() == abs;
-    }
-
-    @FunctionalInterface
-    private interface IntExtractor {
-        int get(ru.icc.regtab.itm.model.semantics.item.CellDerivedItem anchor,
-                ru.icc.regtab.itm.model.semantics.item.CellDerivedItem candidate);
-    }
-
-    private static ItemFilterCondition rangeFilter(
-            RTLParser.RangeContext ctx, IntExtractor candVal, IntExtractor anchorVal) {
+    private static Constraint colRangeConstraint(RTLParser.RangeContext ctx) {
         boolean hiOpen = ctx.end() == null;
+        boolean startIsOffset = ctx.start().offset() != null;
         int lo = boundaryValue(ctx.start(), 0);
         int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.end(), Integer.MAX_VALUE);
-        boolean loRelative = ctx.start().offset() != null;
-        boolean hiRelative = !hiOpen && ctx.end().offset() != null;
-        int loDelta = loRelative ? parseOffset(ctx.start().offset()) : lo;
-        int hiDelta = hiRelative ? parseOffset(ctx.end().offset())   : hi;
-        boolean loAbs = !loRelative;
-        boolean hiAbs = !hiRelative;
-        return (a, c) -> {
-            int v   = candVal.get(a, c);
-            int lo2 = loAbs ? loDelta : anchorVal.get(a, c) + loDelta;
-            int hi2 = hiAbs ? hiDelta : anchorVal.get(a, c) + hiDelta;
-            return v >= lo2 && v <= hi2;
-        };
+        // Offset start → relative range (C+n..); INT start → absolute range (Cn..m)
+        return startIsOffset ? new Constraint.ColRange(lo, hi) : new Constraint.ColAbsoluteRange(lo, hi);
+    }
+
+    private static Constraint rowConstraint(RTLParser.RowContext ctx) {
+        if (ctx.range() != null) {
+            int lo = boundaryValue(ctx.range().start(), 0);
+            if (ctx.range().start().offset() != null) return new Constraint.RowOffset(lo);
+            return new Constraint.RowExact(lo);
+        }
+        if (ctx.offset() != null) return new Constraint.RowOffset(parseOffset(ctx.offset()));
+        return new Constraint.RowExact(Integer.parseInt(ctx.INT().getText()));
+    }
+
+    private static Constraint posConstraint(RTLParser.PosContext ctx) {
+        if (ctx.range()  != null) {
+            int lo = boundaryValue(ctx.range().start(), 0);
+            int hi = ctx.range().end() == null ? Integer.MAX_VALUE : boundaryValue(ctx.range().end(), Integer.MAX_VALUE);
+            return new Constraint.PosRange(lo, hi);
+        }
+        if (ctx.offset() != null) return new Constraint.PosOffset(parseOffset(ctx.offset()));
+        return new Constraint.PosExact(Integer.parseInt(ctx.INT().getText()));
+    }
+
+    // --- Content constraint builders ---
+
+    private static Constraint buildContentConstraint(RTLParser.ContConstrContext ctx) {
+        if (ctx.regex()    != null) return regexConstraint(ctx.regex());
+        if (ctx.blank()    != null) return blankConstraint(ctx.blank());
+        if (ctx.tag()      != null) return tagConstraint(ctx.tag());
+        if (ctx.sameStr()  != null) return Constraint.SameStr.INSTANCE;
+        if (ctx.contains() != null) return containsConstraint(ctx.contains());
+        throw new RtlCompileException("Unknown content constraint");
+    }
+
+    private static Constraint regexConstraint(RTLParser.RegexContext ctx) {
+        String pattern = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
+        return ctx.EXCLAMATION() != null
+                ? new Constraint.NotRegexMatched(pattern)
+                : new Constraint.RegexMatched(pattern);
+    }
+
+    private static Constraint blankConstraint(RTLParser.BlankContext ctx) {
+        return ctx.EXCLAMATION() != null ? Constraint.NotBlank.INSTANCE : Constraint.Blank.INSTANCE;
+    }
+
+    private static Constraint tagConstraint(RTLParser.TagContext ctx) {
+        List<String> tags = ctx.TAG().stream().map(t -> t.getText()).toList();
+        return new Constraint.Tagged(tags);
+    }
+
+    private static Constraint containsConstraint(RTLParser.ContainsContext ctx) {
+        String substring = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
+        return ctx.EXCLAMATION() != null
+                ? new Constraint.NotContains(substring)
+                : new Constraint.Contains(substring);
+    }
+
+    // --- Helper: list of constraints → ItemFilterConditionSpec ---
+
+    private static ItemFilterConditionSpec toSpec(List<Constraint> parts) {
+        if (parts.size() == 1) return new ItemFilterConditionSpec.Bare(parts.get(0));
+        return new ItemFilterConditionSpec.And(List.copyOf(parts));
+    }
+
+    private static ItemFilterConditionSpec.And toAndSpec(List<Constraint> parts) {
+        return new ItemFilterConditionSpec.And(List.copyOf(parts));
+    }
+
+    // --- Numeric helpers ---
+
+    private static int parseOffset(RTLParser.OffsetContext ctx) {
+        int n = Integer.parseInt(ctx.INT().getText());
+        return ctx.MINUS() != null ? -n : n;
     }
 
     private static int boundaryValue(RTLParser.StartContext ctx, int defaultVal) {
@@ -224,68 +298,5 @@ final class ProviderTemplateResolver {
         if (ctx.offset() != null) return parseOffset(ctx.offset());
         if (ctx.INT()    != null) return Integer.parseInt(ctx.INT().getText());
         return defaultVal;
-    }
-
-    private static int parseOffset(RTLParser.OffsetContext ctx) {
-        int n = Integer.parseInt(ctx.INT().getText());
-        return ctx.MINUS() != null ? -n : n;
-    }
-
-    // --- Content constraint builders ---
-
-    private static ItemFilterCondition buildContentConstraint(RTLParser.ContConstrContext ctx) {
-        if (ctx.regex()   != null) return regexFilter(ctx.regex());
-        if (ctx.blank()   != null) return blankFilter(ctx.blank());
-        if (ctx.tag()     != null) return tagFilter(ctx.tag());
-        if (ctx.sameStr() != null) return (a, c) -> c.sameStr(a);
-        throw new RtlCompileException("Unknown content constraint");
-    }
-
-    private static ItemFilterCondition regexFilter(RTLParser.RegexContext ctx) {
-        String pattern = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
-        boolean negated = ctx.EXCLAMATION() != null;
-        return negated
-                ? (a, c) -> !c.str().matches(pattern)
-                : (a, c) ->  c.str().matches(pattern);
-    }
-
-    private static ItemFilterCondition blankFilter(RTLParser.BlankContext ctx) {
-        boolean negated = ctx.EXCLAMATION() != null;
-        return negated
-                ? (a, c) -> !c.blankStr()
-                : (a, c) ->  c.blankStr();
-    }
-
-    private static ItemFilterCondition tagFilter(RTLParser.TagContext ctx) {
-        List<String> tags = ctx.TAG().stream()
-                .map(t -> t.getText())
-                .toList();
-        return (a, c) -> tags.stream().anyMatch(c::hasTag);
-    }
-
-    // --- Combining predicates ---
-
-    private static ItemFilterCondition andAll(List<ItemFilterCondition> parts) {
-        if (parts.isEmpty()) return (a, c) -> true;
-        if (parts.size() == 1) return parts.get(0);
-        ItemFilterCondition result = parts.get(0);
-        for (int i = 1; i < parts.size(); i++) {
-            final ItemFilterCondition prev = result;
-            final ItemFilterCondition next = parts.get(i);
-            result = (a, c) -> prev.test(a, c) && next.test(a, c);
-        }
-        return result;
-    }
-
-    private static ItemFilterCondition orAll(List<ItemFilterCondition> parts) {
-        if (parts.isEmpty()) return (a, c) -> true;
-        if (parts.size() == 1) return parts.get(0);
-        ItemFilterCondition result = parts.get(0);
-        for (int i = 1; i < parts.size(); i++) {
-            final ItemFilterCondition prev = result;
-            final ItemFilterCondition next = parts.get(i);
-            result = (a, c) -> prev.test(a, c) || next.test(a, c);
-        }
-        return result;
     }
 }

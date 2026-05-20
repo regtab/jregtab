@@ -1,26 +1,27 @@
-package ru.icc.regtab.itm.atp;
+﻿package ru.icc.regtab.itm.atp;
 
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task13.
  */
 class AtpTask13Test extends AtpTaskBase {
 
-    private static final ItemFilterCondition SAME_SUBCOLUMN    = (a, c) -> c.sameSubcol(a);
+    private static final ItemFilterConditionSpec SAME_SUBCOLUMN    = ItemFilterConditionSpec.sameSubcol();
 
-    private static final ItemFilterCondition SAME_SUBROW_COL2  = (a, c) -> c.sameSubrow(a) && c.col(2);
-    private static final ItemFilterCondition SAME_SUBROW_COL4  = (a, c) -> c.sameSubrow(a) && c.col(4);
-    private static final ItemFilterCondition SAME_SUBROW_COL1  = (a, c) -> c.sameSubrow(a) && c.col(1);
-    private static final ItemFilterCondition SAME_SUBROW_COL3  = (a, c) -> c.sameSubrow(a) && c.col(3);
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL2  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(2));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL4  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(4));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL1  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(1));
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL3  = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(3));
 
     @Override
     protected String taskId() {
@@ -37,12 +38,12 @@ class AtpTask13Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.avp(ProviderSpec.one(SAME_SUBCOLUMN)),
-                                        ActionSpec.rec(ProviderSpec.of(1, SAME_SUBROW_COL2), ProviderSpec.of(1, SAME_SUBROW_COL4),
-                                                       ProviderSpec.of(1, SAME_SUBROW_COL1), ProviderSpec.of(1, SAME_SUBROW_COL3))
+                                        ActionSpec.avp(ProviderSpec.attr(SAME_SUBCOLUMN)),
+                                        ActionSpec.rec(ProviderSpec.val(1, SAME_SUBROW_COL2), ProviderSpec.val(1, SAME_SUBROW_COL4),
+                                                       ProviderSpec.val(1, SAME_SUBROW_COL1), ProviderSpec.val(1, SAME_SUBROW_COL3))
                                 )),
                                 CellPattern.of(Quantifier.exactly(4), AtomicContentSpec.val(
-                                        ActionSpec.avp(ProviderSpec.one(SAME_SUBCOLUMN))
+                                        ActionSpec.avp(ProviderSpec.attr(SAME_SUBCOLUMN))
                                 )),
                                 CellPattern.skip(Quantifier.oneOrMore())
                         )

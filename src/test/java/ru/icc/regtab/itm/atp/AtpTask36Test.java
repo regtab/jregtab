@@ -3,12 +3,13 @@ package ru.icc.regtab.itm.atp;
 import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task36: pivot student blocks (12 rows × 3 cols).
@@ -17,8 +18,8 @@ import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
  */
 class AtpTask36Test extends AtpTaskBase {
 
-    private static final ItemFilterCondition SAME_SUBTABLE_COL2 = (a, c) -> c.sameSubtable(a) && c.col(2);
-    private static final ItemFilterCondition LEFT_OF             = (a, c) -> c.leftOf(a).sameSubrow();
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL2 = ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColExact(2));
+    private static final ItemFilterConditionSpec LEFT_OF             = ItemFilterConditionSpec.leftOf();
 
     @Override
     protected String taskId() {

@@ -4,12 +4,17 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.CellPredicate;
+import ru.icc.regtab.itm.atp.spec.Constraint;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
+import ru.icc.regtab.itm.atp.spec.StringExtractor;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
+
+import java.util.List;
 
 /**
  * ATP equivalent of Fluent API Task40.
@@ -17,10 +22,10 @@ import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 class AtpTask40Test extends AtpTaskBase {
 
     private static final CellMatchCondition REPORTED_CRIME_TITLE =
-            new CellMatchCondition(c -> c.text().contains("Reported crime in"));
+            new CellMatchCondition(new CellPredicate.Contains("Reported crime in"));
 
-    private static final ItemFilterCondition SAME_SUBTABLE_COL1 = (a, c) -> c.sameSubtable(a) && c.col(1);
-    private static final ItemFilterCondition SAME_SUBROW        = (a, c) -> c.sameSubrow(a);
+    private static final ItemFilterConditionSpec SAME_SUBTABLE_COL1 = ItemFilterConditionSpec.and(Constraint.SameSubtable.INSTANCE, new Constraint.ColExact(1));
+    private static final ItemFilterConditionSpec SAME_SUBROW        = ItemFilterConditionSpec.sameSubrow();
 
     @Override
     protected String taskId() {
@@ -33,7 +38,7 @@ class AtpTask40Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(REPORTED_CRIME_TITLE, Quantifier.one(), AtomicContentSpec.val(
-                                        input -> input.replaceAll("Reported crime in", "").trim(),
+                                        new StringExtractor.Chain(List.of(new StringExtractor.Replaced("Reported crime in", ""), StringExtractor.Trimmed.INSTANCE)),
                                         ActionSpec.avp(""),
                                         ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL1))
                                 )),

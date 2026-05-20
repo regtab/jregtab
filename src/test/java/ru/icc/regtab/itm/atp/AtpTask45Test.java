@@ -4,23 +4,25 @@ import ru.icc.regtab.itm.atp.spec.ActionSpec;
 import ru.icc.regtab.itm.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.itm.atp.spec.CellMatchCondition;
 import ru.icc.regtab.itm.atp.spec.CellPattern;
+import ru.icc.regtab.itm.atp.spec.CellPredicate;
+import ru.icc.regtab.itm.atp.spec.Constraint;
 import ru.icc.regtab.itm.atp.spec.DelimitedContentSpec;
+import ru.icc.regtab.itm.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
 
 /**
  * ATP equivalent of Fluent API Task45.
  */
 class AtpTask45Test extends AtpTaskBase {
 
-    private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(c -> !c.textBlank());
+    private static final CellMatchCondition NOT_BLANK = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
 
-    private static final ItemFilterCondition SAME_SUBROW_COL0 = (a, c) -> c.sameSubrow(a) && c.col(0);
+    private static final ItemFilterConditionSpec SAME_SUBROW_COL0 = ItemFilterConditionSpec.and(Constraint.SameSubrow.INSTANCE, new Constraint.ColExact(0));
 
     @Override
     protected String taskId() {

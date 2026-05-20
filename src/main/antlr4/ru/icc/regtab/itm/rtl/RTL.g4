@@ -67,8 +67,9 @@ SKIPPED   : 'SKIP' | '_' ;
 // User-defined tags
 tags : TAG+ ;
 
-// Item string extractor
-strExtr : substr | replace | norm | upperCase | lowerCase ;
+// Item string extractor (supports chains: =REPL("x","").TRIM)
+strExtr     : strExtrStep ('.' strExtrStep)* ;
+strExtrStep : substr | replace | norm | upperCase | lowerCase | trim ;
 
 // String processing
 substr    : 'SUBSTR' LPAREN INT COMMA INT RPAREN ;
@@ -76,6 +77,7 @@ replace   : 'REPL'   LPAREN STRING COMMA STRING RPAREN ;
 norm      : 'NORM' ;
 upperCase : 'UC' ;
 lowerCase : 'LC' ;
+trim      : 'TRIM' ;
 
 // Interpretation action specifications
 actSpecs : actSpec (COMMA actSpec)* ;
@@ -113,7 +115,7 @@ xContSpec    : atomContSpec | delimContSpec | compContSpec ;
 
 // Cell match condition
 cellMatchCond : cellMatchConstr ;
-cellMatchConstr : regex | blank ;
+cellMatchConstr : regex | blank | contains ;
 
 // Item provider specification
 provSpec : tblProvSpec | ctxProvSpec ;
@@ -170,7 +172,10 @@ end   : offset | INT ;
 offset : (MINUS INT) | (PLUS INT) ;
 
 // Content constraints
-contConstr : regex | blank | tag | sameStr ;
+contConstr : regex | blank | tag | sameStr | contains ;
+
+// Contains constraint
+contains : EXCLAMATION? 'CONTAINS' STRING ;
 
 tag : 'TAG' TAG+ ;
 

@@ -1,7 +1,5 @@
 package ru.icc.regtab.itm.atp.spec;
 
-import ru.icc.regtab.itm.model.semantics.provider.ItemFilterCondition;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +31,7 @@ public record ActionSpec(
     }
 
     /** Convenience: REC action — all providers share the same cardinality and default traversal. */
-    public static ActionSpec rec(int cardinality, ItemFilterCondition... conditions) {
+    public static ActionSpec rec(int cardinality, ItemFilterConditionSpec... conditions) {
         var providers = new ArrayList<ProviderSpec>(conditions.length);
         for (var c : conditions) {
             providers.add(ProviderSpec.val(cardinality, c));

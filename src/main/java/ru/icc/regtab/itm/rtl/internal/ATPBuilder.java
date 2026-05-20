@@ -1,6 +1,10 @@
 package ru.icc.regtab.itm.rtl.internal;
 
 import ru.icc.regtab.itm.atp.spec.*;
+import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
+import ru.icc.regtab.itm.interpret.DelimitedFieldSplit;
+import ru.icc.regtab.itm.interpret.RecordsetTransformation;
+import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
 import ru.icc.regtab.itm.rtl.RTLBaseVisitor;
 import ru.icc.regtab.itm.rtl.RTLParser;
 import ru.icc.regtab.itm.rtl.RtlCompileException;
@@ -22,7 +26,27 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         List<SubtablePattern> subtables = ctx.subtablePattern().stream()
                 .map(sp -> (SubtablePattern) visit(sp))
                 .toList();
-        return new TablePattern(subtables, List.of());
+        List<RecordsetTransformation> transformations = ctx.settings() != null
+                ? buildTransformations(ctx.settings())
+                : List.of();
+        return new TablePattern(subtables, transformations);
+    }
+
+    private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx) {
+        return ctx.setting().stream()
+                .map(ATPBuilder::buildTransformation)
+                .toList();
+    }
+
+    private static RecordsetTransformation buildTransformation(RTLParser.SettingContext ctx) {
+        if (ctx.normSetting()  != null) return new WhitespaceNormalization();
+        if (ctx.anchSetting()  != null)
+            return new AnchorAttributeAtPosition(Integer.parseInt(ctx.anchSetting().INT().getText()));
+        if (ctx.splitSetting() != null) {
+            String delim = StringExtractorFactory.parseStringLiteral(ctx.splitSetting().STRING().getText());
+            return new DelimitedFieldSplit(delim);
+        }
+        throw new RtlCompileException("Unknown setting type");
     }
 
     // -------- subtable --------
@@ -269,26 +293,32 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     // -------- cell match condition --------
 
-    private CellMatchCondition buildCellMatchCondition(RTLParser.CellMatchCondContext ctx) {
+    private static CellMatchCondition buildCellMatchCondition(RTLParser.CellMatchCondContext ctx) {
         var constr = ctx.cellMatchConstr();
-        if (constr.regex() != null) return buildRegexCond(constr.regex());
-        if (constr.blank() != null) return buildBlankCond(constr.blank());
+        if (constr.regex()    != null) return buildRegexCond(constr.regex());
+        if (constr.blank()    != null) return buildBlankCond(constr.blank());
+        if (constr.contains() != null) return buildContainsCond(constr.contains());
         throw new RtlCompileException("Unknown cell match constraint");
+    }
+
+    private static CellMatchCondition buildContainsCond(RTLParser.ContainsContext ctx) {
+        String substring = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
+        return ctx.EXCLAMATION() != null
+                ? new CellMatchCondition(new CellPredicate.NotContains(substring))
+                : new CellMatchCondition(new CellPredicate.Contains(substring));
     }
 
     private static CellMatchCondition buildRegexCond(RTLParser.RegexContext ctx) {
         String pattern = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
-        boolean neg = ctx.EXCLAMATION() != null;
-        return neg
-                ? new CellMatchCondition(c -> !c.text().matches(pattern))
-                : new CellMatchCondition(c ->  c.text().matches(pattern));
+        return ctx.EXCLAMATION() != null
+                ? new CellMatchCondition(new CellPredicate.NotRegexMatched(pattern))
+                : new CellMatchCondition(new CellPredicate.RegexMatched(pattern));
     }
 
     private static CellMatchCondition buildBlankCond(RTLParser.BlankContext ctx) {
-        boolean neg = ctx.EXCLAMATION() != null;
-        return neg
-                ? new CellMatchCondition(c -> !c.textBlank())
-                : new CellMatchCondition(c ->  c.textBlank());
+        return ctx.EXCLAMATION() != null
+                ? new CellMatchCondition(CellPredicate.NotBlank.INSTANCE)
+                : new CellMatchCondition(CellPredicate.Blank.INSTANCE);
     }
 
     // -------- small helpers --------
