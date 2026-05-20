@@ -108,7 +108,7 @@ class AtpRtlRoundTripTest {
     @Test
     void rtlTask25EqualsAtpTask25() {
         String rtl = """
-                [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->CONCAT] [VAL] [VAL]+ ]+
+                [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->CONCAT] [VAL]+ ]+
                 """;
         assertEquals(new AtpTask25Test().buildPattern(), RtlCompiler.compile(rtl),
                 "RtlTask25 and AtpTask25 patterns differ");
