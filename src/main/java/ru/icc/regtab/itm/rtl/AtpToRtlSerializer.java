@@ -222,7 +222,11 @@ public final class AtpToRtlSerializer {
     private static String serializeOp(ActionSpec as) {
         return switch (as.operationType()) {
             case AVP    -> "AVP";
-            case REC    -> "REC";
+            case REC    -> {
+                if (as.anchorPos()      != null) yield "REC(" + as.anchorPos() + ")";
+                if (as.splitDelimiter() != null) yield "REC('" + escapeString(as.splitDelimiter()) + "')";
+                yield "REC";
+            }
             case CONCAT -> "CONCAT";
             case FILL   -> as.delimiter().isEmpty() ? "FILL" : "FILL(\"" + escapeString(as.delimiter()) + "\")";
             case PREFIX -> as.delimiter().isEmpty() ? "PREFIX" : "PREFIX(\"" + escapeString(as.delimiter()) + "\")";

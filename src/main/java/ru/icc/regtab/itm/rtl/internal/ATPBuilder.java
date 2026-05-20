@@ -270,23 +270,28 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     }
 
     private static ActionSpec buildOp(RTLParser.OpContext ctx, List<ProviderSpec> providers) {
-        if (ctx.AVP()    != null) return new ActionSpec(OperationType.AVP,    null, providers);
-        if (ctx.recOp()  != null) return new ActionSpec(OperationType.REC,    null, providers);
-        if (ctx.CONCAT() != null) return new ActionSpec(OperationType.CONCAT, null, providers);
+        if (ctx.AVP()    != null) return new ActionSpec(OperationType.AVP,    null, providers, null, null);
+        if (ctx.recOp()  != null) {
+            RTLParser.RecOpContext rec = ctx.recOp();
+            Integer anchorPos      = rec.INT()    != null ? Integer.parseInt(rec.INT().getText()) : null;
+            String  splitDelimiter = rec.STRING() != null ? StringExtractorFactory.parseStringLiteral(rec.STRING().getText()) : null;
+            return new ActionSpec(OperationType.REC, null, providers, anchorPos, splitDelimiter);
+        }
+        if (ctx.CONCAT() != null) return new ActionSpec(OperationType.CONCAT, null, providers, null, null);
         if (ctx.fillOp() != null) {
             String d = ctx.fillOp().STRING() != null
                     ? StringExtractorFactory.parseStringLiteral(ctx.fillOp().STRING().getText()) : "";
-            return new ActionSpec(OperationType.FILL, d, providers);
+            return new ActionSpec(OperationType.FILL, d, providers, null, null);
         }
         if (ctx.prefixOp() != null) {
             String d = ctx.prefixOp().STRING() != null
                     ? StringExtractorFactory.parseStringLiteral(ctx.prefixOp().STRING().getText()) : "";
-            return new ActionSpec(OperationType.PREFIX, d, providers);
+            return new ActionSpec(OperationType.PREFIX, d, providers, null, null);
         }
         if (ctx.suffixOp() != null) {
             String d = ctx.suffixOp().STRING() != null
                     ? StringExtractorFactory.parseStringLiteral(ctx.suffixOp().STRING().getText()) : "";
-            return new ActionSpec(OperationType.SUFFIX, d, providers);
+            return new ActionSpec(OperationType.SUFFIX, d, providers, null, null);
         }
         throw new RtlCompileException("Unknown operation type");
     }

@@ -12,7 +12,6 @@ import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.StringExtractor;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 
 /**
  * ATP equivalent of RTL Task02: two generic header rows, data rows look up
@@ -41,7 +40,7 @@ class AtpTask02Test extends AtpTaskBase {
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.val(2, SAME_SUBCOLUMN), ProviderSpec.val(1, SAME_SUBROW))
+                                        ActionSpec.rec(2, ProviderSpec.val(2, SAME_SUBCOLUMN), ProviderSpec.val(1, SAME_SUBROW))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         ),
@@ -49,7 +48,6 @@ class AtpTask02Test extends AtpTaskBase {
                                 CellPattern.of(BLANK, Quantifier.one(), null),
                                 CellPattern.skip()
                         )
-                )
-        ).withTransformations(new AnchorAttributeAtPosition(2));
+                ));
     }
 }
