@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.rtl;
 /**
  * RTL equivalent of AtpTask01: ...
  */
-class RtlTask01Test extends RtlTaskBase {
+public class RtlTask01Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "01"; }

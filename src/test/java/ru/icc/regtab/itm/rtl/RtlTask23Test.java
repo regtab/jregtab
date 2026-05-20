@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * VAL (empty-AVP + REC same-row + CONCAT below-same-str), ATTR (SUFFIX right-AUX),
  * AUX, VAL (AVP same-row-attr).
  */
-class RtlTask23Test extends RtlTaskBase {
+public class RtlTask23Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "23"; }

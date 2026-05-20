@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * matching "*Company" (VAL = REPL('\*','') : DW(ST)->REC) and one-or-more
  * data rows whose cell does NOT match "*Company".
  */
-class RtlTask35Test extends RtlTaskBase {
+public class RtlTask35Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "35"; }

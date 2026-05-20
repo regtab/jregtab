@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * conditional date cells (blank → skip, non-blank → val: first-in-row + first-in-col ->REC).
  * Post-processed by AnchorAttributeAtPosition(2).
  */
-class RtlTask37Test extends RtlTaskBase {
+public class RtlTask37Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "37"; }

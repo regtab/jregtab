@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * Title row: VAL matching "Reported crime in", stripped prefix, avp(""), rec(col1 in subtable).
  * Header skip row (2 cells), 5 attr/val rows, optional trailing skip row.
  */
-class RtlTask40Test extends RtlTaskBase {
+public class RtlTask40Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "40"; }

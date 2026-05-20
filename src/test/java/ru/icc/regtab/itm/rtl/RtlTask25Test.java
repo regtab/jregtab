@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * and one-or-more data cells; rows with same ID are grouped via CONCAT.
  * Result is post-processed by DelimitedFieldSplit("/").
  */
-class RtlTask25Test extends RtlTaskBase {
+public class RtlTask25Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "25"; }

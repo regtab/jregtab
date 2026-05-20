@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * (avp("") + rec col-2 in subtable) then subject ATTR and grade VAL (avp left-attr);
  * exactly 11 data rows skip name, same ATTR/VAL pattern.
  */
-class RtlTask36Test extends RtlTaskBase {
+public class RtlTask36Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "36"; }

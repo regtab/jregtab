@@ -20,7 +20,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-abstract class RtlTaskBase {
+public abstract class RtlTaskBase {
 
     @ParameterizedTest(name = "variant_{0}")
     @ValueSource(ints = {1, 2, 3, 4, 5})
@@ -46,6 +46,10 @@ abstract class RtlTaskBase {
                 : CsvRecordsetLoader.load(expectedPath, actual.schema());
         RecordsetAssert.assertMatches(actual, expected, matchOpts);
         assertTrue(actual.size() > 0);
+    }
+
+    public final ru.icc.regtab.itm.atp.spec.TablePattern buildPattern() {
+        return RtlCompiler.compile(buildRtl());
     }
 
     protected abstract String taskId();

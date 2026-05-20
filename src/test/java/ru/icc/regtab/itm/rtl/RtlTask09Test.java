@@ -4,7 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * RTL equivalent of AtpTask09: subrow pattern with REPL extractor and conditional.
  * Row key at COL0 (RM), col key at ROW0 (CM). Blank cells are skipped.
  */
-class RtlTask09Test extends RtlTaskBase {
+public class RtlTask09Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "09"; }

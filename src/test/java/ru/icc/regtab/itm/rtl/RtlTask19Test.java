@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.rtl;
 /**
  * RTL equivalent of AtpTask19: header with DW->REC, exactly 3 data rows per subtable.
  */
-class RtlTask19Test extends RtlTaskBase {
+public class RtlTask19Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "19"; }

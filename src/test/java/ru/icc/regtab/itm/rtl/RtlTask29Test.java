@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * one-or-more 4-cell data subrows; the anchor cell collects first-6 and same-subrow items
  * via a two-provider REC action.
  */
-class RtlTask29Test extends RtlTaskBase {
+public class RtlTask29Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "29"; }

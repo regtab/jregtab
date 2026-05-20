@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * (BLANK?SKIP|VAL: first-in-row + first-in-col ->REC)+); post-processed by
  * AnchorAttributeAtPosition(2).
  */
-class RtlTask32Test extends RtlTaskBase {
+public class RtlTask32Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "32"; }
