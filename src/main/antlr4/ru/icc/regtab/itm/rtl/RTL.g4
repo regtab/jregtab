@@ -175,7 +175,8 @@ offset : (MINUS INT) | (PLUS INT) ;
 contConstr : regex | blank | tag | sameStr | contains ;
 
 // Contains constraint
-contains : EXCLAMATION? 'CONTAINS' STRING ;
+contains : EXCLAMATION? TILDA STRING ;
+TILDA : '~' ;
 
 tag : 'TAG' TAG+ ;
 

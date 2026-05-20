@@ -51,12 +51,12 @@ public sealed interface CellPredicate permits
     }
 
     record Contains(String substring) implements CellPredicate {
-        public String toRtl() { return "CONTAINS \"" + substring + "\""; }
+        public String toRtl() { return "~\"" + substring + "\""; }
         public Predicate<Cell> toPredicate() { return c -> c.text().contains(substring); }
     }
 
     record NotContains(String substring) implements CellPredicate {
-        public String toRtl() { return "!CONTAINS \"" + substring + "\""; }
+        public String toRtl() { return "!~\"" + substring + "\""; }
         public Predicate<Cell> toPredicate() { return c -> !c.text().contains(substring); }
     }
 

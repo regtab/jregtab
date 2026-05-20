@@ -240,14 +240,14 @@ public sealed interface Constraint permits
     }
 
     record Contains(String substring) implements Constraint {
-        public String toRtl() { return "CONTAINS \"" + substring + "\""; }
+        public String toRtl() { return "~\"" + substring + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.str().contains(substring);
         }
     }
 
     record NotContains(String substring) implements Constraint {
-        public String toRtl() { return "!CONTAINS \"" + substring + "\""; }
+        public String toRtl() { return "!~\"" + substring + "\""; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.str().contains(substring);
         }
