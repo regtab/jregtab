@@ -278,9 +278,10 @@ public sealed interface FilterTerm permits
         }
     }
 
-    /** No RTL analog — {@code toRtl()} throws {@link UnsupportedOperationException}. */
     record NotTagged(List<String> tags) implements FilterTerm {
-        public String toRtl() { throw new UnsupportedOperationException("!TAG has no RTL analog"); }
+        public String toRtl() {
+            return "!TAG " + String.join(" ", tags.stream().map(t -> t.startsWith("#") ? t : "#" + t).toList());
+        }
         public ItemFilterCondition toCondition() {
             return (a, c) -> tags.stream().noneMatch(c::hasTag);
         }

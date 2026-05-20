@@ -114,10 +114,10 @@ final class ProviderTemplateResolver {
         for (RTLParser.OrGroupContext g : orGroups) {
             ItemFilterConditionSpec spec = buildOrGroup(g);
             switch (spec) {
-                case ItemFilterConditionSpec.Bare b ->
-                        allAnds.add(new ItemFilterConditionSpec.And(List.of(b.constraint())));
-                case ItemFilterConditionSpec.And a  -> allAnds.add(a);
-                case ItemFilterConditionSpec.Or o   -> allAnds.addAll(o.groups());
+                case ItemFilterConditionSpec.Bare(var c) ->
+                        allAnds.add(new ItemFilterConditionSpec.And(List.of(c)));
+                case ItemFilterConditionSpec.And a        -> allAnds.add(a);
+                case ItemFilterConditionSpec.Or(var gs)   -> allAnds.addAll(gs);
                 default -> throw new RtlCompileException("Unexpected spec type in OR");
             }
         }
@@ -157,9 +157,9 @@ final class ProviderTemplateResolver {
         if (ctx.constraints() != null) {
             ItemFilterConditionSpec inner = buildConstraints(ctx.constraints());
             return switch (inner) {
-                case ItemFilterConditionSpec.Bare b -> List.of(List.of(b.constraint()));
-                case ItemFilterConditionSpec.And a  -> List.of(new ArrayList<>(a.terms()));
-                case ItemFilterConditionSpec.Or  o  -> o.groups().stream()
+                case ItemFilterConditionSpec.Bare(var c)  -> List.of(List.of(c));
+                case ItemFilterConditionSpec.And(var ts)  -> List.of(new ArrayList<>(ts));
+                case ItemFilterConditionSpec.Or(var gs)   -> gs.stream()
                         .map(g -> (List<FilterTerm>) new ArrayList<>(g.terms()))
                         .toList();
                 default -> throw new RtlCompileException("Unexpected nested spec type");
@@ -260,7 +260,9 @@ final class ProviderTemplateResolver {
 
     private static FilterTerm tagConstraint(RTLParser.TagContext ctx) {
         List<String> tags = ctx.TAG().stream().map(t -> t.getText()).toList();
-        return new FilterTerm.Tagged(tags);
+        return ctx.EXCLAMATION() != null
+                ? new FilterTerm.NotTagged(tags)
+                : new FilterTerm.Tagged(tags);
     }
 
     private static FilterTerm containsConstraint(RTLParser.ContainsContext ctx) {

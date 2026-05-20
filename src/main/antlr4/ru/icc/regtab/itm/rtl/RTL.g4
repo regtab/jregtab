@@ -178,7 +178,7 @@ contConstr : regex | blank | tag | sameStr | contains ;
 contains : EXCLAMATION? TILDA STRING ;
 TILDA : '~' ;
 
-tag : 'TAG' TAG+ ;
+tag : EXCLAMATION? 'TAG' TAG+ ;
 
 sameStr : STR ;
 STR : 'STR' ;
