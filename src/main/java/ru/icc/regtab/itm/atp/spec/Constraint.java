@@ -124,7 +124,7 @@ public sealed interface Constraint permits
 
     record NotSameCell() implements Constraint {
         public static final NotSameCell INSTANCE = new NotSameCell();
-        public String toRtl() { return "TAB"; }
+        public String toRtl() { return "NCL"; }
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.sameCell(a);
         }

@@ -189,13 +189,13 @@ final class ProviderTemplateResolver {
         if (ctx.RIGHT_OF()  != null) return Constraint.RightOf.INSTANCE;
         if (ctx.ABOVE()     != null) return Constraint.Above.INSTANCE;
         if (ctx.BELOW()     != null) return Constraint.Below.INSTANCE;
-        if (ctx.ROW()       != null) return Constraint.SameRow.INSTANCE;
-        if (ctx.COLUMN()    != null) return Constraint.SameCol.INSTANCE;
-        if (ctx.SUBROW()    != null) return Constraint.SameSubrow.INSTANCE;
-        if (ctx.SUBCOLUMN() != null) return Constraint.SameSubcol.INSTANCE;
-        if (ctx.SUBTABLE()  != null) return Constraint.SameSubtable.INSTANCE;
-        if (ctx.TABLE()     != null) return Constraint.NotSameCell.INSTANCE;
-        if (ctx.CELL()      != null) return Constraint.SameCell.INSTANCE;
+        if (ctx.SAME_ROW()       != null) return Constraint.SameRow.INSTANCE;
+        if (ctx.SAME_COLUMN()    != null) return Constraint.SameCol.INSTANCE;
+        if (ctx.SAME_SUBROW()    != null) return Constraint.SameSubrow.INSTANCE;
+        if (ctx.SAME_SUBCOLUMN() != null) return Constraint.SameSubcol.INSTANCE;
+        if (ctx.SAME_SUBTABLE()  != null) return Constraint.SameSubtable.INSTANCE;
+        if (ctx.NOT_SAME_CELL()  != null) return Constraint.NotSameCell.INSTANCE;
+        if (ctx.SAME_CELL()      != null) return Constraint.SameCell.INSTANCE;
         return null; // col/row/pos — no named base condition
     }
 
