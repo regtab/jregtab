@@ -1,5 +1,6 @@
 package ru.icc.regtab.itm.atp;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
@@ -89,5 +90,27 @@ class AtpRtlRoundTripTest {
 
     private static TaskCase task(String name, AtpTaskBase base) {
         return new TaskCase(name, base.buildPattern());
+    }
+
+    /** Verifies that RtlTask02 and AtpTask02 produce structurally equal TablePatterns. */
+    @Test
+    void rtlTask02EqualsAtpTask02() {
+        String rtl = """
+                { [ [VAL=NORM] [] ]{2}
+                  [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
+                  [ [BLANK?] [] ]? }+
+                """;
+        assertEquals(new AtpTask02Test().buildPattern(), RtlCompiler.compile(rtl),
+                "RtlTask02 and AtpTask02 patterns differ");
+    }
+
+    /** Verifies that RtlTask25 and AtpTask25 produce structurally equal TablePatterns. */
+    @Test
+    void rtlTask25EqualsAtpTask25() {
+        String rtl = """
+                [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->CONCAT] [VAL] [VAL]+ ]+
+                """;
+        assertEquals(new AtpTask25Test().buildPattern(), RtlCompiler.compile(rtl),
+                "RtlTask25 and AtpTask25 patterns differ");
     }
 }
