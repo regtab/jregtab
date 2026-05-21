@@ -1,0 +1,25 @@
+package ru.icc.regtab.itm.semantics.action;
+
+import ru.icc.regtab.itm.semantics.item.Item;
+import ru.icc.regtab.itm.semantics.operation.WorkingStateOperation;
+import ru.icc.regtab.itm.semantics.provider.ItemProvider;
+
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * Interpretation action (def:interpretation-action): a triple (anchor, providers, operation)
+ * where anchor is the item being interpreted, providers yield related items,
+ * and operation updates the working state.
+ */
+public record InterpretationAction(
+        Item anchor,
+        List<ItemProvider> providers,
+        WorkingStateOperation operation
+) {
+    public InterpretationAction {
+        Objects.requireNonNull(anchor, "anchor");
+        providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
+        Objects.requireNonNull(operation, "operation");
+    }
+}

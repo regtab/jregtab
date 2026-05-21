@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm;
 
-import ru.icc.regtab.itm.model.semantics.TableSemantics;
-import ru.icc.regtab.itm.model.syntax.TableSyntax;
+import ru.icc.regtab.itm.semantics.TableSemantics;
+import ru.icc.regtab.itm.syntax.TableSyntax;
 
 import java.util.Objects;
 
