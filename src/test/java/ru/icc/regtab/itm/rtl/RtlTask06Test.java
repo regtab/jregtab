@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 06: repeated subtables — first row has a subtable-wide REC anchor
  * then conditional cells; four following rows contain only conditional cells.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_06/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask06Test}
  * <pre>
  * { [ [VAL : ST*->REC] [(BLANK ? _ | VAL)]+ ]

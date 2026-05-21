@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 17: repeated subtables where the header cell collects all values below
  * (unbounded), followed by one-or-more non-blank data rows and an optional skip row.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_17/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask17Test}
  * <pre>
  * { [ [VAL : BW*->REC] ] [ [!BLANK? VAL] ]+ [ [] ]? }+

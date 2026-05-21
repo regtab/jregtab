@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 18: repeated subtables with one compound ATTR=VAL header row (collecting
  * subtable-wide values and an AVP) and exactly 15 data rows with ATTR=VAL AVP only.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_18/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask18Test}
  * <pre>
  * { [ [ATTR "=" VAL : ST*->REC, CL->AVP] ] [ [ATTR "=" VAL : CL->AVP] ]{15} }+

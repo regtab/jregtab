@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 26: repeated subtables with a three-cell header row (anchor with AVP and
  * column-2 REC, plus ATTR and AVP cells) and exactly 5 three-cell data rows.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_26/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask26Test}
  * <pre>
  * { [ [VAL : ''->AVP, (ST & C2)*->REC] [ATTR] [VAL : SR->AVP] ]

@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 03: flat table with a row-key anchor followed by exactly two value
  * cells per row, each referencing the anchor via same-subrow.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_03/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask03Test}
  * <pre>
  * [ [VAL] [VAL : SR->REC(1)]{2} ]+

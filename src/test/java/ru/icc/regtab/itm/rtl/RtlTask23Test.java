@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 23: repeated subtables of exactly 3 rows, each with four cells combining
  * AVP, REC, CONCAT, and SUFFIX actions across same-row and below-same-string providers.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_23/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask23Test}
  * <pre>
  * { [ [VAL : ''->AVP, SR*->REC, (BW & STR)*->CONCAT] [ATTR : RT->SUFFIX] [AUX] [VAL : SR->AVP] ]{3} }+

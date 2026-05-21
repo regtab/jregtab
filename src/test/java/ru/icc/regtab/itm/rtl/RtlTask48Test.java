@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 48: a fixed 2-row×2-cell skip header, then repeated person subtables
  * each with a name anchor row, a blank+compound row, and an optional blank footer.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_48/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask48Test}
  * <pre>
  * [ []{2} ]{2}

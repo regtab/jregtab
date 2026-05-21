@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 05: cross-table unpivot — one column-header row, one skip row, then
  * data rows with a row-key anchor and value cells referencing both axes.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_05/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask05Test}
  * <pre>
  * [ [] [VAL]+ ]

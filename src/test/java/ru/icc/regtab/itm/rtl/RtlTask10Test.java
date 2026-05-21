@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 10: repeated subtables each with zero-or-more structured skip rows,
  * one data row collecting values via same-subrow REC, and an optional blank footer.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_10/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask10Test}
  * <pre>
  * { [ []{4} [BLANK?] []{3} ]*

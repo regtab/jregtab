@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 16: flat table where each anchor cell in column 0 collects one value
  * to the right via REC and concatenates same-string cells below via CONCAT.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_16/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask16Test}
  * <pre>
  * [ [VAL : RT->REC, (BW & STR)*->CONCAT] [VAL] ]+

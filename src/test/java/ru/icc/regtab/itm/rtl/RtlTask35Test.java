@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 35: repeated subtables where the header row is identified by a glob
  * match on "*Company" and the anchor value is cleaned by stripping the asterisk.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_35/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask35Test}
  * <pre>
  * { [ [~'*Company' ? VAL = REPL('\*', '') : BW*->REC] ]

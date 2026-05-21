@@ -5,6 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * slash-delimited SUFFIX, REC over values two-or-more positions right, and
  * CONCAT grouping rows with the same ID string.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_25/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask25Test}
  * <pre>
  * [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->CONCAT] [VAL]+ ]+

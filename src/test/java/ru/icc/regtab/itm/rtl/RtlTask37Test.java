@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 37: cross-table with a corner-skip header row and per-person data rows
  * using conditional blank-skipping (same structure as task 32).
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_37/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask37Test}
  * <pre>
  * [ [] [VAL]+ ]

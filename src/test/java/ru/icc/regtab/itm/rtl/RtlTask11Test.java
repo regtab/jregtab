@@ -5,6 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * explicit subrow grouping and conditional blank-skipping (same structure as task 09,
  * without the regex-cleaned headers).
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_11/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask11Test}
  * <pre>
  * [ [] [VAL]+ ]

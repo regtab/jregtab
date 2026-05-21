@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 07: cross-table with three row-key columns, one column-header row,
  * and data cells binding three row keys plus one column key.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_07/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask07Test}
  * <pre>
  * [ []{3} [VAL]+ ]

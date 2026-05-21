@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 09: cross-table unpivot with regex-cleaned column headers, explicit
  * subrow grouping, and conditional blank-skipping in data cells.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_09/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask09Test}
  * <pre>
  * [ [] [VAL = REPL('\s+', '')]{5} ]

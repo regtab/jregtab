@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 27: repeated subtables with a single-cell header collecting all values
  * below, one skip row separator, and exactly 9 plain data rows.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_27/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask27Test}
  * <pre>
  * { [ [VAL : BW*->REC] ]

@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 49: cross-table unpivot with non-blank guards — a skip+header row followed
  * by data rows where each data cell references both row and column anchors.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_49/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask49Test}
  * <pre>
  * [ [] [!BLANK? VAL]+ ]

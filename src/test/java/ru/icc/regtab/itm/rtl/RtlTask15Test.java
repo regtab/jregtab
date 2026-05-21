@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 15: flat table where each cell contains a compound value — three
  * space-separated parts each collected via same-cell REC.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_15/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask15Test}
  * <pre>
  * [ [VAL ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1)] ]+

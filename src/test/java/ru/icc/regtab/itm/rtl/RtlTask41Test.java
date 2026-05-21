@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 41: repeated subtables each with two optional rows — a compound fill+REC
  * row and a right-then-context REC row — for key-value pair extraction.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_41/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask41Test}
  * <pre>
  * { [ [!BLANK? VAL : ''->FILL, (CL, RT)->REC "" VAL] [!BLANK? VAL] ]?

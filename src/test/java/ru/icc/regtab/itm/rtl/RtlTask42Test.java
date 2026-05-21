@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 42: flat table where each row has a name anchor cell followed by exactly
  * two compound ATTR:VAL cells, each with a same-cell AVP.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_42/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask42Test}
  * <pre>
  * [ [VAL : ''->AVP, RT*->REC] [ATTR ":" VAL : CL->AVP]{2} ]+

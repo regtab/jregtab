@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 12: single-row header where the anchor collects all values in column 5
  * (unbounded), followed by data rows that only fill column 5.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_12/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask12Test}
  * <pre>
  * [ [VAL : C5*->REC] []{4} [VAL] ]

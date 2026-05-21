@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 46: repeated subtables with one-or-more non-blank three-cell rows —
  * anchor VAL (AVP + same-row REC + below-same-string CONCAT), ATTR, and AVP VAL.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_46/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask46Test}
  * <pre>
  * { [ [!BLANK? VAL : ''->AVP, SR*->REC, (BW & STR)*->CONCAT] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+ }+

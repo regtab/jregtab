@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 32: cross-table unpivot with one skip+header row and data rows using
  * conditional blank-skipping (same structure as tasks 09/11, without subrow grouping).
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_32/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask32Test}
  * <pre>
  * [ [] [VAL]+ ]

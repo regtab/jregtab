@@ -5,6 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * three compound ATTR:VAL cells, each with a same-cell AVP (same as task 42
  * but with three attribute-value pairs instead of two).
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_43/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask43Test}
  * <pre>
  * [ [VAL : ''->AVP, RT*->REC] [ATTR ":" VAL : CL->AVP]{3} ]+

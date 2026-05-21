@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 22: repeated subtables where the anchor collects values in columns 2–5
  * in column-major traversal order, plus a plain data row.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_22/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask22Test}
  * <pre>
  * { [ [VAL : ^(ST & C2..5)*->REC] [] [VAL]+ ] [ []{2} [VAL]+ ] }+

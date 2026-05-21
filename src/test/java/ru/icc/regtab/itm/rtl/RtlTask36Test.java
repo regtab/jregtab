@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 36: repeated student-grade subtables — header row carries the student
  * name anchor, then exactly 11 subject/grade rows share the same left-attr AVP pattern.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_36/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask36Test}
  * <pre>
  * { [ [VAL : ''->AVP, (ST & C2)*->REC] [ATTR] [VAL : LT->AVP] ]

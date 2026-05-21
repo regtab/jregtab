@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 14: repeated subtables with a non-blank header row (blank sentinel in C2)
  * and data rows combining two subtable-scoped column lookups with two same-row values.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_14/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask14Test}
  * <pre>
  * { [ [!BLANK ? VAL]{2} [BLANK?] ]

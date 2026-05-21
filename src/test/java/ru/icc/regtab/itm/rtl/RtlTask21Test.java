@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 21: repeated subtables where a multi-cell normalised header row collects
  * all values below (unbounded), followed by exactly 2 normalised data rows.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_21/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask21Test}
  * <pre>
  * { [ [VAL=NORM : BW*->REC]+ ] [ [VAL=NORM]+ ]{2} }+

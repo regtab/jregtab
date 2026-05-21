@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 20: flat table with a two-cell header row (anchor collecting all
  * same-subtable values) and one-or-more two-cell data rows.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_20/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask20Test}
  * <pre>
  * [ [VAL : ST*->REC] [VAL] ] [ [VAL]{2} ]+

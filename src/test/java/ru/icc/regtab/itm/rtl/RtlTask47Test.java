@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 47: repeated subtables with one-or-more non-blank two-cell rows —
  * anchor VAL with same-row REC and below-same-string CONCAT, plus a plain VAL.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_47/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask47Test}
  * <pre>
  * { [ [!BLANK? VAL : SR*->REC, (BW & STR)*->CONCAT] [!BLANK? VAL] ]+ }+

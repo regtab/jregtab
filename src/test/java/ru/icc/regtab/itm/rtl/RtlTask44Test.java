@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 44: repeated subtables with one-or-more three-cell data rows (non-blank
  * anchor, non-blank value, blank guard) and an optional trailing compound row.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_44/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask44Test}
  * <pre>
  * { [ [!BLANK? VAL : SR->REC] [!BLANK? VAL] [BLANK?] ]+

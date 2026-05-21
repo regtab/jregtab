@@ -5,6 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * pattern, text-cleaned anchor, header skip row, five ATTR/VAL data rows,
  * and an optional trailing skip row.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_40/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask40Test}
  * <pre>
  * { [ [~'Reported crime in'? VAL = REPL('Reported crime in', '').TRIM : ''->AVP, (ST & C1)*->REC] [] ]

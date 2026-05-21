@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 13: header row with five ATTR cells; data rows use AVP for the first
  * five columns and REC referencing four specific column positions in the same row.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_13/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask13Test}
  * <pre>
  * [ [ATTR]{5} []+ ]

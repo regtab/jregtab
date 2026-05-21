@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 39: flat table where each cell is a compound value — a price part
  * collected via same-cell REC, a bedroom count, and a trailing skip part.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_39/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask39Test}
  * <pre>
  * [ [VAL : CL*->REC " / " VAL "br" _] ]+

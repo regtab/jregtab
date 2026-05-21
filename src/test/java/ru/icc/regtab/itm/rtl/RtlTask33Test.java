@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 33: flat table where each row's anchor cell collects same-row values via
  * REC and groups rows with the same ID string via CONCAT.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_33/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask33Test}
  * <pre>
  * [ [VAL : SR*->REC, (BW & STR)*->CONCAT] [VAL]+ ]+

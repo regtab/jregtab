@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 04: one skip row followed by data rows with a row-key anchor and
  * one-or-more value cells referencing it via same-subrow.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_04/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask04Test}
  * <pre>
  * [ []+ ]

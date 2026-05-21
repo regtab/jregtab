@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 02: repeated subtables with two normalised header rows, one-or-more
  * data rows, and an optional blank-row footer.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_02/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask02Test}
  * <pre>
  * { [ [VAL=NORM] [] ]{2}

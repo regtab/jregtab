@@ -5,6 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * below (unbounded), followed by exactly 4 plain data rows (same as task 31
  * but without a trailing skip row).
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_34/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask34Test}
  * <pre>
  * { [ [VAL : BW*->REC] ]

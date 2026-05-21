@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 29: flat table where each physical row is divided into an explicit 6-cell
  * header subrow and one-or-more 4-cell data subrows with a composite REC anchor.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_29/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask29Test}
  * <pre>
  * [ [VAL]{6} { [VAL : (ROW{6}, RT*)->REC(6)] [VAL]{3} }+ ]+

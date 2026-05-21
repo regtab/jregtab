@@ -4,6 +4,7 @@ package ru.icc.regtab.itm.rtl;
  * Task 38: flat table with forward-fill — each row has a same-row REC anchor,
  * a plain value, and a third cell that fills from above when blank.
  * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_38/}
  * ATP: {@link ru.icc.regtab.itm.atp.AtpTask38Test}
  * <pre>
  * [ [VAL : SR*->REC] [VAL] [(BLANK ? VAL : -AV->FILL | VAL)] ]+
