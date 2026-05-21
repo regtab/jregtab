@@ -5,7 +5,7 @@ import ru.icc.regtab.itm.model.syntax.Cell;
 import java.util.Objects;
 
 /**
- * Cell match condition λ (Def. 22): a predicate on cells expressed as a
+ * Cell match condition λ (def:atp:cell-match-condition): a predicate on cells expressed as a
  * finite Boolean combination of atomic constraints on cell properties.
  * <p>
  * A cell c satisfies λ iff {@code λ(c) = true}.

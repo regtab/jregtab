@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Atomic content specification (Def. 20):
- * CS_atom = (idd, ξ, ⟨AS₁, …, ASₘ⟩).
+ * Atomic content specification S_atom (def:atomic-content-spec):
+ * S_atom = (idd, ξ, ⟨S_act¹, …, S_actᵐ⟩).
  * <p>
  * Describes how a single item is derived from the input text of the matched cell.
- * The derived item serves as the anchor for all action specifications.
+ * The derived item ι_anch serves as the anchor for all action specifications S_act.
  *
- * @param idd       item derivation directive (VAL, ATTR, AUX, SKIP)
- * @param extractor optional string extractor ξ (null = identity)
- * @param actions   ordered sequence of interpretation action specifications
+ * @param idd       item derivation directive idd (VAL, ATTR, AUX, SKIP)
+ * @param extractor optional string extractor ξ (null = identity, i.e. raw input text used directly)
+ * @param actions   ordered sequence of action specifications ⟨S_act¹, …, S_actᵐ⟩
  */
 public record AtomicContentSpec(
         ItemDerivationDirective idd,

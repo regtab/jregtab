@@ -3,14 +3,12 @@ package ru.icc.regtab.itm.atp.spec;
 import java.util.Objects;
 
 /**
- * A segment within a compound content specification: a leading delimiter
- * followed by a content specification (atomic or delimited).
- * <p>
- * The first segment's leading delimiter corresponds to δ₀ in Def. 25;
- * subsequent segments' leading delimiters correspond to δ₁, δ₂, etc.
+ * One (δᵢ, S_xⁱ) pair within a compound content specification S_comp
+ * (def:compound-content-spec): a leading delimiter δᵢ followed by a component
+ * specification S_xⁱ (atomic or delimited).
  *
- * @param leadingDelimiter delimiter preceding this segment (empty string if absent)
- * @param spec            atomic or delimited content specification for this segment
+ * @param leadingDelimiter leading delimiter δᵢ (empty string if absent, i.e. δ₀)
+ * @param spec             component specification S_xⁱ (atomic or delimited)
  */
 public record CompoundSegment(
         String leadingDelimiter,

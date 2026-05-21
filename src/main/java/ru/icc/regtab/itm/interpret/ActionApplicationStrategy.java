@@ -7,7 +7,8 @@ import ru.icc.regtab.itm.model.syntax.GridPosition;
 import java.util.Comparator;
 
 /**
- * Strategy for ordering anchor items during working state completion (Def. 15).
+ * Strategy for ordering anchor items during working state completion
+ * (sec:itm:table-interpretation).
  * <p>
  * {@code ROW_FIRST} (Γ_row) processes anchors row-by-row (primary: row, secondary: column).
  * {@code COLUMN_FIRST} (Γ_col) processes anchors column-by-column (primary: column, secondary: row).

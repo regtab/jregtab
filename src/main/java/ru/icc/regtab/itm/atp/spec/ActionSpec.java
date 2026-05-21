@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Interpretation action specification (Def. 19):
- * AS = (op, ⟨PS₁, …, PSₙ⟩).
+ * Interpretation action specification S_act (def:action-spec):
+ * S_act = (op, ⟨S_prov¹, …, S_provⁿ⟩).
  * <p>
  * A template from which a concrete {@link ru.icc.regtab.itm.model.semantics.action.InterpretationAction}
  * is constructed at match time, with the derived item bound as the anchor.
@@ -19,9 +19,9 @@ import java.util.Objects;
  * {@link #splitDelimiter} maps to {@link ru.icc.regtab.itm.interpret.DelimitedFieldSplit}.
  * {@link TablePattern#of(SubtablePattern...)} collects these automatically.
  *
- * @param operationType  type of working-state update operation
+ * @param operationType  working-state update operation op
  * @param delimiter      delimiter for FILL/PREFIX/SUFFIX (empty string if none); null for AVP/REC/CONCAT
- * @param providers      sequence of item provider specifications
+ * @param providers      sequence of item provider specifications ⟨S_prov¹, …, S_provⁿ⟩
  * @param anchorPos      inline anchor position for REC (null = none)
  * @param splitDelimiter inline split delimiter for REC (null = none)
  */

@@ -4,16 +4,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Subtable pattern (Def. 27):
- * P_st = (ℓ, λ, q, ⟨P_row¹, …, P_rowᵏ⟩).
+ * Subtable pattern (def:stp):
+ * P_st = (λ, q, ⟨P_row¹, …, P_rowᵏ⟩), k ≥ 1.
  *
- * @param label     optional label for reuse (null if absent)
- * @param condition optional cell match condition λ (null if absent)
+ * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
- * @param rowPatterns ordered sequence of row patterns (≥ 1)
+ * @param rowPatterns ordered sequence of row patterns P_row (≥ 1)
  */
 public record SubtablePattern(
-        String label,
         CellMatchCondition condition,
         Quantifier quantifier,
         List<RowPattern> rowPatterns
@@ -28,11 +26,11 @@ public record SubtablePattern(
 
     /** Convenience: subtable with given row patterns and quantifier. */
     public static SubtablePattern of(Quantifier q, RowPattern... rows) {
-        return new SubtablePattern(null, null, q, List.of(rows));
+        return new SubtablePattern(null, q, List.of(rows));
     }
 
     /** Convenience: single subtable. */
     public static SubtablePattern of(RowPattern... rows) {
-        return new SubtablePattern(null, null, Quantifier.one(), List.of(rows));
+        return new SubtablePattern(null, Quantifier.one(), List.of(rows));
     }
 }

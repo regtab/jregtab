@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.model.semantics.item;
 import java.util.Objects;
 
 /**
- * A context-derived item: a string constant supplied from the external context (Def. 9).
+ * A context-derived item: a string constant supplied from the external context (def:context-derived-item).
  */
 public final class ContextDerivedItem implements Item {
 

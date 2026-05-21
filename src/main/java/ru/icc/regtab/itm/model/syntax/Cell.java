@@ -4,7 +4,7 @@ import java.util.Objects;
 
 /**
  * An atomic unit of a table occupying a distinct position in the row-column grid.
- * Carries layout, formatting, and content properties (Def. 2-4).
+ * Carries layout, formatting, and content properties (def:syntactic-layer).
  */
 public final class Cell {
 

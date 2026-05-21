@@ -62,7 +62,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         List<RowPattern> rows = ctx.rowPattern().stream()
                 .map(r -> (RowPattern) visit(r))
                 .toList();
-        return new SubtablePattern(null, null, Quantifier.one(), rows);
+        return new SubtablePattern(null, Quantifier.one(), rows);
     }
 
     @Override
@@ -77,7 +77,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             List<RowPattern> rows = body.rowPattern().stream()
                     .map(r -> (RowPattern) visit(r))
                     .toList();
-            return new SubtablePattern(null, cond, q, rows);
+            return new SubtablePattern(cond, q, rows);
         } finally {
             inheritedActionsStack.pop();
         }
@@ -97,7 +97,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             List<SubrowPattern> subrows = body.subrowPattern().stream()
                     .map(sr -> (SubrowPattern) visit(sr))
                     .toList();
-            return new RowPattern(null, cond, q, subrows);
+            return new RowPattern(cond, q, subrows);
         } finally {
             inheritedActionsStack.pop();
         }
@@ -116,7 +116,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         List<CellPattern> cells = ctx.cellPattern().stream()
                 .map(cp -> (CellPattern) visit(cp))
                 .toList();
-        return new SubrowPattern(null, null, Quantifier.one(), cells);
+        return new SubrowPattern(null, Quantifier.one(), cells);
     }
 
     @Override
@@ -131,7 +131,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             List<CellPattern> cells = body.cellPattern().stream()
                     .map(cp -> (CellPattern) visit(cp))
                     .toList();
-            return new SubrowPattern(null, cond, q, cells);
+            return new SubrowPattern(cond, q, cells);
         } finally {
             inheritedActionsStack.pop();
         }
@@ -147,7 +147,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
             CellMatchCondition cond = body != null && body.cellMatchCond() != null
                     ? buildCellMatchCondition(body.cellMatchCond()) : null;
-            return new CellPattern(null, cond, q, null);
+            return new CellPattern(cond, q, null);
         }
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;
@@ -156,7 +156,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         pushInherited(local);
         try {
             ContentSpec cs = buildContentSpec(body.contSpec());
-            return new CellPattern(null, cond, q, cs);
+            return new CellPattern(cond, q, cs);
         } finally {
             inheritedActionsStack.pop();
         }

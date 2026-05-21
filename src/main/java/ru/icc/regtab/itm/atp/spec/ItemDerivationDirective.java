@@ -3,8 +3,8 @@ package ru.icc.regtab.itm.atp.spec;
 import ru.icc.regtab.itm.model.semantics.item.ItemType;
 
 /**
- * Item derivation directive (Def. 20): specifies how matched cell content
- * is processed.
+ * Item derivation directive idd (def:atomic-content-spec): specifies how the
+ * input text of a matched cell is processed to derive an item.
  */
 public enum ItemDerivationDirective {
     /** Derive a value-associated item. */

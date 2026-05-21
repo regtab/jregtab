@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Item linearization Ω_τ (Def. 8): produces a sorted sequence of items
+ * Item linearization Ω_τ (def:item-linearization): produces a sorted sequence of items
  * according to traversal order τ and the precedence relation prec_τ.
  * <p>
  * For two items a, b with cells c_a, c_b at positions (i,j) and (i',j'):

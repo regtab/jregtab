@@ -5,10 +5,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Item string extractor ξ (Def. 20): a structured, serializable transformation
- * applied to input text to produce the derived item's string value.
+ * Item string extractor ξ (def:atomic-content-spec): a structured, serializable
+ * transformation applied to input text to produce the derived item's string value.
  * <p>
- * If absent (null), the item string equals the raw input text.
+ * If absent (null), the input text is used directly as the item string.
  */
 public sealed interface StringExtractor permits
         StringExtractor.Verbatim,

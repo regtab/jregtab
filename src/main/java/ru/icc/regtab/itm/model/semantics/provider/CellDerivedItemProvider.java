@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Cell-derived item provider (Def. 9):
+ * Cell-derived item provider (def:cell-derived-item-provider):
  * Υ^{J,k}_{τ,κ}(anchor) = Ω_τ(Φ_κ(anchor, J \ {anchor}))[:k].
  * <p>
  * Parameterized by traversal order τ, item filter Φ_κ, item linearization Ω_τ,

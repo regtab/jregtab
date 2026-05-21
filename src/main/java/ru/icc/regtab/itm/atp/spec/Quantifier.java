@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.atp.spec;
 import java.util.Objects;
 
 /**
- * Quantifier (Def. 23): specifies how many consecutive substructures
+ * Quantifier (def:atp:quantifier): specifies how many consecutive substructures
  * at a given level are matched.
  * <p>
  * {@code ?} — zero or one; {@code 1} — exactly one (default);
