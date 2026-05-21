@@ -58,15 +58,6 @@ final class ProviderTemplateResolver {
         return new ProviderSpec(actualCardinality, order, condition, kind, null);
     }
 
-    /** Builds a {@link ProviderSpec} with UNRESTRICTED kind (for inherited/context action specs). */
-    static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx) {
-        TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
-        int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterConditionSpec condition = buildCondition(ctx);
-        return new ProviderSpec(cardinality, order, condition,
-                CellDerivedProviderKind.UNRESTRICTED, null);
-    }
-
     // --- Traversal order ---
 
     private static TraversalOrder parseTraversalOrder(RTLParser.TraversalOrderMarkContext ctx) {
@@ -81,7 +72,7 @@ final class ProviderTemplateResolver {
 
     private static CellDerivedProviderKind inferKind(RTLParser.OpContext op,
                                                      ItemDerivationDirective anchorType) {
-        if (op == null || anchorType == null) return CellDerivedProviderKind.UNRESTRICTED;
+        if (op == null) return CellDerivedProviderKind.UNRESTRICTED;
         if (op.recOp() != null || op.CONCAT() != null) return CellDerivedProviderKind.VAL;
         if (op.AVP() != null)                        return CellDerivedProviderKind.ATTR;
         return CellDerivedProviderKind.UNRESTRICTED;

@@ -1,5 +1,7 @@
 package ru.icc.regtab.itm.atp.spec;
 
+import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +34,17 @@ public record ActionSpec(
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
+        if (operationType == OperationType.REC
+                || operationType == OperationType.CONCAT
+                || operationType == OperationType.AVP) {
+            for (var p : providers) {
+                if (!p.isContextLiteral()
+                        && p.targetItemKind() == CellDerivedProviderKind.UNRESTRICTED) {
+                    throw new IllegalArgumentException(
+                            operationType + " action requires a typed provider (VAL/ATTR/AUX), got UNRESTRICTED");
+                }
+            }
+        }
     }
 
     /** Convenience: REC action with given providers, no inline params. */
