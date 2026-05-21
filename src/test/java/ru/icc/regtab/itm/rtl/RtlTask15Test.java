@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.rtl;
 /**
  * RTL equivalent of AtpTask15: compound spec with three CL->REC segments.
  */
-class RtlTask15Test extends RtlTaskBase {
+public class RtlTask15Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "15"; }

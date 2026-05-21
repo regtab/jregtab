@@ -10,7 +10,6 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.interpret.DelimitedFieldSplit;
 
 /**
  * ATP equivalent of Fluent API Task25.
@@ -35,13 +34,11 @@ class AtpTask25Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.suffix(SEP, ProviderSpec.of(1, RIGHT_OF)),
-                                        ActionSpec.rec(ProviderSpec.val(SUBROW_AFTER_ANCHOR)),
-                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
+                                        ActionSpec.rec(SEP, ProviderSpec.val(ProviderSpec.UNBOUNDED, SUBROW_AFTER_ANCHOR)),
+                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
-                                CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )
-                )
-        ).withTransformations(new DelimitedFieldSplit(SEP));
+                ));
     }
 }

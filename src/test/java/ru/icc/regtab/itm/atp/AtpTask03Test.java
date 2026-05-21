@@ -9,7 +9,6 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 
 /**
  * ATP equivalent of Fluent API Task03.
@@ -30,10 +29,9 @@ class AtpTask03Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.val(1, SAME_SUBROW))
+                                        ActionSpec.rec(1, ProviderSpec.val(1, SAME_SUBROW))
                                 ))
                         )
-                )
-        ).withTransformations(new AnchorAttributeAtPosition(1));
+                ));
     }
 }

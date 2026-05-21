@@ -34,7 +34,7 @@ class AtpTask44Test extends AtpTaskBase {
         CompoundContentSpec commaPair = CompoundContentSpec.of(
                 AtomicContentSpec.val(),
                 CompoundContentSpec.Segment.of(",", AtomicContentSpec.val(
-                        ActionSpec.rec(ProviderSpec.val(SAME_CELL))
+                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_CELL))
                 ))
         );
 

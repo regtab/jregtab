@@ -27,7 +27,7 @@ class AtpTask39Test extends AtpTaskBase {
     @Override
     protected TablePattern buildPattern() {
         CompoundContentSpec priceBedroomSpec = CompoundContentSpec.of(
-                AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(SAME_CELL))),
+                AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_CELL))),
                 CompoundContentSpec.Segment.of(" / ", AtomicContentSpec.val()),
                 CompoundContentSpec.Segment.of("br", AtomicContentSpec.skip())
         );

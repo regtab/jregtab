@@ -28,13 +28,12 @@ class AtpTask20Test extends AtpTaskBase {
                 SubtablePattern.of(
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBTABLE))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
-                                CellPattern.of(AtomicContentSpec.val()),
-                                CellPattern.of(AtomicContentSpec.val())
+                                CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.val())
                         )
                 )
         );

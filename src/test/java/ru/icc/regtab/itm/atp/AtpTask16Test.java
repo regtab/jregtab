@@ -31,7 +31,7 @@ class AtpTask16Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.rec(ProviderSpec.val(1, RIGHT_OF)),
-                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
+                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         )

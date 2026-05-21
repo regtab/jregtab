@@ -47,7 +47,7 @@ class AtpTask48Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL1))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBTABLE_COL1))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), telFaxSpec)
                         ),
@@ -56,8 +56,7 @@ class AtpTask48Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), telFaxSpec)
                         ),
                         RowPattern.of(Quantifier.zeroOrOne(),
-                                CellPattern.of(BLANK, Quantifier.one(), null),
-                                CellPattern.of(BLANK, Quantifier.one(), null)
+                                CellPattern.of(BLANK, Quantifier.exactly(2), null)
                         )
                 )
         );

@@ -40,7 +40,7 @@ class AtpTask40Test extends AtpTaskBase {
                                 CellPattern.of(REPORTED_CRIME_TITLE, Quantifier.one(), AtomicContentSpec.val(
                                         new StringExtractor.Chain(List.of(new StringExtractor.Replaced("Reported crime in", ""), StringExtractor.Trimmed.INSTANCE)),
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBTABLE_COL1))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBTABLE_COL1))
                                 )),
                                 CellPattern.skip()
                         ),

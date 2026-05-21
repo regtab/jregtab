@@ -27,7 +27,7 @@ class AtpTask12Test extends AtpTaskBase {
                 SubtablePattern.of(
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.val(ItemFilterConditionSpec.bare(new FilterTerm.ColExact(5))))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, ItemFilterConditionSpec.bare(new FilterTerm.ColExact(5))))
                                 )),
                                 CellPattern.skip(Quantifier.exactly(4)),
                                 CellPattern.of(AtomicContentSpec.val())

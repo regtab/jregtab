@@ -10,7 +10,6 @@ import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.interpret.AnchorAttributeAtPosition;
 
 /**
  * ATP equivalent of Fluent API Task15.
@@ -28,9 +27,9 @@ class AtpTask15Test extends AtpTaskBase {
     protected TablePattern buildPattern() {
         CompoundContentSpec compoundSpec = CompoundContentSpec.of(
                 AtomicContentSpec.val(),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(1, SAME_CELL)))),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(1, SAME_CELL)))),
-                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(1, SAME_CELL))))
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(1, ProviderSpec.val(1, SAME_CELL)))),
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(1, ProviderSpec.val(1, SAME_CELL)))),
+                CompoundContentSpec.Segment.of(" ", AtomicContentSpec.val(ActionSpec.rec(1, ProviderSpec.val(1, SAME_CELL))))
         );
 
         return TablePattern.of(
@@ -38,7 +37,6 @@ class AtpTask15Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(compoundSpec)
                         )
-                )
-        ).withTransformations(new AnchorAttributeAtPosition(1));
+                ));
     }
 }

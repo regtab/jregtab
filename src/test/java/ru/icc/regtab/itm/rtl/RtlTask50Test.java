@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.rtl;
  * VAL(avp+rec sameRow+concat DW(STR)), ATTR, VAL(avp attr-same-row).
  * Same as Task46 but with a single (non-repeating) subtable.
  */
-class RtlTask50Test extends RtlTaskBase {
+public class RtlTask50Test extends RtlTaskBase {
 
     @Override
     protected String taskId() { return "50"; }

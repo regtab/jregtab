@@ -29,7 +29,7 @@ class AtpTask18Test extends AtpTaskBase {
         CompoundContentSpec firstRow = CompoundContentSpec.of(
                 AtomicContentSpec.attr(),
                 CompoundContentSpec.Segment.of("=", AtomicContentSpec.val(
-                        ActionSpec.rec(ProviderSpec.val(BELOW_SUBTABLE)),
+                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_SUBTABLE)),
                         ActionSpec.avp(ProviderSpec.attr(SAME_CELL))
                 ))
         );
