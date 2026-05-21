@@ -17,10 +17,10 @@ import ru.icc.regtab.itm.recordset.Recordset;
  */
 public final class Task02 extends TaskBase {
 
-    private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.of(
+    private static final ProviderSpec L1_L2_SAME_SUBTABLE = ProviderSpec.any(
             (a, c) -> c.sameSubtable(a) && (c.hasTag("#L1") || c.hasTag("#L2")));
 
-    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.of(
+    private static final ProviderSpec SAME_ROW_REST = ProviderSpec.any(
             (a, c) -> c.sameRow(a), 1);
 
     @Override

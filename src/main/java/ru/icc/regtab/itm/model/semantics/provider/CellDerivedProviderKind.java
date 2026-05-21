@@ -5,7 +5,7 @@ package ru.icc.regtab.itm.model.semantics.provider;
  * Υ<sub>tbl</sub><sup>attr</sup>, Υ<sub>tbl</sub><sup>aux</sup>).
  * <p>
  * {@link #UNRESTRICTED} matches the legacy behaviour: full cell-derived set J with no type restriction
- * before predicate κ (use unrestricted {@code ProviderSpec.of(...)} factories in the pattern API).
+ * before predicate κ (use unrestricted {@code ProviderSpec.any(...)} factories in the pattern API).
  */
 public enum CellDerivedProviderKind {
     /**

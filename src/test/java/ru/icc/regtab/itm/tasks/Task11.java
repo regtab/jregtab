@@ -38,8 +38,8 @@ public final class Task11 extends TaskBase {
                 .when(Cell::textBlank).skip()
                 .otherwise().val()
                 .actions().rec(
-                        ProviderSpec.of(FIRST_IN_ROW, 1),
-                        ProviderSpec.of(FIRST_IN_COL, 1))
+                        ProviderSpec.any(FIRST_IN_ROW, 1),
+                        ProviderSpec.any(FIRST_IN_COL, 1))
                 .apply(syntax);
     }
 }

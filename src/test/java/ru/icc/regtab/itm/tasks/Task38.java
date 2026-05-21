@@ -22,7 +22,7 @@ public final class Task38 extends TaskBase {
      * picks the nearest row above first (same triple as {@code rec} providers).
      */
     private static final ProviderSpec FILL_FROM_ABOVE =
-            ProviderSpec.of((a, c) -> c.above(a).sameCol(), TraversalOrder.REVERSE_ROW_MAJOR, 1);
+            ProviderSpec.any((a, c) -> c.above(a).sameCol(), TraversalOrder.REVERSE_ROW_MAJOR, 1);
 
     @Override
     protected InterpretableTable buildItm(TableSyntax syntax) {
