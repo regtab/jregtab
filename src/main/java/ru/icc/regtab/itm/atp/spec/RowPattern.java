@@ -5,9 +5,9 @@ import java.util.Objects;
 
 /**
  * Row pattern (def:rp):
- * P_row = (ℓ, λ, q, ⟨P_sr¹, …, P_srᵏ⟩).
+ * P_row = (λ, q, ⟨P_sr¹, …, P_srᵏ⟩), k ≥ 1.
  *
- * @param label      optional label ℓ for reuse (null if absent)
+ * @param label      optional label for pattern reuse (null if absent; not in formal def:rp)
  * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
  * @param subrowPatterns ordered sequence of subrow patterns P_sr (≥ 1)

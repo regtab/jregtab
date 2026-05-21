@@ -2,11 +2,13 @@ package ru.icc.regtab.itm.atp.spec;
 
 /**
  * Cell pattern (def:cp):
- * P_cell = (ℓ, λ, q, S_cont).
+ * P_cell = (λ, q, S_cont).
  * <p>
  * If S_cont is absent (null), the cell is skipped: matched but produces no items.
+ * The {@code label} field is an implementation extension for pattern reuse;
+ * it is not part of the formal definition (label definition is commented out in the manuscript).
  *
- * @param label      optional label ℓ for reuse (null if absent)
+ * @param label      optional label for pattern reuse (null if absent; not in formal def:cp)
  * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
  * @param contentSpec content specification S_cont (null = skip)
