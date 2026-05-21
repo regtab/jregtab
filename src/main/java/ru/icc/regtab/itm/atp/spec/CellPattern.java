@@ -1,7 +1,7 @@
 package ru.icc.regtab.itm.atp.spec;
 
 /**
- * Cell pattern (Def. 24):
+ * Cell pattern (def:cp):
  * P_cell = (ℓ, λ, q, CS).
  * <p>
  * If CS is absent (null), the cell is skipped: matched but produces no items.

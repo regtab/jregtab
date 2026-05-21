@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Subtable pattern (Def. 27):
+ * Subtable pattern (def:stp):
  * P_st = (ℓ, λ, q, ⟨P_row¹, …, P_rowᵏ⟩).
  *
  * @param label     optional label for reuse (null if absent)

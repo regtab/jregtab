@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.atp.spec;
 import java.util.Objects;
 
 /**
- * Conditional content specification (Def. 26):
+ * Conditional content specification (def:conditional-content-spec):
  * CS_cond = (λ, CS_x⁺, CS_x⁻).
  * <p>
  * If the matched cell satisfies λ, then CS_x⁺ governs the cell;

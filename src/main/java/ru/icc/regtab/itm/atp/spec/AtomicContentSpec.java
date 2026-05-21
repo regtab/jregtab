@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Atomic content specification (Def. 20):
+ * Atomic content specification (def:atomic-content-spec):
  * CS_atom = (idd, ξ, ⟨AS₁, …, ASₘ⟩).
  * <p>
  * Describes how a single item is derived from the input text of the matched cell.

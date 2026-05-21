@@ -8,7 +8,7 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 import java.util.Objects;
 
 /**
- * Item provider specification PS_i = (k, τ, κ) from Def. 19.
+ * Item provider specification PS_i = (k, τ, κ) (def:item-provider-spec).
  * <p>
  * Together these parameters define either a typed cell-derived item provider
  * instantiated at match time or a context-derived literal provider.

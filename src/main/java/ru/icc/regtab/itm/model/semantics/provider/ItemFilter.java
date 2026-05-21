@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Item filter Φ_κ (Def. 7): for a given anchor item and a subset of items,
+ * Item filter Φ_κ (def:item-filter): for a given anchor item and a subset of items,
  * returns the subset of items relevant to the anchor.
  * <p>
  * Φ_κ(ι_anch, J) = {ι ∈ J | κ(ι_anch, ι) = true}

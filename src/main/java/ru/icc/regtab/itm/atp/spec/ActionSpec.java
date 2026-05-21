@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Interpretation action specification (Def. 19):
+ * Interpretation action specification (def:action-spec):
  * AS = (op, ⟨PS₁, …, PSₙ⟩).
  * <p>
  * A template from which a concrete {@link ru.icc.regtab.itm.model.semantics.action.InterpretationAction}

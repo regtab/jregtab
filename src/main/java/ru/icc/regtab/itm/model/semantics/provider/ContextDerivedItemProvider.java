@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Cell-derived item provider (Def. 11):
+ * Context-derived item provider (def:context-derived-item-provider):
  * named instances Υ<sub>ctx</sub><sup>val</sup>, Υ<sub>ctx</sub><sup>attr</sup>, Υ<sub>ctx</sub><sup>aux</sup>
  * with anchor constraints; {@link ContextDerivedProviderKind#UNRESTRICTED} matches legacy behaviour.
  */

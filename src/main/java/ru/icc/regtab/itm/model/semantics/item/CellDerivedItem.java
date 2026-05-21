@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * A cell-derived item: a triple (s, u_vec, i) where s is a string obtained from
  * the source cell, u_vec is a sequence of user-defined tags, and i is a zero-based
- * index of the item within the cell (Def. 5).
+ * index of the item within the cell (def:cell-derived-item).
  */
 public final class CellDerivedItem implements Item {
 

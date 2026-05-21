@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The semantic layer of an ITM instance (Def. 16):
+ * The semantic layer of an ITM instance (def:semantic-layer):
  * L_sem = (I_tbl, I_ctx, A).
  */
 public final class TableSemantics {

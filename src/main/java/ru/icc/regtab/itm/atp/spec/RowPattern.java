@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Row pattern (Def. 26):
+ * Row pattern (def:rp):
  * P_row = (ℓ, λ, q, ⟨P_sr¹, …, P_srᵏ⟩).
  *
  * @param label     optional label for reuse (null if absent)

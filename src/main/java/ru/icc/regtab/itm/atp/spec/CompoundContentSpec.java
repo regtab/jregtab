@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Compound content specification (Def. 25):
+ * Compound content specification (def:compound-content-spec):
  * CS_comp = (δ₀, CS_x¹, δ₁, CS_x², δ₂, …, CS_xⁿ, δₙ).
  * <p>
  * Describes a cell whose raw text matches a pattern of alternating delimiters

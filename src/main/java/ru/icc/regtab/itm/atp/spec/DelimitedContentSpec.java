@@ -3,7 +3,7 @@ package ru.icc.regtab.itm.atp.spec;
 import java.util.Objects;
 
 /**
- * Delimited content specification (Def. 24):
+ * Delimited content specification (def:delimited-content-spec):
  * CS_delim = (δ, CS_atom).
  * <p>
  * The raw cell text is split on the non-empty delimiter δ, and the atomic

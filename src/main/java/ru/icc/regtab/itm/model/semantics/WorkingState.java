@@ -7,7 +7,7 @@ import ru.icc.regtab.itm.model.semantics.item.ItemType;
 import java.util.*;
 
 /**
- * Working state of an ITM instance (Def. 12).
+ * Working state of an ITM instance (def:working-state).
  * Tracks values, attributes, attribute-value pairs, and record item sequences
  * as they are built up during table interpretation.
  */

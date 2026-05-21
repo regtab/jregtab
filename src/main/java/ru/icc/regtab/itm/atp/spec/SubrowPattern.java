@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Subrow pattern (Def. 25):
+ * Subrow pattern (def:srp):
  * P_sr = (ℓ, λ, q, ⟨P_cell¹, …, P_cellᵏ⟩).
  *
  * @param label     optional label for reuse (null if absent)

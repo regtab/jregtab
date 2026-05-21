@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Interpretation action (Def. 14): a triple (anchor, providers, operation)
+ * Interpretation action (def:interpretation-action): a triple (anchor, providers, operation)
  * where anchor is the item being interpreted, providers yield related items,
  * and operation updates the working state.
  */
