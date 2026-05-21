@@ -1,7 +1,16 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask17: header cell uses DW->REC for all non-blank cells below.
+ * Task 17: repeated subtables where the header cell collects all values below
+ * (unbounded), followed by one-or-more non-blank data rows and an optional skip row.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask17Test}
+ * <pre>
+ * { [ [VAL : BW*->REC] ] [ [!BLANK? VAL] ]+ [ [] ]? }+
+ * </pre>
+ * Each subtable has a single-cell header row whose VAL anchors an unbounded
+ * REC collecting all cells below (BW*). Then one-or-more rows each with a
+ * non-blank VAL, followed by an optional empty row separator.
  */
 public class RtlTask17Test extends RtlTaskBase {
 

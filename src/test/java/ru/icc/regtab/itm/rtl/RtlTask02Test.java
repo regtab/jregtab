@@ -1,8 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask02: two header rows (#L1, #L2), data rows look up
- * both headers via CL(ST, TAG #L1 #L2) and same-row anchor via CL(ROW+0).
+ * Task 02: repeated subtables with two normalised header rows, one-or-more
+ * data rows, and an optional blank-row footer.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask02Test}
+ * <pre>
+ * { [ [VAL=NORM] [] ]{2}
+ *   [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
+ *   [ [BLANK?]  [] ]? }+
+ * </pre>
+ * Header rows: 2 repetitions, VAL with whitespace normalisation. Data rows:
+ * non-blank anchor with REC(2) — providers SC{2} (2 attrs from same subcol)
+ * and SR (1 val from same subrow). Footer: optional blank-guard row.
  */
 public class RtlTask02Test extends RtlTaskBase {
 

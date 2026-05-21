@@ -1,9 +1,22 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask40: repeating crime-report blocks.
- * Title row: VAL matching "Reported crime in", stripped prefix, avp(""), rec(col1 in subtable).
- * Header skip row (2 cells), 5 attr/val rows, optional trailing skip row.
+ * Task 40: repeated crime-report subtables — title row identified by glob
+ * pattern, text-cleaned anchor, header skip row, five ATTR/VAL data rows,
+ * and an optional trailing skip row.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask40Test}
+ * <pre>
+ * { [ [~'Reported crime in'? VAL = REPL('Reported crime in', '').TRIM : ''->AVP, (ST & C1)*->REC] [] ]
+ *   [ []{2} ]
+ *   [ [ATTR] [VAL : SR->AVP] ]{5}
+ *   [ []{2} ]? }+
+ * </pre>
+ * Title row: cell matching glob 'Reported crime in', value trimmed of the prefix
+ * text, with empty-literal AVP and unbounded REC over same-subtable column 1
+ * (ST & C1); plus a skip cell. Then a two-cell skip row. Exactly 5 data rows
+ * each with an ATTR and a VAL using SR->AVP (same-subrow attribute). Optional
+ * two-cell footer skip row.
  */
 public class RtlTask40Test extends RtlTaskBase {
 

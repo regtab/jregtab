@@ -1,8 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask34: one-or-more subtables each with a header row
- * (VAL: DW(ST)->REC) followed by exactly 4 data rows (VAL).
+ * Task 34: repeated subtables with a single-cell header collecting all values
+ * below (unbounded), followed by exactly 4 plain data rows (same as task 31
+ * but without a trailing skip row).
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask34Test}
+ * <pre>
+ * { [ [VAL : BW*->REC] ]
+ *   [ [VAL] ]{4} }+
+ * </pre>
+ * Each subtable has a header row with a VAL anchor using BW*->REC (unbounded
+ * collection of cells below), then exactly 4 single-cell data rows each with
+ * a plain VAL.
  */
 public class RtlTask34Test extends RtlTaskBase {
 

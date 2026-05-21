@@ -1,8 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask13: ATTR headers at R0, data cells use CM->AVP
- * and RM(Cn)->REC for four specific columns.
+ * Task 13: header row with five ATTR cells; data rows use AVP for the first
+ * five columns and REC referencing four specific column positions in the same row.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask13Test}
+ * <pre>
+ * [ [ATTR]{5} []+ ]
+ * [ [VAL : SC->AVP, ((SR & C2), (SR & C4), (SR & C1), (SR & C3))->REC] [VAL : SC->AVP]{4} []+ ]+
+ * </pre>
+ * Header row: exactly 5 ATTR cells (column names) then trailing skips. Data
+ * rows: anchor VAL uses SC->AVP (column-header attribute) and a four-provider
+ * REC gathering values from same-subrow columns C2, C4, C1, C3. The next four
+ * cells also use SC->AVP. Remaining cells are skipped.
  */
 public class RtlTask13Test extends RtlTaskBase {
 

@@ -1,9 +1,17 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask29: each row has a fixed 6-cell header subrow followed by
- * one-or-more 4-cell data subrows; the anchor cell collects first-6 and same-subrow items
- * via a two-provider REC action.
+ * Task 29: flat table where each physical row is divided into an explicit 6-cell
+ * header subrow and one-or-more 4-cell data subrows with a composite REC anchor.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask29Test}
+ * <pre>
+ * [ [VAL]{6} { [VAL : (ROW{6}, RT*)->REC(6)] [VAL]{3} }+ ]+
+ * </pre>
+ * Each row starts with exactly 6 plain VAL cells (the header subrow). Then one-or-more
+ * explicit subrows follow: an anchor VAL with REC(6) using providers ROW{6} (6 values
+ * from the same logical row) and RT* (unbounded values to the right), plus exactly 3
+ * plain VAL cells.
  */
 public class RtlTask29Test extends RtlTaskBase {
 

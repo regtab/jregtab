@@ -1,8 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask09: subrow pattern with REPL extractor and conditional.
- * Row key at COL0 (RM), col key at ROW0 (CM). Blank cells are skipped.
+ * Task 09: cross-table unpivot with regex-cleaned column headers, explicit
+ * subrow grouping, and conditional blank-skipping in data cells.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask09Test}
+ * <pre>
+ * [ [] [VAL = REPL('\s+', '')]{5} ]
+ * [ { [VAL] [(BLANK? _ | VAL : (SR, SC)->REC(2))]+ } ]+
+ * </pre>
+ * Header row: skip cell then exactly 5 column-header VALs with whitespace
+ * stripped via REPL. Data rows use an explicit subrow block: a row-key VAL
+ * anchor followed by one-or-more conditional cells — blank cells are skipped,
+ * non-blank cells produce REC(2) with providers SR (same subrow) and SC
+ * (same subcol) for a two-axis unpivot.
  */
 public class RtlTask09Test extends RtlTaskBase {
 

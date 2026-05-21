@@ -1,8 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask10: optional skip rows, data row uses CL(ROW+0)->REC,
- * optional trailing blank row.
+ * Task 10: repeated subtables each with zero-or-more structured skip rows,
+ * one data row collecting values via same-subrow REC, and an optional blank footer.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask10Test}
+ * <pre>
+ * { [ []{4} [BLANK?] []{3} ]*
+ *   [ [VAL : SR*->REC] [VAL]+ ]
+ *   [ [BLANK?]+ ]? }+
+ * </pre>
+ * Each subtable starts with zero-or-more skip rows (4 skipped, 1 optional
+ * blank guard, 3 skipped). The single data row has an anchor VAL with
+ * unbounded REC over all same-subrow values (SR*), then one-or-more plain
+ * VALs. An optional footer row contains one-or-more blank-guard cells.
  */
 public class RtlTask10Test extends RtlTaskBase {
 

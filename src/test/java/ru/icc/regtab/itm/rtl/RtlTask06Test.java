@@ -1,8 +1,17 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask06: anchor cell uses CL(ST)->REC, remaining cells
- * conditionally skip blanks or extract values.
+ * Task 06: repeated subtables — first row has a subtable-wide REC anchor
+ * then conditional cells; four following rows contain only conditional cells.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask06Test}
+ * <pre>
+ * { [ [VAL : ST*->REC] [(BLANK ? _ | VAL)]+ ]
+ *   [ [(BLANK ? _ | VAL)]+ ]{4} }+
+ * </pre>
+ * First row of each subtable: anchor VAL with REC collecting all same-subtable
+ * values (ST, unbounded), followed by one-or-more cells that skip if blank or
+ * extract VAL otherwise. Next four rows: only conditional blank-or-VAL cells.
  */
 public class RtlTask06Test extends RtlTaskBase {
 

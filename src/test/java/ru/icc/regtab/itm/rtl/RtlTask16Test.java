@@ -1,8 +1,16 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask16: anchor looks up one cell to the right (REC),
- * and concatenates cells below with the same string content (CONCAT).
+ * Task 16: flat table where each anchor cell in column 0 collects one value
+ * to the right via REC and concatenates same-string cells below via CONCAT.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask16Test}
+ * <pre>
+ * [ [VAL : RT->REC, (BW & STR)*->CONCAT] [VAL] ]+
+ * </pre>
+ * Data rows: anchor VAL uses RT->REC (1 value immediately to the right) and
+ * (BW & STR)*->CONCAT (unbounded concatenation of cells that are both below
+ * and have the same string as the anchor), followed by a plain VAL cell.
  */
 public class RtlTask16Test extends RtlTaskBase {
 

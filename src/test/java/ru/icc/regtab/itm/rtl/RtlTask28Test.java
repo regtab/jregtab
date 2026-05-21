@@ -1,8 +1,16 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask28: header row with CL(ST)->REC and one-or-more value cells,
- * followed by one-or-more data rows each with one-or-more value cells.
+ * Task 28: flat table with a header row (anchor collecting all same-subtable
+ * values plus one-or-more plain VALs) and one-or-more multi-cell data rows.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask28Test}
+ * <pre>
+ * [ [VAL : ST*->REC] [VAL]+ ] [ [VAL]+ ]+
+ * </pre>
+ * Header row: anchor VAL with ST*->REC (unbounded same-subtable collection),
+ * followed by one-or-more plain VAL cells. Each data row contains one-or-more
+ * plain VAL cells that feed into the anchor's REC.
  */
 public class RtlTask28Test extends RtlTaskBase {
 

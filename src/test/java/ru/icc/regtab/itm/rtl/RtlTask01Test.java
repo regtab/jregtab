@@ -1,7 +1,16 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask01: ...
+ * Task 01: two-row subtables — anchor row (VAL rec over whole subtable)
+ * plus a plain value row.
+ * <p>
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask01Test}
+ * <pre>
+ * { [ [VAL : ST*->REC] [VAL]{2} []+ ]
+ *   [ []               [VAL]{4} []+ ] }+
+ * </pre>
+ * Each subtable has two fixed rows. First row: anchor VAL with REC collecting
+ * all values in the same subtable (ST, unbounded). Second row: 4 plain VALs.
  */
 public class RtlTask01Test extends RtlTaskBase {
 
