@@ -7,13 +7,11 @@ import java.util.Objects;
  * Row pattern (def:rp):
  * P_row = (λ, q, ⟨P_sr¹, …, P_srᵏ⟩), k ≥ 1.
  *
- * @param label      optional label for pattern reuse (null if absent; not in formal def:rp)
  * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
  * @param subrowPatterns ordered sequence of subrow patterns P_sr (≥ 1)
  */
 public record RowPattern(
-        String label,
         CellMatchCondition condition,
         Quantifier quantifier,
         List<SubrowPattern> subrowPatterns
@@ -28,24 +26,24 @@ public record RowPattern(
 
     /** Convenience: row with one subrow containing the given cell patterns. */
     public static RowPattern of(CellPattern... cells) {
-        return new RowPattern(null, null, Quantifier.one(),
+        return new RowPattern(null, Quantifier.one(),
                 List.of(SubrowPattern.of(cells)));
     }
 
     /** Convenience: row with quantifier and one subrow. */
     public static RowPattern of(Quantifier q, CellPattern... cells) {
-        return new RowPattern(null, null, q,
+        return new RowPattern(null, q,
                 List.of(SubrowPattern.of(cells)));
     }
 
     /** Convenience: row with explicit subrow patterns. */
     public static RowPattern of(Quantifier q, SubrowPattern... subrows) {
-        return new RowPattern(null, null, q, List.of(subrows));
+        return new RowPattern(null, q, List.of(subrows));
     }
 
     /** Convenience: row with condition, quantifier, and one subrow. */
     public static RowPattern of(CellMatchCondition cond, Quantifier q, CellPattern... cells) {
-        return new RowPattern(null, cond, q,
+        return new RowPattern(cond, q,
                 List.of(SubrowPattern.of(cells)));
     }
 }

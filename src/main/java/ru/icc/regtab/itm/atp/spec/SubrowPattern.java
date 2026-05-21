@@ -7,13 +7,11 @@ import java.util.Objects;
  * Subrow pattern (def:srp):
  * P_sr = (λ, q, ⟨P_cell¹, …, P_cellᵏ⟩), k ≥ 1.
  *
- * @param label      optional label for pattern reuse (null if absent; not in formal def:srp)
  * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
  * @param cellPatterns ordered sequence of cell patterns P_cell (≥ 1)
  */
 public record SubrowPattern(
-        String label,
         CellMatchCondition condition,
         Quantifier quantifier,
         List<CellPattern> cellPatterns
@@ -28,11 +26,11 @@ public record SubrowPattern(
 
     /** Convenience: single subrow with given cell patterns. */
     public static SubrowPattern of(CellPattern... cells) {
-        return new SubrowPattern(null, null, Quantifier.one(), List.of(cells));
+        return new SubrowPattern(null, Quantifier.one(), List.of(cells));
     }
 
     /** Convenience: subrow with quantifier. */
     public static SubrowPattern of(Quantifier q, CellPattern... cells) {
-        return new SubrowPattern(null, null, q, List.of(cells));
+        return new SubrowPattern(null, q, List.of(cells));
     }
 }
