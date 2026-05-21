@@ -8,8 +8,8 @@ import ru.icc.regtab.itm.atp.spec.ProviderSpec;
 import ru.icc.regtab.itm.atp.spec.Quantifier;
 import ru.icc.regtab.itm.atp.spec.RowPattern;
 import ru.icc.regtab.itm.atp.spec.SubtablePattern;
+import ru.icc.regtab.itm.atp.spec.StringExtractor;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
-import ru.icc.regtab.itm.interpret.WhitespaceNormalization;
 
 /**
  * ATP equivalent of Fluent API Task21.
@@ -29,13 +29,16 @@ class AtpTask21Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val(
+                                        StringExtractor.WhitespaceNormalized.INSTANCE,
                                         ActionSpec.rec(ProviderSpec.val(BELOW))
                                 ))
                         ),
                         RowPattern.of(Quantifier.exactly(2),
-                                CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
+                                CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val(
+                                        StringExtractor.WhitespaceNormalized.INSTANCE
+                                ))
                         )
                 )
-        ).withTransformations(new WhitespaceNormalization());
+        );
     }
 }

@@ -32,7 +32,7 @@ class AtpTask41Test extends AtpTaskBase {
     @Override
     protected TablePattern buildPattern() {
         CompoundContentSpec pairValSpec = CompoundContentSpec.of(
-                AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.ctxAttr("")), ActionSpec.rec(ProviderSpec.val(SAME_CELL), ProviderSpec.val(RIGHT_OF))),
+                AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.ctxAttr("")), ActionSpec.rec(ProviderSpec.val(1, SAME_CELL), ProviderSpec.val(1, RIGHT_OF))),
                 CompoundContentSpec.Segment.of("", AtomicContentSpec.val())
         );
 
@@ -45,7 +45,7 @@ class AtpTask41Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.zeroOrOne(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         AtomicContentSpec.val(
-                                                ActionSpec.rec(ProviderSpec.val(RIGHT_OF), ProviderSpec.ctxAttr(""))
+                                                ActionSpec.rec(ProviderSpec.val(1, RIGHT_OF), ProviderSpec.ctxAttr(""))
                                         )
                                 ),
                                 CellPattern.of(BLANK, Quantifier.one(), null)

@@ -33,8 +33,7 @@ class AtpTask10Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.zeroOrMore(),
                                 CellPattern.skip(Quantifier.exactly(4)),
                                 CellPattern.of(BLANK, Quantifier.one(), null),
-                                CellPattern.skip(),
-                                CellPattern.skip(Quantifier.exactly(2))
+                                CellPattern.skip(Quantifier.exactly(3))
                         ),
                         RowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(

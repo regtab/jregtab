@@ -18,7 +18,7 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 class AtpTask22Test extends AtpTaskBase {
 
     private static final ItemFilterConditionSpec SAME_SUBTABLE_COLS2_5 =
-            ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColRange(2, 5));
+            ItemFilterConditionSpec.and(FilterTerm.SameSubtable.INSTANCE, new FilterTerm.ColAbsoluteRange(2,5));
 
     @Override
     protected String taskId() {

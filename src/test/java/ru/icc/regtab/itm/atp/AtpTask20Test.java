@@ -33,8 +33,7 @@ class AtpTask20Test extends AtpTaskBase {
                                 CellPattern.of(AtomicContentSpec.val())
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),
-                                CellPattern.of(AtomicContentSpec.val()),
-                                CellPattern.of(AtomicContentSpec.val())
+                                CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.val())
                         )
                 )
         );

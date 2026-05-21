@@ -36,7 +36,7 @@ class AtpTask45Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val()),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         new DelimitedContentSpec(",", AtomicContentSpec.val(
-                                                ActionSpec.rec(1, ProviderSpec.val(SAME_SUBROW_COL0))
+                                                ActionSpec.rec(1, ProviderSpec.val(1, SAME_SUBROW_COL0))
                                         ))
                                 )
                         )

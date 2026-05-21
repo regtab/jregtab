@@ -12,7 +12,7 @@ public class RtlTask18Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [ATTR "=" VAL : ^ST*->REC, CL->AVP] ] [ [ATTR "=" VAL : CL->AVP] ]{15} }+
+                { [ [ATTR "=" VAL : ST*->REC, CL->AVP] ] [ [ATTR "=" VAL : CL->AVP] ]{15} }+
                 """;
     }
 }

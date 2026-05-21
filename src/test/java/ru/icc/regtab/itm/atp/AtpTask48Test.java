@@ -56,8 +56,7 @@ class AtpTask48Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), telFaxSpec)
                         ),
                         RowPattern.of(Quantifier.zeroOrOne(),
-                                CellPattern.of(BLANK, Quantifier.one(), null),
-                                CellPattern.of(BLANK, Quantifier.one(), null)
+                                CellPattern.of(BLANK, Quantifier.exactly(2), null)
                         )
                 )
         );
