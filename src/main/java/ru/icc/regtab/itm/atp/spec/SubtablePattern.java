@@ -7,10 +7,10 @@ import java.util.Objects;
  * Subtable pattern (def:stp):
  * P_st = (ℓ, λ, q, ⟨P_row¹, …, P_rowᵏ⟩).
  *
- * @param label     optional label for reuse (null if absent)
- * @param condition optional cell match condition λ (null if absent)
+ * @param label      optional label ℓ for reuse (null if absent)
+ * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
- * @param rowPatterns ordered sequence of row patterns (≥ 1)
+ * @param rowPatterns ordered sequence of row patterns P_row (≥ 1)
  */
 public record SubtablePattern(
         String label,

@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Schema construction strategy (Def. 15): defines the order in which
- * (anchor, position) pairs are visited when constructing the schema.
+ * Schema construction strategy Γ (sec:itm:table-interpretation): defines the
+ * order in which (anchor, position) pairs are visited when constructing the schema.
  */
 public enum SchemaConstructionStrategy {
     /**

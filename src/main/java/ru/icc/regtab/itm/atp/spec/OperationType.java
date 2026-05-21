@@ -1,8 +1,8 @@
 package ru.icc.regtab.itm.atp.spec;
 
 /**
- * Operation type (Def. 19): identifies the working-state update operation
- * to be applied when an interpretation action is executed.
+ * Operation type op (def:action-spec): identifies the working-state update
+ * operation o to be applied when an interpretation action is executed.
  */
 public enum OperationType {
     /** O_fill^δ: replace value/attribute with delimiter-joined provider strings. */

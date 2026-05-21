@@ -7,10 +7,10 @@ import java.util.Objects;
  * Row pattern (def:rp):
  * P_row = (ℓ, λ, q, ⟨P_sr¹, …, P_srᵏ⟩).
  *
- * @param label     optional label for reuse (null if absent)
- * @param condition optional cell match condition λ (null if absent)
+ * @param label      optional label ℓ for reuse (null if absent)
+ * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
- * @param subrowPatterns ordered sequence of subrow patterns (≥ 1)
+ * @param subrowPatterns ordered sequence of subrow patterns P_sr (≥ 1)
  */
 public record RowPattern(
         String label,
