@@ -1,5 +1,8 @@
 package ru.icc.regtab.itm.atp.spec;
 
+import ru.icc.regtab.itm.model.semantics.item.ItemType;
+import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +35,29 @@ public record ActionSpec(
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
+        for (var p : providers) {
+            if (p.isContextLiteral()) {
+                var ctxType = p.contextLiteral().type();
+                if (operationType == OperationType.CONCAT)
+                    throw new IllegalArgumentException(
+                            "CONCAT action does not allow context literals");
+                if (operationType == OperationType.REC && ctxType != ItemType.VALUE)
+                    throw new IllegalArgumentException(
+                            "REC action requires a VALUE context literal, got " + ctxType);
+                if (operationType == OperationType.AVP && ctxType != ItemType.ATTRIBUTE)
+                    throw new IllegalArgumentException(
+                            "AVP action requires an ATTRIBUTE context literal, got " + ctxType);
+            } else {
+                var kind = p.targetItemKind();
+                if ((operationType == OperationType.REC || operationType == OperationType.CONCAT)
+                        && kind != CellDerivedProviderKind.VAL)
+                    throw new IllegalArgumentException(
+                            operationType + " action requires a VAL provider, got " + kind);
+                if (operationType == OperationType.AVP && kind != CellDerivedProviderKind.ATTR)
+                    throw new IllegalArgumentException(
+                            "AVP action requires an ATTR provider, got " + kind);
+            }
+        }
     }
 
     /** Convenience: REC action with given providers, no inline params. */

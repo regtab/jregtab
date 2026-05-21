@@ -1083,7 +1083,7 @@ public final class TablePattern {
          * so attribute anchors are valid.
          */
         public CompoundBuilder rec(ItemFilterCondition predicate) {
-            return rec(ProviderSpec.of(Objects.requireNonNull(predicate, "predicate")));
+            return rec(ProviderSpec.any(Objects.requireNonNull(predicate, "predicate")));
         }
 
         public CompoundBuilder rec(ProviderSpec first, ProviderSpec... rest) {

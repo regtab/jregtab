@@ -108,12 +108,14 @@ class AtpSpecTest {
 
     @Test
     void actionSpecConvenience() {
-        var ps = ProviderSpec.of(new ItemFilterConditionSpec.Custom("always true", (a, c) -> true));
-        var rec = ActionSpec.rec(ps);
+        var psVal  = ProviderSpec.val(new ItemFilterConditionSpec.Custom("always true", (a, c) -> true));
+        var psFill = ProviderSpec.any(new ItemFilterConditionSpec.Custom("always true", (a, c) -> true));
+
+        var rec = ActionSpec.rec(psVal);
         assertEquals(OperationType.REC, rec.operationType());
         assertEquals(1, rec.providers().size());
 
-        var fill = ActionSpec.fill(", ", ps);
+        var fill = ActionSpec.fill(", ", psFill);
         assertEquals(OperationType.FILL, fill.operationType());
         assertEquals(", ", fill.delimiter());
     }

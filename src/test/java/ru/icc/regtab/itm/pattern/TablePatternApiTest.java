@@ -166,8 +166,8 @@ class TablePatternApiTest {
                 .rows().one()
                 .cells().one().val()
                 .actions().rec(
-                        ProviderSpec.of((a, c) -> c.sameSubtable(a)),
-                        ProviderSpec.of((a, c) -> false))
+                        ProviderSpec.any((a, c) -> c.sameSubtable(a)),
+                        ProviderSpec.any((a, c) -> false))
                 .cells().exactly(2).val()
                 .cells().oneOrMore().skip()
                 .rows().one()

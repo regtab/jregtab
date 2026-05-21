@@ -44,7 +44,7 @@ class AtpIntegrationTest {
 
         // First cell in each row is anchor with rec pointing to other vals in same row
         var anchorSpec = AtomicContentSpec.val(
-                ActionSpec.rec(ProviderSpec.of(new ItemFilterConditionSpec.Custom("sameRow+val",
+                ActionSpec.rec(ProviderSpec.val(new ItemFilterConditionSpec.Custom("sameRow+val",
                         (a, c) -> a.cell().pos().row() == c.cell().pos().row()
                                 && c.type() == ItemType.VALUE)))
         );
@@ -83,12 +83,12 @@ class AtpIntegrationTest {
         });
 
         // AVP: value looks up attribute in same column, header subtable
-        var avpProvider = ProviderSpec.one(new ItemFilterConditionSpec.Custom("sameCol+attr",
+        var avpProvider = ProviderSpec.attr(new ItemFilterConditionSpec.Custom("sameCol+attr",
                 (a, c) -> c.cell().pos().col() == a.cell().pos().col()
                         && c.type() == ItemType.ATTRIBUTE));
 
         // Rec: anchor + other values in same row
-        var recProvider = ProviderSpec.of(new ItemFilterConditionSpec.Custom("sameRow+val",
+        var recProvider = ProviderSpec.val(new ItemFilterConditionSpec.Custom("sameRow+val",
                 (a, c) -> a.cell().pos().row() == c.cell().pos().row()
                         && c.type() == ItemType.VALUE));
 
@@ -193,7 +193,7 @@ class AtpIntegrationTest {
         var compound = new CompoundContentSpec(java.util.List.of(
                 new CompoundSegment("", AtomicContentSpec.attr()),
                 new CompoundSegment(": ", AtomicContentSpec.val(
-                        ActionSpec.avp(ProviderSpec.one(new ItemFilterConditionSpec.Custom("sameCell+attr",
+                        ActionSpec.avp(ProviderSpec.attr(new ItemFilterConditionSpec.Custom("sameCell+attr",
                                 (a, c) -> a.cell().pos().row() == c.cell().pos().row()
                                         && a.cell().pos().col() == c.cell().pos().col()
                                         && c.type() == ItemType.ATTRIBUTE))),

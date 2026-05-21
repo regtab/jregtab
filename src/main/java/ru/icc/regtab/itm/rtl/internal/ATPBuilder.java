@@ -224,24 +224,14 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     // -------- action specs --------
 
-    /** Used for inherited actSpecs (subtable/row/subrow/cell level) — UNRESTRICTED kind. */
+    /** Used for inherited actSpecs (subtable/row/subrow/cell level) — kind inferred from op only. */
     private List<ActionSpec> buildActSpecs(RTLParser.ActSpecsContext ctx) {
         return ctx.actSpec().stream().map(this::buildActSpec).toList();
     }
 
     private ActionSpec buildActSpec(RTLParser.ActSpecContext ctx) {
-        List<ProviderSpec> providers = buildProvSpecs(ctx.provSpecs());
+        List<ProviderSpec> providers = buildProvSpecs(ctx.provSpecs(), ctx.op(), null);
         return buildOp(ctx.op(), providers);
-    }
-
-    private List<ProviderSpec> buildProvSpecs(RTLParser.ProvSpecsContext ctx) {
-        return ctx.provSpec().stream().map(this::buildProvSpec).toList();
-    }
-
-    private ProviderSpec buildProvSpec(RTLParser.ProvSpecContext ctx) {
-        if (ctx.tblProvSpec() != null) return ProviderTemplateResolver.resolve(ctx.tblProvSpec());
-        String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
-        return ProviderSpec.ctxAttr(literal);
     }
 
     /** Used for actSpecs directly on an atomContSpec — kind inferred from op + anchor type. */
@@ -266,6 +256,8 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         if (ctx.tblProvSpec() != null)
             return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType);
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
+        if (op != null && (op.recOp() != null || op.CONCAT() != null))
+            return ProviderSpec.ctxVal(literal);
         return ProviderSpec.ctxAttr(literal);
     }
 

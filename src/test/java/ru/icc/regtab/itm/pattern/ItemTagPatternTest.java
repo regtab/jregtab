@@ -47,8 +47,8 @@ class ItemTagPatternTest {
                 .rows().oneOrMore()
                 .cells().one().check(c -> !c.textBlank()).val()
                 .actions().rec(
-                        ProviderSpec.of((a, c) -> c.hasTag("#L1") || c.hasTag("#L2")),
-                        ProviderSpec.of((a, c) -> c.sameRow(a), 1))
+                        ProviderSpec.any((a, c) -> c.hasTag("#L1") || c.hasTag("#L2")),
+                        ProviderSpec.any((a, c) -> c.sameRow(a), 1))
                 .cells().one().val()
                 .rows().zeroOrMore()
                 .cells().one().skip()

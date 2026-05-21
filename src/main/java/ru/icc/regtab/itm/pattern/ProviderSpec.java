@@ -74,22 +74,22 @@ public record ProviderSpec(
     /**
      * Legacy: full J (no type restriction before κ); same defaults as single-predicate {@code rec}.
      */
-    public static ProviderSpec of(ItemFilterCondition predicate) {
+    public static ProviderSpec any(ItemFilterCondition predicate) {
         return new ProviderSpec(predicate, TraversalOrder.ROW_MAJOR, CellDerivedItemProvider.UNBOUNDED,
                 CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
-    public static ProviderSpec of(ItemFilterCondition predicate, int cardinality) {
+    public static ProviderSpec any(ItemFilterCondition predicate, int cardinality) {
         return new ProviderSpec(predicate, TraversalOrder.ROW_MAJOR, cardinality, CellDerivedProviderKind.UNRESTRICTED,
                 null);
     }
 
-    public static ProviderSpec of(ItemFilterCondition predicate, TraversalOrder traversal) {
+    public static ProviderSpec any(ItemFilterCondition predicate, TraversalOrder traversal) {
         return new ProviderSpec(predicate, traversal, CellDerivedItemProvider.UNBOUNDED,
                 CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
-    public static ProviderSpec of(ItemFilterCondition predicate, TraversalOrder traversal, int cardinality) {
+    public static ProviderSpec any(ItemFilterCondition predicate, TraversalOrder traversal, int cardinality) {
         return new ProviderSpec(predicate, traversal, cardinality, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 

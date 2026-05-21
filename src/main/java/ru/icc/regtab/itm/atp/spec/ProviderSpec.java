@@ -60,22 +60,17 @@ public record ProviderSpec(
     }
 
     /** Convenience: cardinality-1 unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec of(ItemFilterConditionSpec condition) {
+    public static ProviderSpec any(ItemFilterConditionSpec condition) {
         return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Convenience: specified cardinality, unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec of(int cardinality, ItemFilterConditionSpec condition) {
+    public static ProviderSpec any(int cardinality, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
-    /** Convenience: cardinality 1, unrestricted provider, default traversal (ROW_MAJOR). */
-    public static ProviderSpec one(ItemFilterConditionSpec condition) {
-        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
-    }
-
     /** Convenience: full constructor for unrestricted cell-derived provider. */
-    public static ProviderSpec of(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
+    public static ProviderSpec any(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {
         return new ProviderSpec(cardinality, traversalOrder, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 

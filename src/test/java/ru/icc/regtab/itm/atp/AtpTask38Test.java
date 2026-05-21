@@ -39,7 +39,7 @@ class AtpTask38Test extends AtpTaskBase {
                                 CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.of(new ConditionalContentSpec(
                                         BLANK,
-                                        AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.of(1, TraversalOrder.REVERSE_ROW_MAJOR, ABOVE))),
+                                        AtomicContentSpec.val(ActionSpec.fill("", ProviderSpec.any(1, TraversalOrder.REVERSE_ROW_MAJOR, ABOVE))),
                                         AtomicContentSpec.val()))
                         )
                 )

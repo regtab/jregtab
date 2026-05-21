@@ -17,7 +17,7 @@ public final class Task44 extends TaskBase {
                 .subtables().oneOrMore()
                 .rows().oneOrMore()
                 .cells().one().check(c -> !c.textBlank()).val()
-                .actions().rec(ProviderSpec.of((a, c) -> c.sameRow(a), 1))
+                .actions().rec(ProviderSpec.any((a, c) -> c.sameRow(a), 1))
                 .cells().one().check(c -> !c.textBlank()).val()
                 .cells().one().check(Cell::textBlank).skip()
                 .rows().zeroOrOne()

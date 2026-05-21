@@ -37,7 +37,7 @@ class AtpTask23Test extends AtpTaskBase {
                                         ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr(
-                                        ActionSpec.suffix("", ProviderSpec.of(1, TraversalOrder.ROW_MAJOR, RIGHT_OF))
+                                        ActionSpec.suffix("", ProviderSpec.any(1, TraversalOrder.ROW_MAJOR, RIGHT_OF))
                                 )),
                                 CellPattern.of(AtomicContentSpec.aux()),
                                 CellPattern.of(AtomicContentSpec.val(
