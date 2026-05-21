@@ -1,5 +1,6 @@
 package ru.icc.regtab.itm.atp.spec;
 
+import ru.icc.regtab.itm.model.semantics.item.ItemType;
 import ru.icc.regtab.itm.model.semantics.provider.CellDerivedProviderKind;
 
 import java.util.ArrayList;
@@ -34,15 +35,25 @@ public record ActionSpec(
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
-        if (operationType == OperationType.REC
-                || operationType == OperationType.CONCAT
-                || operationType == OperationType.AVP) {
-            for (var p : providers) {
-                if (!p.isContextLiteral()
-                        && p.targetItemKind() == CellDerivedProviderKind.UNRESTRICTED) {
+        for (var p : providers) {
+            if (p.isContextLiteral()) {
+                var ctxType = p.contextLiteral().type();
+                if ((operationType == OperationType.REC || operationType == OperationType.CONCAT)
+                        && ctxType != ItemType.VALUE)
                     throw new IllegalArgumentException(
-                            operationType + " action requires a typed provider (VAL/ATTR/AUX), got UNRESTRICTED");
-                }
+                            operationType + " action requires a VALUE context literal, got " + ctxType);
+                if (operationType == OperationType.AVP && ctxType != ItemType.ATTRIBUTE)
+                    throw new IllegalArgumentException(
+                            "AVP action requires an ATTRIBUTE context literal, got " + ctxType);
+            } else {
+                var kind = p.targetItemKind();
+                if ((operationType == OperationType.REC || operationType == OperationType.CONCAT)
+                        && kind != CellDerivedProviderKind.VAL)
+                    throw new IllegalArgumentException(
+                            operationType + " action requires a VAL provider, got " + kind);
+                if (operationType == OperationType.AVP && kind != CellDerivedProviderKind.ATTR)
+                    throw new IllegalArgumentException(
+                            "AVP action requires an ATTR provider, got " + kind);
             }
         }
     }

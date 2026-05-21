@@ -45,7 +45,7 @@ class AtpTask41Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.zeroOrOne(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         AtomicContentSpec.val(
-                                                ActionSpec.rec(ProviderSpec.val(1, RIGHT_OF), ProviderSpec.ctxAttr(""))
+                                                ActionSpec.rec(ProviderSpec.val(1, RIGHT_OF), ProviderSpec.ctxVal(""))
                                         )
                                 ),
                                 CellPattern.of(BLANK, Quantifier.one(), null)

@@ -256,6 +256,8 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         if (ctx.tblProvSpec() != null)
             return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType);
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
+        if (op != null && (op.recOp() != null || op.CONCAT() != null))
+            return ProviderSpec.ctxVal(literal);
         return ProviderSpec.ctxAttr(literal);
     }
 
