@@ -30,7 +30,7 @@ class AtpTask21Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val(
                                         StringExtractor.WhitespaceNormalized.INSTANCE,
-                                        ActionSpec.rec(ProviderSpec.val(BELOW))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW))
                                 ))
                         ),
                         RowPattern.of(Quantifier.exactly(2),

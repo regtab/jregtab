@@ -34,8 +34,8 @@ class AtpTask47Test extends AtpTaskBase {
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
-                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBROW)),
-                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
+                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val())
                         )

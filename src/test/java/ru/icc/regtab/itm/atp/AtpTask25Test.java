@@ -34,8 +34,8 @@ class AtpTask25Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.suffix(SEP, ProviderSpec.of(1, RIGHT_OF)),
-                                        ActionSpec.rec(SEP, ProviderSpec.val(SUBROW_AFTER_ANCHOR)),
-                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
+                                        ActionSpec.rec(SEP, ProviderSpec.val(ProviderSpec.UNBOUNDED, SUBROW_AFTER_ANCHOR)),
+                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )

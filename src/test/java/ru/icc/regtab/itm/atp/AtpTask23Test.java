@@ -33,8 +33,8 @@ class AtpTask23Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.exactly(3),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
-                                        ActionSpec.rec(ProviderSpec.val(SAME_SUBROW)),
-                                        ActionSpec.concat(ProviderSpec.val(BELOW_STR))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
+                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr(
                                         ActionSpec.suffix("", ProviderSpec.of(1, TraversalOrder.ROW_MAJOR, RIGHT_OF))

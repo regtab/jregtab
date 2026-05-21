@@ -59,9 +59,9 @@ public record ProviderSpec(
         }
     }
 
-    /** Convenience: unbounded unrestricted provider, default traversal (ROW_MAJOR). */
+    /** Convenience: cardinality-1 unrestricted provider, default traversal (ROW_MAJOR). */
     public static ProviderSpec of(ItemFilterConditionSpec condition) {
-        return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
+        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.UNRESTRICTED, null);
     }
 
     /** Convenience: specified cardinality, unrestricted provider, default traversal (ROW_MAJOR). */
@@ -81,7 +81,7 @@ public record ProviderSpec(
 
     /** Typed value provider Υ_tbl^val. */
     public static ProviderSpec val(ItemFilterConditionSpec condition) {
-        return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.VAL, null);
+        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.VAL, null);
     }
 
     public static ProviderSpec val(int cardinality, ItemFilterConditionSpec condition) {
@@ -103,7 +103,7 @@ public record ProviderSpec(
 
     /** Typed auxiliary provider Υ_tbl^aux. */
     public static ProviderSpec aux(ItemFilterConditionSpec condition) {
-        return new ProviderSpec(UNBOUNDED, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.AUX, null);
+        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, condition, CellDerivedProviderKind.AUX, null);
     }
 
     public static ProviderSpec aux(int cardinality, TraversalOrder traversalOrder, ItemFilterConditionSpec condition) {

@@ -35,7 +35,7 @@ class AtpTask35Test extends AtpTaskBase {
                         RowPattern.of(
                                 CellPattern.of(COMPANY_ROW, Quantifier.one(), AtomicContentSpec.val(
                                         new StringExtractor.Replaced("\\*", ""),
-                                        ActionSpec.rec(ProviderSpec.val(BELOW))
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW))
                                 ))
                         ),
                         RowPattern.of(Quantifier.oneOrMore(),

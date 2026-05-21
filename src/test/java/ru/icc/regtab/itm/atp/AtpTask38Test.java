@@ -35,7 +35,7 @@ class AtpTask38Test extends AtpTaskBase {
         return TablePattern.of(
                 SubtablePattern.of(
                         RowPattern.of(Quantifier.oneOrMore(),
-                                CellPattern.of(AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(SAME_SUBROW)))),
+                                CellPattern.of(AtomicContentSpec.val(ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)))),
                                 CellPattern.of(AtomicContentSpec.val()),
                                 CellPattern.of(new ConditionalContentSpec(
                                         BLANK,
