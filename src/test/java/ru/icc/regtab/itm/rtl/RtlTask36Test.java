@@ -1,9 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask36: pivot student blocks — first row has name VAL
- * (avp("") + rec col-2 in subtable) then subject ATTR and grade VAL (avp left-attr);
- * exactly 11 data rows skip name, same ATTR/VAL pattern.
+ * Task 36: repeated student-grade subtables — header row carries the student
+ * name anchor, then exactly 11 subject/grade rows share the same left-attr AVP pattern.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_36/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask36Test}
+ * <pre>
+ * { [ [VAL : ''->AVP, (ST & C2)*->REC] [ATTR] [VAL : LT->AVP] ]
+ *   [ [] [ATTR] [VAL : LT->AVP] ]{11} }+
+ * </pre>
+ * Header row: anchor VAL with empty-literal AVP and unbounded REC over same-subtable
+ * column 2 (ST & C2), a plain ATTR cell, and a VAL cell whose attribute is the
+ * immediately left-of ATTR (LT->AVP). Each of the 11 data rows has a skip cell
+ * instead of an anchor, followed by the same ATTR and LT->AVP VAL.
  */
 public class RtlTask36Test extends RtlTaskBase {
 

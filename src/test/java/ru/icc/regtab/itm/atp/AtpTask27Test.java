@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task27.
+ * Task 27: repeated subtables with a single-cell header collecting all values
+ * below, one skip-row separator, and exactly 9 plain data rows.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_27/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask27Test}
  */
 class AtpTask27Test extends AtpTaskBase {
 

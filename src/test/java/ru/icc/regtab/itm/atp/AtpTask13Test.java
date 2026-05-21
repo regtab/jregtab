@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task13.
+ * Task 13: header row with five ATTR cells; data rows use AVP for five columns
+ * and REC referencing four specific column positions in the same row.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_13/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask13Test}
  */
 class AtpTask13Test extends AtpTaskBase {
 

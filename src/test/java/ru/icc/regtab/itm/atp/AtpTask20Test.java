@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task20.
+ * Task 20: flat table with a two-cell header row (anchor collecting all
+ * same-subtable values via REC) and one-or-more two-cell data rows.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_20/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask20Test}
  */
 class AtpTask20Test extends AtpTaskBase {
 

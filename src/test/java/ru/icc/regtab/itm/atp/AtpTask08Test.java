@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task08.
+ * Task 08: one skip row followed by data rows with a row-key anchor and
+ * one-or-more value cells referencing it via same-subrow REC(1).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_08/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask08Test}
  */
 class AtpTask08Test extends AtpTaskBase {
 

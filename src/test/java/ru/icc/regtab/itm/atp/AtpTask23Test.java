@@ -13,7 +13,11 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
- * ATP equivalent of Fluent API Task23.
+ * Task 23: repeated subtables of exactly 3 rows, each combining AVP, REC, CONCAT,
+ * and SUFFIX actions across same-row and below-same-string providers.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_23/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask23Test}
  */
 class AtpTask23Test extends AtpTaskBase {
 

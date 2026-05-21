@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task46.
+ * Task 46: repeated subtables with one-or-more non-blank three-cell rows —
+ * anchor VAL (AVP + same-row REC + below-same-string CONCAT), ATTR, and AVP VAL.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_46/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask46Test}
  */
 class AtpTask46Test extends AtpTaskBase {
 

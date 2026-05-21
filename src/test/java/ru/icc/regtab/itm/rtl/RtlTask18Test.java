@@ -1,8 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask18: each subtable has a header row (ATTR=VAL with DW(ST)->REC)
- * followed by exactly 15 data rows (ATTR=VAL with CL->AVP).
+ * Task 18: repeated subtables with one compound ATTR=VAL header row (collecting
+ * subtable-wide values and an AVP) and exactly 15 data rows with ATTR=VAL AVP only.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_18/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask18Test}
+ * <pre>
+ * { [ [ATTR "=" VAL : ST*->REC, CL->AVP] ] [ [ATTR "=" VAL : CL->AVP] ]{15} }+
+ * </pre>
+ * Header row: compound ATTR=VAL cell where the VAL part uses ST*->REC (unbounded
+ * same-subtable collection) and CL->AVP (same-cell attribute). Each of the 15
+ * data rows has a compound ATTR=VAL cell with only CL->AVP (same-cell attribute
+ * lookup without further REC).
  */
 public class RtlTask18Test extends RtlTaskBase {
 

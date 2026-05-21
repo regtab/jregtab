@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task05.
+ * Task 05: cross-table unpivot — one column-header row, one skip row, then
+ * data rows with a row-key anchor and value cells referencing both axes via REC(2).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_05/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask05Test}
  */
 class AtpTask05Test extends AtpTaskBase {
 

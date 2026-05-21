@@ -13,7 +13,11 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
- * ATP equivalent of Fluent API Task22.
+ * Task 22: repeated subtables where the anchor collects values in columns 2–5
+ * in column-major traversal order, plus a plain data row.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_22/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask22Test}
  */
 class AtpTask22Test extends AtpTaskBase {
 

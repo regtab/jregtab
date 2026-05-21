@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task15.
+ * Task 15: flat table where each cell contains a compound value — three
+ * space-separated parts each collected via same-cell REC(1).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_15/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask15Test}
  */
 class AtpTask15Test extends AtpTaskBase {
 

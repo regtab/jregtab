@@ -1,8 +1,17 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask45: NOT_BLANK val + delimited(",") val rec(same-row col0).
- * Post-processed by AnchorAttributeAtPosition(1).
+ * Task 45: flat table where each row has a non-blank anchor cell and a non-blank
+ * delimited cell whose comma-separated values each reference same-subrow column 0.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_45/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask45Test}
+ * <pre>
+ * [ [!BLANK? VAL] [!BLANK? (VAL : (SR & C0)->REC(1)){','}] ]+
+ * </pre>
+ * Each data row: a non-blank plain VAL anchor, then a non-blank delimited cell
+ * where each comma-separated token is a VAL with REC(1) using provider SR & C0
+ * (same-subrow column 0), binding the row-key anchor to every delimited value.
  */
 public class RtlTask45Test extends RtlTaskBase {
 

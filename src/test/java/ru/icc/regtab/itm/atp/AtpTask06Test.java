@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task06.
+ * Task 06: repeated subtables — first row has a subtable-wide REC anchor
+ * then conditional cells; four following rows contain only conditional cells.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_06/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask06Test}
  */
 class AtpTask06Test extends AtpTaskBase {
 

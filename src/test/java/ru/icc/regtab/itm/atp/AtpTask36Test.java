@@ -12,9 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task36: pivot student blocks (12 rows × 3 cols).
- * First row: name VAL (avp("") + rec col-2 in subtable), subject ATTR, grade VAL (avp left-attr).
- * Next exactly-11 rows: skip, subject ATTR, grade VAL (avp left-attr).
+ * Task 36: repeated student-grade subtables — header row carries the student
+ * name anchor, then exactly 11 subject/grade rows share the same left-attr AVP pattern.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_36/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask36Test}
  */
 class AtpTask36Test extends AtpTaskBase {
 

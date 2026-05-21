@@ -1,8 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask26: subtables with a header row (VAL: empty-AVP + col-2-REC, ATTR, VAL: AVP)
- * followed by exactly 5 data rows (SKIP, ATTR, VAL: AVP).
+ * Task 26: repeated subtables with a three-cell header row (anchor with AVP and
+ * column-2 REC, plus ATTR and AVP cells) and exactly 5 three-cell data rows.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_26/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask26Test}
+ * <pre>
+ * { [ [VAL : ''->AVP, (ST & C2)*->REC] [ATTR] [VAL : SR->AVP] ]
+ *   [ [] [ATTR] [VAL : SR->AVP] ]{5} }+
+ * </pre>
+ * Header row: anchor VAL with empty-literal AVP and unbounded REC over same-subtable
+ * column 2 (ST & C2); then a plain ATTR cell; then a VAL cell whose attribute is
+ * fetched from the same-subrow ATTR (SR->AVP). Each of the 5 data rows mirrors
+ * the header but starts with a skip cell instead of an anchor.
  */
 public class RtlTask26Test extends RtlTaskBase {
 

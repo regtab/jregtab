@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task03.
+ * Task 03: flat table with a row-key anchor followed by exactly two value
+ * cells per row, each referencing the anchor via same-subrow REC(1).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_03/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask03Test}
  */
 class AtpTask03Test extends AtpTaskBase {
 

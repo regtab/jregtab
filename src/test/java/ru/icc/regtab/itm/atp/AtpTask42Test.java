@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task42.
+ * Task 42: flat table where each row has a name anchor cell followed by exactly
+ * two compound ATTR:VAL cells, each with a same-cell AVP.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_42/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask42Test}
  */
 class AtpTask42Test extends AtpTaskBase {
 

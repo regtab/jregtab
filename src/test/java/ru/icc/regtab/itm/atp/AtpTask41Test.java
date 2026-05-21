@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task41.
+ * Task 41: repeated subtables each with two optional rows — a compound fill+REC
+ * row and a right-then-context REC row — for key-value pair extraction.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_41/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask41Test}
  */
 class AtpTask41Test extends AtpTaskBase {
 

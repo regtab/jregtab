@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task44.
+ * Task 44: repeated subtables with non-blank anchor/value/blank-guard data rows
+ * and an optional trailing compound comma-delimited row.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_44/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask44Test}
  */
 class AtpTask44Test extends AtpTaskBase {
 

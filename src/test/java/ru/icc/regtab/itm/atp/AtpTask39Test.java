@@ -12,8 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task39: compound cell вЂ” price VAL (rec same-cell),
- * separator " / ", bedrooms VAL, separator "br", rest SKIP.
+ * Task 39: flat table where each cell is a compound value — a price part collected
+ * via same-cell REC, a bedroom count, and a trailing skip part.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_39/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask39Test}
  */
 class AtpTask39Test extends AtpTaskBase {
 

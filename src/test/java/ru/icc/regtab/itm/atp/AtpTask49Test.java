@@ -13,7 +13,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task49.
+ * Task 49: cross-table unpivot with non-blank guards — a skip+header row followed
+ * by data rows where each data cell references both row and column anchors via REC(2).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_49/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask49Test}
  */
 class AtpTask49Test extends AtpTaskBase {
 

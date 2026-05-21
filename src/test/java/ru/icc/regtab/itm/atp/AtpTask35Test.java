@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task35.
+ * Task 35: repeated subtables where the header row is matched by a glob on "*Company"
+ * and its anchor value is asterisk-stripped before collecting all values below via REC.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_35/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask35Test}
  */
 class AtpTask35Test extends AtpTaskBase {
 

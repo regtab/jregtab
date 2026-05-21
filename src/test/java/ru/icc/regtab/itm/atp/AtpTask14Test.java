@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task14.
+ * Task 14: repeated subtables with a non-blank header row and data rows
+ * combining two subtable-scoped column lookups with two same-row values via REC(4).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_14/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask14Test}
  */
 class AtpTask14Test extends AtpTaskBase {
 

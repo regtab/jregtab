@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task47.
+ * Task 47: repeated subtables with one-or-more non-blank two-cell rows —
+ * anchor VAL with same-row REC and below-same-string CONCAT, plus a plain VAL.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_47/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask47Test}
  */
 class AtpTask47Test extends AtpTaskBase {
 

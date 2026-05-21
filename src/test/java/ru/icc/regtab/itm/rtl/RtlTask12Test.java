@@ -1,7 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask12: header cell at C0 collects all C5 values via CM(C5).
+ * Task 12: single-row header where the anchor collects all values in column 5
+ * (unbounded), followed by data rows that only fill column 5.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_12/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask12Test}
+ * <pre>
+ * [ [VAL : C5*->REC] []{4} [VAL] ]
+ * [ []{5} [VAL] ]+
+ * </pre>
+ * Header row: anchor VAL in column 0 with REC collecting all values in column 5
+ * (C5, unbounded), four skipped cells, then the first column-5 VAL. Each
+ * subsequent row skips five cells and contributes another column-5 VAL to the
+ * REC collection.
  */
 public class RtlTask12Test extends RtlTaskBase {
 

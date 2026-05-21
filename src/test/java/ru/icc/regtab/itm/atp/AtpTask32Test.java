@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task32.
+ * Task 32: cross-table unpivot with one skip+header row and data rows using
+ * conditional blank-skipping and REC(2) over same-row and same-column providers.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_32/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask32Test}
  */
 class AtpTask32Test extends AtpTaskBase {
 

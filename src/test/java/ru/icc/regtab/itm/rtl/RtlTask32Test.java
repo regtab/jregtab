@@ -1,9 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask32: header row (SKIP, VAL+), data rows (VAL,
- * (BLANK?SKIP|VAL: first-in-row + first-in-col ->REC)+); post-processed by
- * AnchorAttributeAtPosition(2).
+ * Task 32: cross-table unpivot with one skip+header row and data rows using
+ * conditional blank-skipping (same structure as tasks 09/11, without subrow grouping).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_32/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask32Test}
+ * <pre>
+ * [ [] [VAL]+ ]
+ * [ [VAL] [(BLANK ? _ | VAL : (SR, SC)->REC(2))]+ ]+
+ * </pre>
+ * Header row: one skip cell then one-or-more column-header VALs. Data rows:
+ * a plain VAL row-key anchor followed by one-or-more conditional cells — blank
+ * cells are skipped, non-blank cells produce REC(2) with providers SR (same
+ * subrow) and SC (same subcol) for a two-axis unpivot.
  */
 public class RtlTask32Test extends RtlTaskBase {
 

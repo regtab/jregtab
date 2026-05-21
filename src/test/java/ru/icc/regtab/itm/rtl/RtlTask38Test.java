@@ -1,9 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask38: forward-fill blank value cells.
- * Each row: VAL (rec same-row), VAL, conditional (blank → VAL: UW->FILL | VAL).
- * UW picks the nearest non-blank cell above in the same column (REVERSE_COLUMN_MAJOR, card=1).
+ * Task 38: flat table with forward-fill — each row has a same-row REC anchor,
+ * a plain value, and a third cell that fills from above when blank.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_38/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask38Test}
+ * <pre>
+ * [ [VAL : SR*->REC] [VAL] [(BLANK ? VAL : -AV->FILL | VAL)] ]+
+ * </pre>
+ * Each data row: anchor VAL with SR*->REC (unbounded same-subrow collection);
+ * a plain VAL; and a conditional third cell — if blank, uses -AV->FILL to take
+ * the nearest non-blank cell above (reverse row-major, cardinality 1); otherwise
+ * a plain VAL.
  */
 public class RtlTask38Test extends RtlTaskBase {
 

@@ -14,8 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task37: corner skip + qual-header row, then per-person rows
- * where date cells are conditional (blank → skip, non-blank → val with rec first-in-row + first-in-col).
+ * Task 37: cross-table with a corner-skip header row and per-person data rows
+ * using conditional blank-skipping and REC(2) over same-row and same-column providers.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_37/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask37Test}
  */
 class AtpTask37Test extends AtpTaskBase {
 

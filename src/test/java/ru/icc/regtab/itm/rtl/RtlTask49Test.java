@@ -1,8 +1,19 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask49: header skip+val row followed by data rows with
- * VAL and VAL rec(first-same-row, first-same-col). Post-processed by AnchorAttributeAtPosition(2).
+ * Task 49: cross-table unpivot with non-blank guards — a skip+header row followed
+ * by data rows where each data cell references both row and column anchors.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_49/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask49Test}
+ * <pre>
+ * [ [] [!BLANK? VAL]+ ]
+ * [ [!BLANK? VAL] [!BLANK? VAL : (SR, SC)->REC(2)]+ ]+
+ * </pre>
+ * Header row: one skip cell then one-or-more non-blank column-header VALs. Data
+ * rows: a non-blank row-key anchor VAL followed by one-or-more non-blank data
+ * cells each producing REC(2) with providers SR (same subrow) and SC (same
+ * subcol) for a two-axis unpivot.
  */
 public class RtlTask49Test extends RtlTaskBase {
 

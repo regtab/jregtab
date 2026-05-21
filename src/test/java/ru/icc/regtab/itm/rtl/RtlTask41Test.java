@@ -1,8 +1,20 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask41: alternating two-column rows (compound fill+rec) and
- * single-column rows (val rec right+ctxAux). Two optional rows per subtable iteration.
+ * Task 41: repeated subtables each with two optional rows — a compound fill+REC
+ * row and a right-then-context REC row — for key-value pair extraction.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_41/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask41Test}
+ * <pre>
+ * { [ [!BLANK? VAL : ''->FILL, (CL, RT)->REC "" VAL] [!BLANK? VAL] ]?
+ *   [ [!BLANK? VAL : (RT, '')->REC] [BLANK?] ]? }+
+ * </pre>
+ * First optional row: non-blank compound cell with empty-literal FILL and REC
+ * from both same-cell (CL) and right-of (RT) providers, concatenated with a
+ * plain VAL; plus a non-blank plain VAL cell. Second optional row: non-blank
+ * anchor VAL with REC from right-of (RT) and an empty-string context provider,
+ * followed by an optional blank cell.
  */
 public class RtlTask41Test extends RtlTaskBase {
 

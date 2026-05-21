@@ -1,8 +1,18 @@
 package ru.icc.regtab.itm.rtl;
 
 /**
- * RTL equivalent of AtpTask39: compound cell — price VAL (rec same-cell),
- * separator " / ", bedrooms VAL, separator "br", rest SKIP.
+ * Task 39: flat table where each cell is a compound value — a price part
+ * collected via same-cell REC, a bedroom count, and a trailing skip part.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_39/}
+ * ATP: {@link ru.icc.regtab.itm.atp.AtpTask39Test}
+ * <pre>
+ * [ [VAL : CL*->REC " / " VAL "br" _] ]+
+ * </pre>
+ * Each cell contains a compound spec: a VAL anchor with CL*->REC (unbounded
+ * same-cell collection, splitting the price part), followed by the literal
+ * separator " / " and a bedrooms VAL, then the literal "br" and a skipped
+ * remainder.
  */
 public class RtlTask39Test extends RtlTaskBase {
 
