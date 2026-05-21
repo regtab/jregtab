@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task33.
+ * Task 33: flat table where each row's anchor collects same-row values via REC
+ * and groups rows with the same ID string via CONCAT.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_33/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask33Test}
  */
 class AtpTask33Test extends AtpTaskBase {
 

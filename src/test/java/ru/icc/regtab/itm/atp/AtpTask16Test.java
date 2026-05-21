@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task16.
+ * Task 16: flat table where each anchor cell collects one value to the right
+ * via REC and concatenates same-string cells below via CONCAT.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_16/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask16Test}
  */
 class AtpTask16Test extends AtpTaskBase {
 

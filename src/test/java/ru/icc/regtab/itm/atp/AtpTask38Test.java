@@ -15,8 +15,11 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 
 /**
- * ATP equivalent of Fluent API Task38: forward-fill blank value cells.
- * Each row: VAL (rec same-row), VAL, conditional (blank в†’ VAL+fill(above) | VAL).
+ * Task 38: flat table with forward-fill — each row has a same-row REC anchor,
+ * a plain value, and a third cell that fills from above when blank.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_38/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask38Test}
  */
 class AtpTask38Test extends AtpTaskBase {
 

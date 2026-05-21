@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task18.
+ * Task 18: repeated subtables with one compound ATTR=VAL header row (collecting
+ * subtable-wide values and AVP) and exactly 15 data rows with ATTR=VAL AVP only.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_18/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask18Test}
  */
 class AtpTask18Test extends AtpTaskBase {
 

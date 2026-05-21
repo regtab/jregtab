@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task24.
+ * Task 24: flat single-column table with a header cell collecting all values
+ * below via unbounded REC and one-or-more plain data rows.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_24/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask24Test}
  */
 class AtpTask24Test extends AtpTaskBase {
 

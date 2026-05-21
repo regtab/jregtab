@@ -17,7 +17,11 @@ import ru.icc.regtab.itm.atp.spec.TablePattern;
 import java.util.List;
 
 /**
- * ATP equivalent of Fluent API Task40.
+ * Task 40: repeated crime-report subtables — title row identified by glob pattern,
+ * text-cleaned anchor, header skip row, five ATTR/VAL data rows, optional footer.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_40/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask40Test}
  */
 class AtpTask40Test extends AtpTaskBase {
 

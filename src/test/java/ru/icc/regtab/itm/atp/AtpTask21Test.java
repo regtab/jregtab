@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.StringExtractor;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task21.
+ * Task 21: repeated subtables where a multi-cell normalised header row collects
+ * all values below (unbounded), followed by exactly 2 normalised data rows.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_21/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask21Test}
  */
 class AtpTask21Test extends AtpTaskBase {
 

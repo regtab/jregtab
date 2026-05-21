@@ -15,7 +15,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task11.
+ * Task 11: cross-table unpivot with a column-header row and data rows using
+ * explicit subrow grouping and conditional blank-skipping.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_11/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask11Test}
  */
 class AtpTask11Test extends AtpTaskBase {
 

@@ -14,7 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task50.
+ * Task 50: single (non-repeating) flat table with non-blank three-cell rows —
+ * anchor VAL (AVP + same-row REC + below-same-string CONCAT), ATTR, and AVP VAL.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_50/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask50Test}
  */
 class AtpTask50Test extends AtpTaskBase {
 

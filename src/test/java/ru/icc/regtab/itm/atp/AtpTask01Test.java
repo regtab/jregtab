@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task01.
+ * Task 01: two-row subtables — anchor VAL collects all same-subtable values
+ * via REC (unbounded), plus a plain-value second row.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_01/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask01Test}
  */
 class AtpTask01Test extends AtpTaskBase {
 

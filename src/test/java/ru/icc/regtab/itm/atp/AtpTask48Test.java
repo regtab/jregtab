@@ -15,7 +15,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task48.
+ * Task 48: a fixed 2-row skip header, then repeated person subtables each with
+ * a name-anchor row, a blank+compound ATTR:VAL row, and an optional blank footer.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_48/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask48Test}
  */
 class AtpTask48Test extends AtpTaskBase {
 

@@ -15,7 +15,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task45.
+ * Task 45: flat table where each row has a non-blank anchor and a non-blank
+ * delimited cell whose comma-separated values each reference same-subrow column 0.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_45/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask45Test}
  */
 class AtpTask45Test extends AtpTaskBase {
 

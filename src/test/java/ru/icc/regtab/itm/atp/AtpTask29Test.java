@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task29.
+ * Task 29: flat table where each physical row is split into a 6-cell header subrow
+ * and one-or-more 4-cell data subrows with a composite REC anchor.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_29/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask29Test}
  */
 class AtpTask29Test extends AtpTaskBase {
 

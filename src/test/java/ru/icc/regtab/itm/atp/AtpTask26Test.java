@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task26.
+ * Task 26: repeated subtables with a three-cell header row (anchor with AVP and
+ * column-2 REC) and exactly 5 data rows pairing ATTR with same-row AVP.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_26/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask26Test}
  */
 class AtpTask26Test extends AtpTaskBase {
 

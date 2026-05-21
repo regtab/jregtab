@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task12.
+ * Task 12: single-row header where the anchor collects all values in column 5
+ * via unbounded REC, followed by data rows that only fill column 5.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_12/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask12Test}
  */
 class AtpTask12Test extends AtpTaskBase {
 

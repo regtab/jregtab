@@ -14,8 +14,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of RTL Task02: two generic header rows, data rows look up
- * both headers via sameSubcol (card 2) and same-row value via sameSubrow (card 1).
+ * Task 02: repeated subtables with two normalised header rows, one-or-more
+ * data rows, and an optional blank-row footer.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_02/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask02Test}
  */
 class AtpTask02Test extends AtpTaskBase {
 

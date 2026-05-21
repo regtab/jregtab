@@ -11,7 +11,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task07.
+ * Task 07: cross-table with three row-key columns, one column-header row,
+ * and data cells binding three row keys plus one column key via REC(4).
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_07/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask07Test}
  */
 class AtpTask07Test extends AtpTaskBase {
 

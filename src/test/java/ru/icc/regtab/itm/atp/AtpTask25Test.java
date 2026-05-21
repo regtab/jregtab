@@ -12,7 +12,11 @@ import ru.icc.regtab.itm.atp.spec.SubtablePattern;
 import ru.icc.regtab.itm.atp.spec.TablePattern;
 
 /**
- * ATP equivalent of Fluent API Task25.
+ * Task 25: flat table where each row's first cell uses SUFFIX, slash-delimited REC
+ * over values to the right, and CONCAT to group rows with the same ID string.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_25/}
+ * RTL: {@link ru.icc.regtab.itm.rtl.RtlTask25Test}
  */
 class AtpTask25Test extends AtpTaskBase {
 
