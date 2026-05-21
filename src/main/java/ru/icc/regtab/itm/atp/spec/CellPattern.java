@@ -2,14 +2,14 @@ package ru.icc.regtab.itm.atp.spec;
 
 /**
  * Cell pattern (def:cp):
- * P_cell = (ℓ, λ, q, CS).
+ * P_cell = (ℓ, λ, q, S_cont).
  * <p>
- * If CS is absent (null), the cell is skipped: matched but produces no items.
+ * If S_cont is absent (null), the cell is skipped: matched but produces no items.
  *
- * @param label     optional label for reuse (null if absent)
- * @param condition optional cell match condition λ (null if absent)
+ * @param label      optional label ℓ for reuse (null if absent)
+ * @param condition  optional cell match condition λ (null if absent)
  * @param quantifier quantifier q (default: ONE)
- * @param contentSpec optional content specification (null = skip)
+ * @param contentSpec content specification S_cont (null = skip)
  */
 public record CellPattern(
         String label,

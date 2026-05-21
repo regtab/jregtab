@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Compound content specification (def:compound-content-spec):
- * CS_comp = (δ₀, CS_x¹, δ₁, CS_x², δ₂, …, CS_xⁿ, δₙ).
+ * Compound content specification S_comp (def:compound-content-spec):
+ * S_comp = (δ₀, S_x¹, δ₁, S_x², δ₂, …, S_xⁿ, δₙ).
  * <p>
- * Describes a cell whose raw text matches a pattern of alternating delimiters
- * and content specifications. Each segment contains a leading delimiter and
- * its content spec. The trailing delimiter δₙ is stored separately.
+ * The raw cell text is parsed according to the delimiter structure, producing
+ * one substring per component S_xⁱ; each component is then resolved as either
+ * an atomic or a delimited specification, yielding one or more items per component.
  *
- * @param segments         ordered sequence of compound segments (≥ 1)
+ * @param segments          ordered sequence of (δᵢ, S_xⁱ) pairs (≥ 1)
  * @param trailingDelimiter trailing delimiter δₙ (empty string if absent)
  */
 public record CompoundContentSpec(

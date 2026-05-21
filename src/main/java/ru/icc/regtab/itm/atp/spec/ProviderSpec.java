@@ -8,16 +8,19 @@ import ru.icc.regtab.itm.model.semantics.provider.TraversalOrder;
 import java.util.Objects;
 
 /**
- * Item provider specification PS_i = (k, τ, κ) (def:item-provider-spec).
+ * Item provider specification S_prov (def:item-provider-spec).
  * <p>
- * Together these parameters define either a typed cell-derived item provider
- * instantiated at match time or a context-derived literal provider.
+ * For a cell-derived provider: S_prov = (k, τ, κ), where k is the cardinality,
+ * τ is the traversal order, and κ is the item filter condition.
+ * For a context-derived provider: S_prov = (vec{s}, ipt), where vec{s} is the
+ * sequence of string constants and ipt is the item/provider type.
  *
- * @param cardinality maximum number of items to retrieve (Integer.MAX_VALUE for ∞)
+ * @param cardinality    cardinality k — maximum number of items to retrieve (Integer.MAX_VALUE for ∞)
  * @param traversalOrder traversal order τ
- * @param filterCondition item filter condition κ (null for context literals)
- * @param targetItemKind target cell-derived item set kind
- * @param contextLiteral optional fixed context item specification
+ * @param filterCondition item filter condition κ (null for context-derived providers)
+ * @param targetItemKind target cell-derived item set kind (null for context-derived providers)
+ * @param contextLiteral context-derived provider specification (null for cell-derived providers);
+ *                       carries string constants vec{s} and item/provider type ipt
  */
 public record ProviderSpec(
         int cardinality,

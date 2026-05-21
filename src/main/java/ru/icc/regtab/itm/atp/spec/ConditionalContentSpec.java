@@ -3,15 +3,16 @@ package ru.icc.regtab.itm.atp.spec;
 import java.util.Objects;
 
 /**
- * Conditional content specification (def:conditional-content-spec):
- * CS_cond = (λ, CS_x⁺, CS_x⁻).
+ * Conditional content specification S_cond (def:conditional-content-spec):
+ * S_cond = (λ, S_x⁺, S_x⁻).
  * <p>
- * If the matched cell satisfies λ, then CS_x⁺ governs the cell;
- * otherwise CS_x⁻ governs it.
+ * Branch S_x⁺ is selected if the matched cell c satisfies λ (c ⊨ λ),
+ * and S_x⁻ otherwise; the selected branch is resolved as an atomic,
+ * delimited, or compound specification.
  *
  * @param condition cell match condition λ
- * @param positive  content specification when λ is satisfied (CS_x⁺)
- * @param negative  content specification when λ is not satisfied (CS_x⁻)
+ * @param positive  content specification S_x⁺ selected when c ⊨ λ
+ * @param negative  content specification S_x⁻ selected when c ⊭ λ
  */
 public record ConditionalContentSpec(
         CellMatchCondition condition,
