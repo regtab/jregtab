@@ -26,6 +26,15 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 
 ---
 
+## Documentation
+
+- [Architecture](docs/architecture.md) — package map, data flow, interpretation phases, RTL compilation pipeline
+- [Formal model](docs/formal-model.md) — ITM and ATP formal definitions mapped to Java classes
+- [RTL reference](docs/rtl-reference.md) — complete RTL syntax reference with tables and examples
+- [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
+
+---
+
 ## Architecture
 
 The library is organised around the following components:
