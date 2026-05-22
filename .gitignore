@@ -16,6 +16,9 @@ target/
 CLAUDE.md
 plans/
 
+# Manuscript (not distributed with the repo)
+.paper/
+
 # IntelliJ IDEA
 .idea/
 .antlr/
