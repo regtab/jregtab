@@ -32,11 +32,13 @@ The library is organised around the following components:
 
 | Component | Package | Description |
 |---|---|---|
-| **ITM API** | `ru.icc.regtab.itm.model` | Classes for the syntactic layer (`TableSyntax`, `Cell`, `Row`, `Subrow`, `Subtable`) and the semantic layer (`TableSemantics`, `CellDerivedItem`, `ContextDerivedItem`, interpretation actions and providers) |
-| **Table Interpreter** | `ru.icc.regtab.itm.interpret` | `TableInterpreter` derives a `Recordset` from an `InterpretableTable`; supports configurable `SchemaConstructionStrategy` and post-processing steps (`WhitespaceNormalization`, `FieldSplitting`, `SchemaReordering`) |
-| **ATP Spec** | `ru.icc.regtab.itm.atp.spec` | Formal ATP types: `TablePattern`, `SubtablePattern`, `RowPattern`, `SubrowPattern`, `CellPattern`, content specifications (`AtomicContentSpec`, `DelimitedContentSpec`, `CompoundContentSpec`, `ConditionalContentSpec`), item provider specifications, and interpretation action specifications |
-| **Pattern Matcher** | `ru.icc.regtab.itm.atp.match` | Matches an ATP instance against an ITM instance; on success populates the semantic layer |
-| **Recordset** | `ru.icc.regtab.itm.recordset` | `Recordset`, `Record`, `Schema` |
+| **ITM Syntax** | `ru.icc.regtab.itm.syntax` | Syntactic layer of ITM: `TableSyntax`, `Cell`, `Row`, `Subrow`, `Subtable` |
+| **ITM Semantics** | `ru.icc.regtab.itm.semantics` | Semantic layer of ITM: `TableSemantics`, `CellDerivedItem`, `ContextDerivedItem`, interpretation actions and providers |
+| **ATP Spec** | `ru.icc.regtab.atp.spec` | Formal ATP types: `TablePattern`, `SubtablePattern`, `RowPattern`, `SubrowPattern`, `CellPattern`, content specifications (`AtomicContentSpec`, `DelimitedContentSpec`, `CompoundContentSpec`, `ConditionalContentSpec`), item provider specifications, and interpretation action specifications |
+| **ATP Matcher** | `ru.icc.regtab.atp.match` | Matches an ATP instance against an ITM instance; on success populates the semantic layer |
+| **RTL Compiler** | `ru.icc.regtab.rtl` | Compiles RTL DSL strings to ATP (`RtlCompiler`, ANTLR4 grammar) |
+| **Table Interpreter** | `ru.icc.regtab.interpret` | `TableInterpreter` derives a `Recordset` from an `InterpretableTable`; supports configurable `SchemaConstructionStrategy` and post-processing steps (`WhitespaceNormalization`, `FieldSplitting`, `SchemaReordering`) |
+| **Recordset** | `ru.icc.regtab.recordset` | `Recordset`, `Record`, `Schema` |
 
 ---
 
@@ -53,7 +55,7 @@ The library is organised around the following components:
 mvn compile
 ```
 
-To compile and run the full test suite (all 50 Foofah benchmark tasks, 250 variants):
+To compile and run the full test suite (all 50 Foofah benchmark tasks, 500 variants (250 ATP + 250 RTL)):
 
 ```bash
 mvn test
@@ -69,14 +71,14 @@ An `InterpretableTable` can be constructed directly by assembling the syntactic 
 
 ```java
 import ru.icc.regtab.itm.InterpretableTable;
-import ru.icc.regtab.itm.interpret.TableInterpreter;
-import ru.icc.regtab.itm.model.semantics.TableSemantics;
-import ru.icc.regtab.itm.model.semantics.action.InterpretationAction;
-import ru.icc.regtab.itm.model.semantics.item.*;
-import ru.icc.regtab.itm.model.semantics.operation.*;
-import ru.icc.regtab.itm.model.semantics.provider.*;
-import ru.icc.regtab.itm.model.syntax.TableSyntax;
-import ru.icc.regtab.itm.recordset.Recordset;
+import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.semantics.TableSemantics;
+import ru.icc.regtab.itm.semantics.action.InterpretationAction;
+import ru.icc.regtab.itm.semantics.item.*;
+import ru.icc.regtab.itm.semantics.operation.*;
+import ru.icc.regtab.itm.semantics.provider.*;
+import ru.icc.regtab.itm.syntax.TableSyntax;
+import ru.icc.regtab.recordset.Recordset;
 
 // 1. Build the syntactic layer from your data source
 TableSyntax syntax = new TableSyntax(3, 3);
@@ -101,7 +103,26 @@ Recordset result = new TableInterpreter().interpret(itm);
 
 ### Using ATP patterns
 
-The `ru.icc.regtab.itm.atp.spec` package provides the formal ATP types. Build a `TablePattern` from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances with their content and action specifications, then use the Pattern Matcher to match it against an ITM instance and populate the semantic layer automatically.
+The `ru.icc.regtab.atp.spec` package provides the formal ATP types. Build a `TablePattern` from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances with their content and action specifications, then use the ATP Matcher to match it against an ITM instance and populate the semantic layer automatically.
+
+### Using RTL patterns
+
+RTL (Regular Table Language) is a compact textual DSL that compiles to ATP.
+Use `RtlCompiler.compile(rtl)` to obtain a `TablePattern`, then proceed identically to the ATP path.
+
+**Example — Task 01** (two-row repeating subtables):
+
+```java
+import ru.icc.regtab.rtl.RtlCompiler;
+import ru.icc.regtab.atp.spec.TablePattern;
+
+TablePattern pattern = RtlCompiler.compile("""
+        { [ [VAL : ST*->REC] [VAL]{2} []+ ]
+          [ []               [VAL]{4} []+ ] }+
+        """);
+```
+
+The RTL string above encodes the same pattern as the ATP example below.
 
 ### Illustrative example
 
@@ -125,7 +146,7 @@ mvn test -Dtest="AtpIllustrativeExampleTest"
 
 RegTab has been evaluated on the **Foofah benchmark** — a well-established collection of 50 tabular data transformation tasks assembled by Jin et al. (2017) from real-world forums and related work (37 real-world cases, 13 synthetic). Each task provides five source tables from the same class and five corresponding target recordsets.
 
-All 50 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **250 source-table variants** are transformed correctly (100 % accuracy).
+All 50 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **500 test variants (250 ATP + 250 RTL)** are transformed correctly (100 % accuracy).
 
 The benchmark data (input and expected CSV files) is available at:
 <https://github.com/umich-dbgroup/foofah>
@@ -134,14 +155,14 @@ The benchmark data (input and expected CSV files) is available at:
 
 ## Testing
 
-The test suite lives under `src/test/java/ru/icc/regtab/itm/` and is split into two complementary parts.
+The test suite lives under `src/test/java/ru/icc/regtab/` and is split into two complementary parts.
 
 ### ATP benchmark tests
 
-The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one Foofah task as an ATP pattern using the formal `ru.icc.regtab.itm.atp.spec` API:
+The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one Foofah task as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
 
 ```
-src/test/java/ru/icc/regtab/itm/atp/
+src/test/java/ru/icc/regtab/atp/
     AtpTaskBase.java          # parameterised base: loads CSV, runs matcher, asserts output
     AtpTask01Test.java
     AtpTask02Test.java
@@ -162,18 +183,21 @@ Each test class overrides two methods:
 4. Applies optional post-processing (e.g. `WhitespaceNormalization`)
 5. Asserts the result against `src/test/resources/tasks/task_{NN}/expected_{V}.csv`
 
-Tasks 36–39 are currently covered by the Fluent API tests only (see below) and do not yet have dedicated `AtpTask{NN}Test` classes.
+All 50 tasks have dedicated `AtpTask{NN}Test` classes.
 
 **Example — Task 01** (subtables with a `rec` action using the `sameSubtable` predicate):
 
 ```java
+import ru.icc.regtab.atp.spec.*;
+
 @Override
 protected TablePattern buildPattern() {
+    var sameSubtable = ItemFilterConditionSpec.sameSubtable();
     return TablePattern.of(
         SubtablePattern.of(Quantifier.oneOrMore(),
             RowPattern.of(
                 CellPattern.of(AtomicContentSpec.val(
-                    ActionSpec.rec(ProviderSpec.of((a, c) -> c.is.in.sameSubtable(a)))
+                    ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, sameSubtable))
                 )),
                 CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.val()),
                 CellPattern.skip(Quantifier.oneOrMore())
@@ -185,6 +209,36 @@ protected TablePattern buildPattern() {
             )
         )
     );
+}
+```
+
+### RTL benchmark tests
+
+The `rtl` package mirrors the ATP benchmark: each `RtlTask{NN}Test` implements the same Foofah task as an RTL string. These tests verify that the RTL compiler produces an ATP pattern equivalent to the hand-crafted ATP counterpart.
+
+```
+src/test/java/ru/icc/regtab/rtl/
+    RtlTaskBase.java          # loads CSV, compiles RTL → ATP, runs matcher, asserts output
+    RtlTask01Test.java
+    RtlTask02Test.java
+    ...
+    RtlTask50Test.java
+```
+
+Each test class overrides two methods:
+
+- `taskId()` — returns the two-digit task number (e.g. `"01"`)
+- `buildRtl()` — returns the RTL string for that task
+
+**Example — Task 01:**
+
+```java
+@Override
+protected String buildRtl() {
+    return """
+            { [ [VAL : ST*->REC] [VAL]{2} []+ ]
+              [ []               [VAL]{4} []+ ] }+
+            """;
 }
 ```
 
@@ -216,6 +270,12 @@ To run only the ATP benchmark tests:
 
 ```bash
 mvn test -Dtest="AtpTask*Test"
+```
+
+To run only the RTL benchmark tests:
+
+```bash
+mvn test -Dtest="RtlTask*Test"
 ```
 
 To run a single task:
