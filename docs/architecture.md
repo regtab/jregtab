@@ -53,26 +53,24 @@ ru.icc.regtab
 ## Data flow
 
 ```
-   [Source data]
-        │
-        ▼
-  TableSyntax          ← build cells with text, position, formatting
-        │
-        ├─────────────────────────────────────────────┐
-        │  ATP pattern                                │
-        │  (ATP API or RtlCompiler.compile(rtl))      │
-        ▼                                             │
-  AtpMatcher.match(pattern, syntax)                   │
-        │                                             │
-        ▼                                             │
- Optional<InterpretableTable>                         │
-   (syntax + populated semantic layer)                │
-        │                                             │
-        ▼                                             │
-  TableInterpreter.interpret(itm)                     │
-        │                                             │
-        ▼                                             │
-    Recordset  ───────────────────────────────────────┘
+   [Source data]           [ATP pattern]
+        │                  (ATP API or
+        ▼                   RtlCompiler.compile(rtl))
+  TableSyntax                    │
+        │                        │
+        └──────────┬─────────────┘
+                   ▼
+       AtpMatcher.match(pattern, syntax)
+                   │
+                   ▼
+      Optional<InterpretableTable>
+        (syntax + populated semantic layer)
+                   │
+                   ▼
+       TableInterpreter.interpret(itm)
+                   │
+                   ▼
+               Recordset
 ```
 
 If the pattern does not match, `AtpMatcher.match` returns `Optional.empty()`.
