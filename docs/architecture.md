@@ -62,17 +62,17 @@ ru.icc.regtab
         │  ATP pattern                                │
         │  (ATP API or RtlCompiler.compile(rtl))      │
         ▼                                             │
-  AtpMatcher.match(pattern, syntax)                  │
+  AtpMatcher.match(pattern, syntax)                   │
         │                                             │
         ▼                                             │
- Optional<InterpretableTable>                        │
-   (syntax + populated semantic layer)               │
+ Optional<InterpretableTable>                         │
+   (syntax + populated semantic layer)                │
         │                                             │
         ▼                                             │
-  TableInterpreter.interpret(itm)                    │
+  TableInterpreter.interpret(itm)                     │
         │                                             │
         ▼                                             │
-    Recordset  ──────────────────────────────────────┘
+    Recordset  ───────────────────────────────────────┘
 ```
 
 If the pattern does not match, `AtpMatcher.match` returns `Optional.empty()`.
