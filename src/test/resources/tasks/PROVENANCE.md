@@ -89,3 +89,4 @@ Test data created as part of the jRegTab project to cover table patterns not pre
 |---------|-----------|
 | 51 | illus_exp_1 |
 | 52 | illus_exp_2 |
+| 53 | two_row_group |
