@@ -65,7 +65,7 @@
       "tasks": [
         {"task_id": "51", "regtab_id": "illus_exp_1"},
         {"task_id": "52", "regtab_id": "illus_exp_2"},
-        {"task_id": "53", "regtab_id": "two_row_group"}
+        {"task_id": "53", "regtab_id": "illus_exp_3"}
       ]
     }
   ]
