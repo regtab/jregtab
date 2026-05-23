@@ -29,8 +29,8 @@ public record ProviderSpec(
         CellDerivedProviderKind targetItemKind,
         ContextLiteralSpec contextLiteral
 ) {
-    /** Fixed context string and item type. */
-    public record ContextLiteralSpec(String text, ItemType type) {
+    /** Fixed context string and item type; constValue non-null only for ctxAvp providers. */
+    public record ContextLiteralSpec(String text, ItemType type, String constValue) {
         public ContextLiteralSpec {
             Objects.requireNonNull(text, "text");
             Objects.requireNonNull(type, "type");
@@ -110,7 +110,13 @@ public record ProviderSpec(
 
     /** Context-derived constant provider. */
     public static ProviderSpec ctx(String text, ItemType type) {
-        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, null, null, new ContextLiteralSpec(text, type));
+        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, null, null, new ContextLiteralSpec(text, type, null));
+    }
+
+    /** Constant attribute-value pair provider: @'ATTR'='VALUE'. */
+    public static ProviderSpec ctxAvp(String attrName, String value) {
+        return new ProviderSpec(1, TraversalOrder.ROW_MAJOR, null, null,
+                new ContextLiteralSpec(attrName, ItemType.ATTRIBUTE, value));
     }
 
     /** Context-derived attribute constant provider. */

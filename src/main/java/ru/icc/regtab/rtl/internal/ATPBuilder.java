@@ -255,6 +255,11 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
                                        ItemDerivationDirective anchorType) {
         if (ctx.tblProvSpec() != null)
             return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType);
+        if (ctx.ctxAvpSpec() != null) {
+            String name  = StringExtractorFactory.parseStringLiteral(ctx.ctxAvpSpec().STRING(0).getText());
+            String value = StringExtractorFactory.parseStringLiteral(ctx.ctxAvpSpec().STRING(1).getText());
+            return ProviderSpec.ctxAvp(name, value);
+        }
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
         if (op != null && (op.recOp() != null || op.CONCAT() != null))
             return ProviderSpec.ctxVal(literal);
@@ -338,7 +343,9 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     }
 
     private static List<String> buildTags(RTLParser.TagsContext ctx) {
-        return ctx.TAG().stream().map(t -> t.getText()).toList();
+        return ctx.tagItem().stream()
+                .map(t -> "#" + StringExtractorFactory.parseStringLiteral(t.STRING().getText()))
+                .toList();
     }
 
     // -------- inherited actions stack --------

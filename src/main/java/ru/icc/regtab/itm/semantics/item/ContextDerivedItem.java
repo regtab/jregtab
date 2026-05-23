@@ -9,10 +9,16 @@ public final class ContextDerivedItem implements Item {
 
     private final String str;
     private final ItemType type;
+    private final String constValue;
 
     public ContextDerivedItem(String str, ItemType type) {
+        this(str, type, null);
+    }
+
+    public ContextDerivedItem(String str, ItemType type, String constValue) {
         this.str = Objects.requireNonNull(str, "str");
         this.type = Objects.requireNonNull(type, "type");
+        this.constValue = constValue;
     }
 
     @Override
@@ -20,6 +26,9 @@ public final class ContextDerivedItem implements Item {
 
     @Override
     public ItemType type() { return type; }
+
+    /** Non-null only for ctxAvp providers: the constant value to inject into the record. */
+    public String constValue() { return constValue; }
 
     @Override
     public String toString() {

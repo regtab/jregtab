@@ -203,6 +203,12 @@ public final class SemanticConstructor {
             Set<CellDerivedItem> allItems,
             Set<ContextDerivedItem> contextItems) {
         if (spec.isContextLiteral()) {
+            if (spec.contextLiteral().constValue() != null) {
+                ContextDerivedItem item = new ContextDerivedItem(
+                        spec.contextLiteral().text(), ItemType.ATTRIBUTE,
+                        spec.contextLiteral().constValue());
+                return new ContextDerivedItemProvider(List.of(item), ContextDerivedProviderKind.UNRESTRICTED);
+            }
             ContextDerivedItem item = getOrCreateContextItem(contextItems, spec.contextLiteral());
             return new ContextDerivedItemProvider(List.of(item), spec.contextLiteral().kind());
         }

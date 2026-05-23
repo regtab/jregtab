@@ -1,6 +1,7 @@
 package ru.icc.regtab.itm.semantics;
 
 import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
+import ru.icc.regtab.itm.semantics.item.ContextDerivedItem;
 import ru.icc.regtab.itm.semantics.item.Item;
 import ru.icc.regtab.itm.semantics.item.ItemType;
 
@@ -105,7 +106,13 @@ public final class WorkingState {
         if (rec.containsKey(anchor)) return;
         List<Item> sequence = new ArrayList<>();
         sequence.add(anchor);
-        sequence.addAll(items);
+        for (Item item : items) {
+            if (item instanceof ContextDerivedItem cdi && cdi.constValue() != null) {
+                val.put(cdi, cdi.constValue());
+                avp.put(cdi, new AttributeValuePair(cdi.str(), cdi.constValue()));
+            }
+            sequence.add(item);
+        }
         rec.put(anchor, sequence);
     }
 

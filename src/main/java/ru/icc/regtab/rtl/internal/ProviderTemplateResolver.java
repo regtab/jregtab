@@ -250,7 +250,9 @@ final class ProviderTemplateResolver {
     }
 
     private static FilterTerm tagConstraint(RTLParser.TagContext ctx) {
-        List<String> tags = ctx.TAG().stream().map(t -> t.getText()).toList();
+        List<String> tags = ctx.tagItem().stream()
+                .map(t -> "#" + StringExtractorFactory.parseStringLiteral(t.STRING().getText()))
+                .toList();
         return ctx.EXCLAMATION() != null
                 ? new FilterTerm.NotTagged(tags)
                 : new FilterTerm.Tagged(tags);
