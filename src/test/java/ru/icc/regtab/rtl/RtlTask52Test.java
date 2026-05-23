@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ [] [VAL : 'AIRLINE'->AVP]+ ]
  * [ [VAL : 'AIRPORT'->AVP]
- *   [VAL : (^SC, -LT, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+ *   [VAL : (COL, ROW, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
  * </pre>
  * Same as task 51 but adds a constant attribute-value pair YEAR=2025 to every record.
  */
@@ -21,7 +21,7 @@ public class RtlTask52Test extends RtlTaskBase {
         return """
                 [ [] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
-                  [VAL : (^SC, -LT, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+                  [VAL : (COL, ROW, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
                 """;
     }
 }
