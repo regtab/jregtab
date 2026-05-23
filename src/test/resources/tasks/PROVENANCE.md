@@ -1,4 +1,10 @@
-# Provenance: Foofah Test Tasks
+# Provenance: Test Tasks
+
+Test tasks come from two collections.
+
+---
+
+## Collection 1: Foofah (tasks 01–50)
 
 Test data sourced from the [Foofah](https://github.com/umich-dbgroup/foofah) benchmark collection.
 
@@ -10,7 +16,7 @@ Test data sourced from the [Foofah](https://github.com/umich-dbgroup/foofah) ben
 
 **Expected (ground truth):** `D:\YandexDisk\data\foofah-benchmarks\gt` — flat CSV files `{foofah_id}_{variant}.csv` (no header; header `$a_0`,`$a_1`,… is added when copying to `expected_Y.csv`).
 
-## Task mapping: task_XX ↔ foofah_id
+### Task mapping: task_XX ↔ foofah_id
 
 | task_id | foofah_id |
 |---------|-----------|
@@ -66,3 +72,20 @@ Test data sourced from the [Foofah](https://github.com/umich-dbgroup/foofah) ben
 | 50 | exp0_reshape_table_structure_data_wrangler |
 
 **Note:** `exp0_potters_wheel_fold` and `exp0_potters_wheel_fold_2` are distinct tasks. The latter uses variant folders `exp0_potters_wheel_fold_2_1` … `exp0_potters_wheel_fold_2_5`.
+
+---
+
+## Collection 2: RegTab (tasks 51–…)
+
+Test data created as part of the jRegTab project to cover table patterns not present in Foofah.
+
+**Source:** authored by the jRegTab team.
+
+**Structure:** 5 variants per task. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
+
+### Task mapping: task_XX ↔ regtab_id
+
+| task_id | regtab_id |
+|---------|-----------|
+| 51 | illus_exp_1 |
+| 52 | illus_exp_2 |
