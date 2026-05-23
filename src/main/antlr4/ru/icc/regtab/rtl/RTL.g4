@@ -65,7 +65,8 @@ AUXILIARY : 'AUX'  ;
 SKIPPED   : 'SKIP' | '_' ;
 
 // User-defined tags
-tags : TAG+ ;
+tags    : tagItem+ ;
+tagItem : HASH STRING ;
 
 // Item string extractor (supports chains: =REPL("x","").TRIM)
 strExtr     : strExtrStep ('.' strExtrStep)* ;
@@ -118,7 +119,7 @@ cellMatchCond : cellMatchConstr ;
 cellMatchConstr : regex | blank | contains ;
 
 // Item provider specification
-provSpec : tblProvSpec | ctxProvSpec ;
+provSpec : tblProvSpec | ctxProvSpec | ctxAvpSpec ;
 
 // Cell derived item provider specification
 // Single bare form: spatConstr only (avoids ambiguity with ctxProvSpec STRING).
@@ -133,6 +134,9 @@ reverseColumnMajor : MINUS CARET ;
 
 // Context derived item provider specification
 ctxProvSpec : STRING ;
+
+// Constant attribute-value pair provider: @'ATTR'='VALUE'
+ctxAvpSpec : AT STRING ASSIGN STRING ;
 
 // Cardinality k: {n} = at most n; * = UNBOUNDED (0..*); absent = at most 1 (default)
 cardinality : LCURLY INT RCURLY | MULT ;
@@ -178,7 +182,7 @@ contConstr : regex | blank | tag | sameStr | contains ;
 contains : EXCLAMATION? TILDA STRING ;
 TILDA : '~' ;
 
-tag : EXCLAMATION? 'TAG' TAG+ ;
+tag : EXCLAMATION? 'TAG' tagItem+ ;
 
 sameStr : STR ;
 STR : 'STR' ;
@@ -213,7 +217,8 @@ ASSIGN        : '=' ;
 
 RIGHT_ARROW : '->' ;
 
-TAG : '#' [a-z_] [a-z_0-9]* ;
+HASH : '#' ;
+AT   : '@' ;
 
 INT : [0-9]+ ;
 

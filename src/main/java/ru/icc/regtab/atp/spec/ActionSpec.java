@@ -38,10 +38,11 @@ public record ActionSpec(
         for (var p : providers) {
             if (p.isContextLiteral()) {
                 var ctxType = p.contextLiteral().type();
+                boolean isConstAvp = p.contextLiteral().constValue() != null;
                 if (operationType == OperationType.CONCAT)
                     throw new IllegalArgumentException(
                             "CONCAT action does not allow context literals");
-                if (operationType == OperationType.REC && ctxType != ItemType.VALUE)
+                if (operationType == OperationType.REC && !isConstAvp && ctxType != ItemType.VALUE)
                     throw new IllegalArgumentException(
                             "REC action requires a VALUE context literal, got " + ctxType);
                 if (operationType == OperationType.AVP && ctxType != ItemType.ATTRIBUTE)

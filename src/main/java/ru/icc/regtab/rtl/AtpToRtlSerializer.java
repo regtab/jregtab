@@ -131,7 +131,10 @@ public final class AtpToRtlSerializer {
     private static String serializeAtomic(AtomicContentSpec a) {
         StringBuilder sb = new StringBuilder(serializeIdd(a.idd()));
         if (!a.tags().isEmpty()) {
-            sb.append(" ").append(a.tags().stream().collect(Collectors.joining(" ")));
+            String tagStr = a.tags().stream()
+                    .map(t -> "#'" + escapeSQ(t.startsWith("#") ? t.substring(1) : t) + "'")
+                    .collect(Collectors.joining(" "));
+            sb.append(" ").append(tagStr);
         }
         if (a.extractor() != null && !(a.extractor() instanceof StringExtractor.Verbatim)) {
             sb.append(" = ").append(a.extractor().toRtl());
@@ -211,7 +214,11 @@ public final class AtpToRtlSerializer {
 
     private static String serializeProvSpec(ProviderSpec ps) {
         if (ps.isContextLiteral()) {
-            return "\"" + escapeString(ps.contextLiteral().text()) + "\"";
+            if (ps.contextLiteral().constValue() != null) {
+                return "@'" + escapeSQ(ps.contextLiteral().text()) + "'='"
+                        + escapeSQ(ps.contextLiteral().constValue()) + "'";
+            }
+            return "'" + escapeSQ(ps.contextLiteral().text()) + "'";
         }
         String order = serializeTraversalOrder(ps.traversalOrder());
         String cond  = ps.filterCondition().toRtl();
@@ -276,8 +283,13 @@ public final class AtpToRtlSerializer {
         return "{" + cardinality + "}";
     }
 
-    /** Escapes embedded double-quote characters by doubling them. */
+    /** Escapes embedded double-quote characters by doubling them (for use in "..." strings). */
     private static String escapeString(String s) {
         return s.replace("\"", "\"\"");
+    }
+
+    /** Escapes embedded single-quote characters by doubling them (for use in '...' strings). */
+    private static String escapeSQ(String s) {
+        return s.replace("'", "''");
     }
 }
