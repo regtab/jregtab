@@ -105,7 +105,8 @@ delimContSpec : LPAREN atomContSpec RPAREN LCURLY separator RCURLY;
 separator  : STRING ;  // Separator
 
 // Compound content specification
-compContSpec : openDelim? atomContSpec (separator atomContSpec)* closeDelim? ;
+compContSpec : openDelim? compSeg (separator compSeg)* closeDelim? ;
+compSeg      : atomContSpec | delimContSpec ;
 
 openDelim  : STRING ;  // Opening delimiter
 closeDelim : STRING ;  // Closing delimiter

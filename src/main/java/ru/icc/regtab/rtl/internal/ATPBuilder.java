@@ -197,16 +197,21 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         String closeDelim = ctx.closeDelim() != null
                 ? StringExtractorFactory.parseStringLiteral(ctx.closeDelim().STRING().getText()) : "";
 
-        var atomSpecs  = ctx.atomContSpec();
+        var segs       = ctx.compSeg();
         var separators = ctx.separator();
 
         List<CompoundSegment> segments = new ArrayList<>();
-        segments.add(new CompoundSegment(openDelim, buildAtomicContentSpec(atomSpecs.get(0))));
+        segments.add(new CompoundSegment(openDelim, buildCompSeg(segs.get(0))));
         for (int i = 0; i < separators.size(); i++) {
             String sep = StringExtractorFactory.parseStringLiteral(separators.get(i).STRING().getText());
-            segments.add(new CompoundSegment(sep, buildAtomicContentSpec(atomSpecs.get(i + 1))));
+            segments.add(new CompoundSegment(sep, buildCompSeg(segs.get(i + 1))));
         }
         return new CompoundContentSpec(segments, closeDelim);
+    }
+
+    private ContentSpec buildCompSeg(RTLParser.CompSegContext ctx) {
+        if (ctx.atomContSpec() != null) return buildAtomicContentSpec(ctx.atomContSpec());
+        return buildDelimitedContentSpec(ctx.delimContSpec());
     }
 
     private ConditionalContentSpec buildConditionalContentSpec(RTLParser.CondContSpecContext ctx) {
