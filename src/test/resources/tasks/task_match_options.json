@@ -17,6 +17,7 @@
     "51": { "expectedHasHeader": true },
     "52": { "expectedHasHeader": true },
     "53": { "expectedHasHeader": true },
-    "56" : { "expectedHasHeader": true }
+    "56" : { "expectedHasHeader": true },
+    "60" : { "expectedHasHeader": true }
   }
 }
