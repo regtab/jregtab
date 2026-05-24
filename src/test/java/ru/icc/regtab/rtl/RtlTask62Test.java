@@ -13,6 +13,9 @@ public class RtlTask62Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                """;
+            { [       []    [VAL]+ ]
+              [ !"x"? [VAL] [VAL: (AV, LT)->REC]+ ]+
+              [       ['x'?]+ ]? }+
+             """;
     }
 }
