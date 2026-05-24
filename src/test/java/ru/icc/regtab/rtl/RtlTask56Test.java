@@ -13,6 +13,8 @@ public class RtlTask56Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                [ [ATTR] [VAL : BW*->REC, ROW->AVP]+ ]
+                [ [ATTR] [VAL : ROW->AVP]+ ]+
                 """;
     }
 }
