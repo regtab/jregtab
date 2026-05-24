@@ -13,6 +13,7 @@ public class RtlTask58Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+               [ [VAL=TRIM: CL->REC '=' VAL=TRIM]+ ]+
                 """;
     }
 }

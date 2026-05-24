@@ -13,6 +13,7 @@ public class RtlTask59Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+               [ [VAL: RT->REC] [VAL: RT*->SUFFIX(', ')] [AUX]+ ]+
                 """;
     }
 }
