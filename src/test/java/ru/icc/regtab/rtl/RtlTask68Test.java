@@ -13,6 +13,8 @@ public class RtlTask68Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                [ [BLANK?] [VAL #'HEAD']+ ]+
+                [ [!BLANK? VAL] [VAL: ((COL & TAG #'HEAD')*, ROW)->REC]+ ]+
                 """;
     }
 }
