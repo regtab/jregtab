@@ -370,10 +370,14 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     }
 
     private List<ActionSpec> mergeWithInherited(List<ActionSpec> local) {
-        List<ActionSpec> inherited = currentInherited();
-        if (inherited.isEmpty()) return local;
-        if (local.isEmpty())     return inherited;
-        List<ActionSpec> all = new ArrayList<>(inherited);
+        List<ActionSpec> fromStack = currentInherited();
+        if (fromStack.isEmpty()) return local;
+        // Everything from the stack is inherited at this cell level — mark it
+        List<ActionSpec> markedInherited = fromStack.stream()
+                .map(ActionSpec::asInherited)
+                .toList();
+        if (local.isEmpty()) return markedInherited;
+        List<ActionSpec> all = new ArrayList<>(markedInherited);
         all.addAll(local);
         return List.copyOf(all);
     }

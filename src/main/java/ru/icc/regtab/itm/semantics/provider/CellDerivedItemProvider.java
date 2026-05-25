@@ -32,6 +32,12 @@ public final class CellDerivedItemProvider implements ItemProvider {
      * — used for {@code O_fill} so κ can select the anchor item (e.g. {@code sameCell}).
      */
     private final boolean excludeAnchorFromCandidates;
+    /**
+     * When {@code true}, an anchor whose type is incompatible with {@link #cellKind} causes
+     * {@link #provide} to return an empty list (silent skip) instead of throwing.
+     * Set for providers that were inherited from a parent scope (row/subrow/subtable level).
+     */
+    private final boolean lenient;
 
     /**
      * @param filter        item filter Φ_κ
@@ -56,10 +62,12 @@ public final class CellDerivedItemProvider implements ItemProvider {
 
     /**
      * @param excludeAnchorFromCandidates if {@code false}, anchor is not removed from J before κ (for {@code O_fill}).
+     * @param lenient                     if {@code true}, incompatible anchor type causes silent empty result instead of throw.
      */
     public CellDerivedItemProvider(ItemFilter filter, ItemLinearization linearization,
                                    Set<CellDerivedItem> targetSet, int cardinality,
-                                   CellDerivedProviderKind cellKind, boolean excludeAnchorFromCandidates) {
+                                   CellDerivedProviderKind cellKind, boolean excludeAnchorFromCandidates,
+                                   boolean lenient) {
         this.filter = Objects.requireNonNull(filter, "filter");
         this.linearization = Objects.requireNonNull(linearization, "linearization");
         this.targetSet = Objects.requireNonNull(targetSet, "targetSet");
@@ -67,6 +75,14 @@ public final class CellDerivedItemProvider implements ItemProvider {
         this.cardinality = cardinality;
         this.cellKind = Objects.requireNonNull(cellKind, "cellKind");
         this.excludeAnchorFromCandidates = excludeAnchorFromCandidates;
+        this.lenient = lenient;
+    }
+
+    /** @see #CellDerivedItemProvider(ItemFilter, ItemLinearization, Set, int, CellDerivedProviderKind, boolean, boolean) */
+    public CellDerivedItemProvider(ItemFilter filter, ItemLinearization linearization,
+                                   Set<CellDerivedItem> targetSet, int cardinality,
+                                   CellDerivedProviderKind cellKind, boolean excludeAnchorFromCandidates) {
+        this(filter, linearization, targetSet, cardinality, cellKind, excludeAnchorFromCandidates, false);
     }
 
     /**
@@ -95,7 +111,19 @@ public final class CellDerivedItemProvider implements ItemProvider {
                                    Set<CellDerivedItem> targetSet, int cardinality,
                                    CellDerivedProviderKind cellKind, boolean excludeAnchorFromCandidates) {
         this(new ItemFilter(predicate), new ItemLinearization(traversalOrder), targetSet, cardinality, cellKind,
-                excludeAnchorFromCandidates);
+                excludeAnchorFromCandidates, false);
+    }
+
+    /**
+     * Named ITM cell-derived provider instance with lenient anchor-kind check.
+     * Used by {@code SemanticConstructor} when the action was inherited from a parent scope.
+     */
+    public CellDerivedItemProvider(ItemFilterCondition predicate, TraversalOrder traversalOrder,
+                                   Set<CellDerivedItem> targetSet, int cardinality,
+                                   CellDerivedProviderKind cellKind, boolean excludeAnchorFromCandidates,
+                                   boolean lenient) {
+        this(new ItemFilter(predicate), new ItemLinearization(traversalOrder), targetSet, cardinality, cellKind,
+                excludeAnchorFromCandidates, lenient);
     }
 
     /**
@@ -134,7 +162,11 @@ public final class CellDerivedItemProvider implements ItemProvider {
         if (!(anchor instanceof CellDerivedItem anch)) {
             throw new IllegalArgumentException("CellDerivedItemProvider requires a cell-derived anchor");
         }
-        validateAnchorKind(anch);
+        if (!isAnchorCompatible(anch)) {
+            if (lenient) return List.of();
+            throw new IllegalArgumentException(
+                    "Υ_tbl^val and Υ_tbl^attr require a value-associated anchor, got: " + anch.type());
+        }
         Set<CellDerivedItem> candidates = new HashSet<>(targetSet);
         if (excludeAnchorFromCandidates) {
             candidates.remove(anch);
@@ -148,25 +180,13 @@ public final class CellDerivedItemProvider implements ItemProvider {
         return sorted.subList(0, cardinality);
     }
 
-    private void validateAnchorKind(CellDerivedItem anchor) {
-        if (cellKind == CellDerivedProviderKind.UNRESTRICTED) {
-            return;
-        }
-        switch (cellKind) {
-            case VAL, ATTR -> {
-                if (anchor.type() != ItemType.VALUE) {
-                    throw new IllegalArgumentException(
-                            "Υ_tbl^val and Υ_tbl^attr require a value-associated anchor, got: " + anchor.type());
-                }
-            }
-            case AUX -> {
-                if (anchor.type() != ItemType.VALUE && anchor.type() != ItemType.ATTRIBUTE) {
-                    throw new IllegalArgumentException(
-                            "Υ_tbl^aux requires a value- or attribute-associated anchor, got: " + anchor.type());
-                }
-            }
-            default -> { }
-        }
+    private boolean isAnchorCompatible(CellDerivedItem anchor) {
+        if (cellKind == CellDerivedProviderKind.UNRESTRICTED) return true;
+        return switch (cellKind) {
+            case VAL, ATTR -> anchor.type() == ItemType.VALUE;
+            case AUX       -> anchor.type() == ItemType.VALUE || anchor.type() == ItemType.ATTRIBUTE;
+            default        -> true;
+        };
     }
 
     private Set<CellDerivedItem> restrictCandidateSet(Set<CellDerivedItem> candidates) {

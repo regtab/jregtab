@@ -24,14 +24,23 @@ import java.util.Objects;
  * @param providers      sequence of item provider specifications ⟨S_prov¹, …, S_provⁿ⟩
  * @param anchorPos      inline anchor position for REC (null = none)
  * @param splitDelimiter inline split delimiter for REC (null = none)
+ * @param inherited      true if this action was inherited from a parent scope (row/subrow/subtable level),
+ *                       false if explicitly specified on the cell's own contSpec
  */
 public record ActionSpec(
         OperationType operationType,
         String delimiter,
         List<ProviderSpec> providers,
         Integer anchorPos,
-        String splitDelimiter
+        String splitDelimiter,
+        boolean inherited
 ) {
+    /** Backward-compatible constructor: all explicit action specs have {@code inherited=false}. */
+    public ActionSpec(OperationType operationType, String delimiter,
+                      List<ProviderSpec> providers, Integer anchorPos, String splitDelimiter) {
+        this(operationType, delimiter, providers, anchorPos, splitDelimiter, false);
+    }
+
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
@@ -59,6 +68,12 @@ public record ActionSpec(
                             "AVP action requires an ATTR provider, got " + kind);
             }
         }
+    }
+
+    /** Returns a copy with {@code inherited=true}; returns {@code this} if already inherited. */
+    public ActionSpec asInherited() {
+        return inherited ? this
+                : new ActionSpec(operationType, delimiter, providers, anchorPos, splitDelimiter, true);
     }
 
     /** Convenience: REC action with given providers, no inline params. */

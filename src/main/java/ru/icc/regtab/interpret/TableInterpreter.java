@@ -147,9 +147,10 @@ public final class TableInterpreter {
             case FillOperation op -> ws.applyFill(anchor, items, op.delimiter());
             case PrefixOperation op -> ws.applyPrefix(anchor, items, op.delimiter());
             case SuffixOperation op -> ws.applySuffix(anchor, items, op.delimiter());
-            case AvpOperation _ -> ws.applyAvp(anchor, items);
-            case RecOperation _ -> ws.applyRec((CellDerivedItem) anchor, items);
-            case ConcatOperation _ -> ws.applyConcat((CellDerivedItem) anchor, items);
+            // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
+            case AvpOperation _    -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
+            case RecOperation _    -> ws.applyRec((CellDerivedItem) anchor, items);
+            case ConcatOperation _ -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items); }
         }
     }
 

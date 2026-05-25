@@ -13,8 +13,8 @@ public class RtlTask69Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [ATTR] [VAL: ^(BW | C+3)*->REC, (SR & C0)->AVP]{2} [ATTR] [VAL: (SR & C3)->AVP]{2}]
-                [ [ATTR] [VAL: (SR & C0)->AVP]{2}                   [ATTR] [VAL: (SR & C3)->AVP]{2}]+
+                [ SR->AVP { [ATTR] [VAL: ^(BW | C+3)*->REC]{2} } { [ATTR] [VAL]{2} } ]
+                [ SR->AVP { [ATTR] [VAL]{2} }                    { [ATTR] [VAL]{2} } ]+
                 """;
     }
 }
