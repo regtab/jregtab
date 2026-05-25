@@ -183,7 +183,7 @@ contConstr : regex | blank | tag | sameStr | contains ;
 contains : EXCLAMATION? TILDA STRING ;
 TILDA : '~' ;
 
-tag : EXCLAMATION? 'TAG' tagItem+ ;
+tag : EXCLAMATION? tagItem+ ;
 
 sameStr : STR ;
 STR : 'STR' ;

@@ -112,7 +112,7 @@ class RtlCompilerTest {
     void parse_contentConstraints() {
         compile("[ [VAL : (SR & \"pattern\")->REC] ]");
         compile("[ [VAL : (SR & BLANK)->REC] ]");
-        compile("[ [VAL : (SR & TAG #'t1' #'t2')->REC] ]");
+        compile("[ [VAL : (SR & #'t1' #'t2')->REC] ]");
     }
 
     @Test

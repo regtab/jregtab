@@ -14,7 +14,7 @@ public class RtlTask68Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [BLANK?] [VAL #'HEAD']+ ]+
-                [ [!BLANK? VAL] [VAL: ((COL & TAG #'HEAD')*, ROW)->REC]+ ]+
+                [ [!BLANK? VAL] [VAL: ((COL & #'HEAD')*, ROW)->REC]+ ]+
                 """;
     }
 }
