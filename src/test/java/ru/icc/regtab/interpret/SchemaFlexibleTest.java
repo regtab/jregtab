@@ -88,7 +88,7 @@ class SchemaFlexibleTest {
                     List.of(new CellDerivedItemProvider(
                             sameNameBelow, TraversalOrder.ROW_MAJOR,
                             allCdi)),
-                    new ConcatOperation()));
+                    new JoinOperation(Set.of(0))));
         }
 
         TableSemantics semantics = new TableSemantics(allCdi, Set.of(), actions);
@@ -176,7 +176,7 @@ class SchemaFlexibleTest {
                     List.of(new CellDerivedItemProvider(
                             sameNameBelow, TraversalOrder.ROW_MAJOR,
                             allCdi)),
-                    new ConcatOperation()));
+                    new JoinOperation(Set.of(0))));
         }
 
         TableSemantics semantics = new TableSemantics(allCdi, Set.of(), actions);

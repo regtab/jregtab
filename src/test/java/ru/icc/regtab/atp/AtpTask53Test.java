@@ -12,6 +12,8 @@ import ru.icc.regtab.atp.spec.SubrowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
+import java.util.Set;
+
 /**
  * Task 53: two-row group table with compound attribute names (group header + qualifier).
  * <p>
@@ -40,7 +42,7 @@ class AtpTask53Test extends AtpTaskBase {
                                 SubrowPattern.of(
                                         CellPattern.of(AtomicContentSpec.val(
                                                 ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_ROW)),
-                                                ActionSpec.concat(ProviderSpec.val(1, BELOW_STR)),
+                                                ActionSpec.join(0, ProviderSpec.val(1, BELOW_STR)),
                                                 ActionSpec.avp("ID")
                                         ))
                                 ),

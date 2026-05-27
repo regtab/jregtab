@@ -85,17 +85,18 @@ actSpecs : actSpec (COMMA actSpec)* ;
 
 // Interpretation action specification
 actSpec : provSpecs RIGHT_ARROW op ;
-op : fillOp | prefixOp | suffixOp | AVP | recOp | CONCAT ;
+op : fillOp | prefixOp | suffixOp | AVP | recOp | joinOp ;
 fillOp   : FILL   (LPAREN STRING RPAREN)? ;
 prefixOp : PREFIX (LPAREN STRING RPAREN)? ;
 suffixOp : SUFFIX (LPAREN STRING RPAREN)? ;
 recOp    : REC    (LPAREN (INT | STRING) RPAREN)? ;
+joinOp   : JOIN   (LPAREN INT (COMMA INT)* RPAREN)? ;
 FILL   : 'FILL'   ;
 PREFIX : 'PREFIX' ;
 SUFFIX : 'SUFFIX' ;
 AVP    : 'AVP'    ;
 REC    : 'REC'    ;
-CONCAT : 'CONCAT' ;
+JOIN   : 'JOIN'   ;
 
 provSpecs : provSpec | (LPAREN provSpec (COMMA provSpec)* RPAREN) ;
 

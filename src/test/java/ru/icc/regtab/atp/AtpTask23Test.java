@@ -12,8 +12,10 @@ import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
 
+import java.util.Set;
+
 /**
- * Task 23: repeated subtables of exactly 3 rows, each combining AVP, REC, CONCAT,
+ * Task 23: repeated subtables of exactly 3 rows, each combining AVP, REC, JOIN(0),
  * and SUFFIX actions across same-row and below-same-string providers.
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_23/}
@@ -38,7 +40,7 @@ class AtpTask23Test extends AtpTaskBase {
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.avp(""),
                                         ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
-                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.attr(
                                         ActionSpec.suffix("", ProviderSpec.any(1, TraversalOrder.ROW_MAJOR, RIGHT_OF))

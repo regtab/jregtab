@@ -125,14 +125,14 @@ class EquipmentTest {
                 List.of(new CellDerivedItemProvider(
                         (a, cand) -> cand == target1, TraversalOrder.ROW_MAJOR,
                         allCdi, 1)),
-                new ConcatOperation()));
+                new JoinOperation(Set.of(0))));
 
         CellDerivedItem target3 = identity[3];
         actions.add(new InterpretationAction(identity[2],
                 List.of(new CellDerivedItemProvider(
                         (a, cand) -> cand == target3, TraversalOrder.ROW_MAJOR,
                         allCdi, 1)),
-                new ConcatOperation()));
+                new JoinOperation(Set.of(0))));
 
         TableSemantics semantics = new TableSemantics(allCdi, allCtx, actions);
         InterpretableTable itm = new InterpretableTable(syntax, semantics);

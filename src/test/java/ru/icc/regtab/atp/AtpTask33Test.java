@@ -11,9 +11,11 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
+import java.util.Set;
+
 /**
  * Task 33: flat table where each row's anchor collects same-row values via REC
- * and groups rows with the same ID string via CONCAT.
+ * and groups rows with the same ID string via JOIN(0).
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_33/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask33Test}
@@ -35,7 +37,7 @@ class AtpTask33Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
-                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )

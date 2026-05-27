@@ -161,7 +161,8 @@ provSpecs -> op
 | `REC(n)` | `prov->REC(n)` | Same + use attribute at position *n* as the record's attribute name |
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
-| `CONCAT` | `prov->CONCAT` | Concatenate provider values onto the anchor value |
+| `JOIN` | `prov->JOIN` | Join item-based records: all items included, then dedup by named attribute (K=∅) |
+| `JOIN(K)` | `prov->JOIN(0)` | Join with key positions K dropped from each joined record before dedup; `JOIN(0)` = old CONCAT |
 | `FILL('s')` | `prov->FILL('/')` | Fill anchor value forward from provider, separated by *s* |
 | `PREFIX('s')` | `prov->PREFIX(' ')` | Prepend provider value to anchor, separated by *s* |
 | `SUFFIX('s')` | `prov->SUFFIX(' ')` | Append provider value to anchor, separated by *s* |
@@ -270,5 +271,5 @@ The item type is inferred from the action: `->AVP` → ATTR, `->REC` → VAL.
 | `^COL->AVP` | Associate with an attribute from the same column (column-major) |
 | `('LABEL')->AVP` | Associate with a fixed string attribute |
 | `(ST*)->REC` (in parentheses) | Same as `ST*->REC` but explicit grouping |
-| `CL->CONCAT` | Concatenate another item from the same cell |
+| `CL->JOIN(0)` | Join (drop anchor) another item from the same cell |
 | `(COL)->FILL('/')` | Fill forward from same-column values, delimiter `/` |

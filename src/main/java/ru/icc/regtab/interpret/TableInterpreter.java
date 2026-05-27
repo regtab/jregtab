@@ -113,14 +113,14 @@ public final class TableInterpreter {
         List<InterpretationAction> strActions = new ArrayList<>();
         List<InterpretationAction> avpActions = new ArrayList<>();
         List<InterpretationAction> recActions = new ArrayList<>();
-        List<InterpretationAction> concatActions = new ArrayList<>();
+        List<InterpretationAction> joinActions = new ArrayList<>();
 
         for (InterpretationAction action : actions) {
             switch (action.operation()) {
                 case FillOperation _, PrefixOperation _, SuffixOperation _ -> strActions.add(action);
                 case AvpOperation _ -> avpActions.add(action);
                 case RecOperation _ -> recActions.add(action);
-                case ConcatOperation _ -> concatActions.add(action);
+                case JoinOperation _ -> joinActions.add(action);
             }
         }
 
@@ -128,12 +128,12 @@ public final class TableInterpreter {
         strActions.sort(cmp);
         avpActions.sort(cmp);
         recActions.sort(cmp);
-        concatActions.sort(cmp);
+        joinActions.sort(cmp);
 
         for (InterpretationAction action : strActions) applyAction(ws, action);
         for (InterpretationAction action : avpActions) applyAction(ws, action);
         for (InterpretationAction action : recActions) applyAction(ws, action);
-        for (InterpretationAction action : concatActions) applyAction(ws, action);
+        for (InterpretationAction action : joinActions) applyAction(ws, action);
     }
 
     private void applyAction(WorkingState ws, InterpretationAction action) {
@@ -150,7 +150,7 @@ public final class TableInterpreter {
             // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
             case AvpOperation _    -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
             case RecOperation _    -> ws.applyRec((CellDerivedItem) anchor, items);
-            case ConcatOperation _ -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items); }
+            case JoinOperation op  -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.keyPositions()); }
         }
     }
 

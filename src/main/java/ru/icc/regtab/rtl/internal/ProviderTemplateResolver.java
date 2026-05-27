@@ -73,7 +73,7 @@ final class ProviderTemplateResolver {
     private static CellDerivedProviderKind inferKind(RTLParser.OpContext op,
                                                      ItemDerivationDirective anchorType) {
         if (op == null) return CellDerivedProviderKind.UNRESTRICTED;
-        if (op.recOp() != null || op.CONCAT() != null) return CellDerivedProviderKind.VAL;
+        if (op.recOp() != null || op.joinOp() != null) return CellDerivedProviderKind.VAL;
         if (op.AVP() != null)                        return CellDerivedProviderKind.ATTR;
         return CellDerivedProviderKind.UNRESTRICTED;
     }

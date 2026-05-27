@@ -13,9 +13,11 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
+import java.util.Set;
+
 /**
  * Task 50: single (non-repeating) flat table with non-blank three-cell rows —
- * anchor VAL (AVP + same-row REC + below-same-string CONCAT), ATTR, and AVP VAL.
+ * anchor VAL (AVP + same-row REC + below-same-string JOIN(0)), ATTR, and AVP VAL.
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_50/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask50Test}
@@ -40,7 +42,7 @@ class AtpTask50Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
                                         ActionSpec.avp(""),
                                         ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
-                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.attr()),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(

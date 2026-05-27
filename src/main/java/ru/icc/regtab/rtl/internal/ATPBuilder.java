@@ -12,7 +12,9 @@ import ru.icc.regtab.rtl.RtlCompileException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Walks an RTL parse tree and builds the ATP spec hierarchy. */
 public final class ATPBuilder extends RTLBaseVisitor<Object> {
@@ -266,7 +268,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             return ProviderSpec.ctxAvp(name, value);
         }
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
-        if (op != null && (op.recOp() != null || op.CONCAT() != null))
+        if (op != null && (op.recOp() != null || op.joinOp() != null))
             return ProviderSpec.ctxVal(literal);
         return ProviderSpec.ctxAttr(literal);
     }
@@ -279,7 +281,11 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             String  splitDelimiter = rec.STRING() != null ? StringExtractorFactory.parseStringLiteral(rec.STRING().getText()) : null;
             return new ActionSpec(OperationType.REC, null, providers, anchorPos, splitDelimiter);
         }
-        if (ctx.CONCAT() != null) return new ActionSpec(OperationType.CONCAT, null, providers, null, null);
+        if (ctx.joinOp() != null) {
+            Set<Integer> kp = new LinkedHashSet<>();
+            for (var t : ctx.joinOp().INT()) kp.add(Integer.parseInt(t.getText()));
+            return new ActionSpec(OperationType.JOIN, null, providers, null, null, Set.copyOf(kp), false);
+        }
         if (ctx.fillOp() != null) {
             String d = ctx.fillOp().STRING() != null
                     ? StringExtractorFactory.parseStringLiteral(ctx.fillOp().STRING().getText()) : "";

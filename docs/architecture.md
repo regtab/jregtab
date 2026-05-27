@@ -84,7 +84,7 @@ If the pattern does not match, `AtpMatcher.match` returns `Optional.empty()`.
 | Phase | What happens |
 |---|---|
 | **1. Initialisation** | Each cell-derived and context-derived item of type VAL/ATTR is entered into the working state with its string value |
-| **2. Completion** | Interpretation actions are applied in operation-type order: FILL/PREFIX/SUFFIX → AVP → REC → CONCAT; each action uses its providers to retrieve items relative to the anchor and updates the working state |
+| **2. Completion** | Interpretation actions are applied in operation-type order: FILL/PREFIX/SUFFIX → AVP → REC → JOIN; each action uses its providers to retrieve items relative to the anchor and updates the working state |
 | **3. Extraction** | The working state is traversed to build the schema (attribute list) and generate records |
 | **4. Transformation** | Optional post-processing steps are applied: `WhitespaceNormalization`, `FieldSplitting`, `SchemaReordering` |
 

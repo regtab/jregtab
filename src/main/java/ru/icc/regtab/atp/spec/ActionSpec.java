@@ -6,6 +6,7 @@ import ru.icc.regtab.itm.semantics.provider.CellDerivedProviderKind;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Interpretation action specification S_act (def:action-spec):
@@ -20,10 +21,11 @@ import java.util.Objects;
  * {@link TablePattern#of(SubtablePattern...)} collects these automatically.
  *
  * @param operationType  working-state update operation op
- * @param delimiter      delimiter for FILL/PREFIX/SUFFIX (empty string if none); null for AVP/REC/CONCAT
+ * @param delimiter      delimiter for FILL/PREFIX/SUFFIX (empty string if none); null for AVP/REC/JOIN
  * @param providers      sequence of item provider specifications ⟨S_prov¹, …, S_provⁿ⟩
  * @param anchorPos      inline anchor position for REC (null = none)
  * @param splitDelimiter inline split delimiter for REC (null = none)
+ * @param keyPositions   key positions K for JOIN (empty = K=∅); null treated as empty
  * @param inherited      true if this action was inherited from a parent scope (row/subrow/subtable level),
  *                       false if explicitly specified on the cell's own contSpec
  */
@@ -33,24 +35,26 @@ public record ActionSpec(
         List<ProviderSpec> providers,
         Integer anchorPos,
         String splitDelimiter,
+        Set<Integer> keyPositions,
         boolean inherited
 ) {
-    /** Backward-compatible constructor: all explicit action specs have {@code inherited=false}. */
+    /** Backward-compatible constructor: keyPositions=Set.of(), inherited=false. */
     public ActionSpec(OperationType operationType, String delimiter,
                       List<ProviderSpec> providers, Integer anchorPos, String splitDelimiter) {
-        this(operationType, delimiter, providers, anchorPos, splitDelimiter, false);
+        this(operationType, delimiter, providers, anchorPos, splitDelimiter, Set.of(), false);
     }
 
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
+        keyPositions = Set.copyOf(keyPositions != null ? keyPositions : Set.of());
         for (var p : providers) {
             if (p.isContextLiteral()) {
                 var ctxType = p.contextLiteral().type();
                 boolean isConstAvp = p.contextLiteral().constValue() != null;
-                if (operationType == OperationType.CONCAT)
+                if (operationType == OperationType.JOIN)
                     throw new IllegalArgumentException(
-                            "CONCAT action does not allow context literals");
+                            "JOIN action does not allow context literals");
                 if (operationType == OperationType.REC && !isConstAvp && ctxType != ItemType.VALUE)
                     throw new IllegalArgumentException(
                             "REC action requires a VALUE context literal, got " + ctxType);
@@ -59,7 +63,7 @@ public record ActionSpec(
                             "AVP action requires an ATTRIBUTE context literal, got " + ctxType);
             } else {
                 var kind = p.targetItemKind();
-                if ((operationType == OperationType.REC || operationType == OperationType.CONCAT)
+                if ((operationType == OperationType.REC || operationType == OperationType.JOIN)
                         && kind != CellDerivedProviderKind.VAL)
                     throw new IllegalArgumentException(
                             operationType + " action requires a VAL provider, got " + kind);
@@ -73,7 +77,8 @@ public record ActionSpec(
     /** Returns a copy with {@code inherited=true}; returns {@code this} if already inherited. */
     public ActionSpec asInherited() {
         return inherited ? this
-                : new ActionSpec(operationType, delimiter, providers, anchorPos, splitDelimiter, true);
+                : new ActionSpec(operationType, delimiter, providers, anchorPos, splitDelimiter,
+                                 keyPositions, true);
     }
 
     /** Convenience: REC action with given providers, no inline params. */
@@ -110,9 +115,19 @@ public record ActionSpec(
         return new ActionSpec(OperationType.AVP, null, List.of(ProviderSpec.ctxAttr(literal)), null, null);
     }
 
-    /** Convenience: CONCAT action with given providers. */
-    public static ActionSpec concat(ProviderSpec... providers) {
-        return new ActionSpec(OperationType.CONCAT, null, List.of(providers), null, null);
+    /** Convenience: JOIN action with K=∅ (include all positions, then dedup). */
+    public static ActionSpec join(ProviderSpec... providers) {
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, Set.of(), false);
+    }
+
+    /** Convenience: JOIN^K action with explicit key positions as a Set (mirrors RTL {@code JOIN(k1,k2,...)}). */
+    public static ActionSpec join(Set<Integer> keyPositions, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, keyPositions, false);
+    }
+
+    /** Convenience: JOIN^K action with a single key position (mirrors RTL {@code JOIN(k)}). */
+    public static ActionSpec join(int keyPosition, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, Set.of(keyPosition), false);
     }
 
     /** Convenience: FILL action with delimiter and providers. */

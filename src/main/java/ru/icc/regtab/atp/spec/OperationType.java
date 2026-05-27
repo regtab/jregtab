@@ -13,8 +13,8 @@ public enum OperationType {
     SUFFIX,
     /** O_avp: construct an attribute–value pair. */
     AVP,
-    /** O_rec: construct a record item sequence. */
+    /** O_rec: construct an item-based record. */
     REC,
-    /** O_concat: concatenate record item sequences. */
-    CONCAT
+    /** O_join^K: join item-based records with key-position dropping and deduplication. */
+    JOIN
 }
