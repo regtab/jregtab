@@ -12,7 +12,6 @@ import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
 
-import java.util.Set;
 
 /**
  * Task 23: repeated subtables of exactly 3 rows, each combining AVP, REC, JOIN(0),

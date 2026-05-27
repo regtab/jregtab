@@ -11,7 +11,6 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
-import java.util.Set;
 
 /**
  * Task 25: flat table where each row's first cell uses SUFFIX, slash-delimited REC

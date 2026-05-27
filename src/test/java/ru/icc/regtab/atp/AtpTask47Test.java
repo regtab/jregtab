@@ -13,7 +13,6 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
-import java.util.Set;
 
 /**
  * Task 47: repeated subtables with one-or-more non-blank two-cell rows —

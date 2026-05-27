@@ -11,7 +11,6 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
-import java.util.Set;
 
 /**
  * Task 33: flat table where each row's anchor collects same-row values via REC

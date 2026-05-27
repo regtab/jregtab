@@ -11,7 +11,6 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
-import java.util.Set;
 
 /**
  * Task 16: flat table where each anchor cell collects one value to the right

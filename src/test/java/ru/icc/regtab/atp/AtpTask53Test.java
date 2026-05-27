@@ -12,7 +12,6 @@ import ru.icc.regtab.atp.spec.SubrowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
-import java.util.Set;
 
 /**
  * Task 53: two-row group table with compound attribute names (group header + qualifier).
