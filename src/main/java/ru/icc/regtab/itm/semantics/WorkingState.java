@@ -209,7 +209,7 @@ public final class WorkingState {
     }
 
     /**
-     * For every record item sequence, the attributes of items
+     * For every item-based record, the attributes of items
      * that have associated attributes are pairwise distinct.
      */
     public boolean isRecordAttributesDistinct() {

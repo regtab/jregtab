@@ -70,7 +70,7 @@ class SchemaFlexibleTest {
                     new AvpOperation()));
         }
 
-        // O_rec: create record item sequence for each name with its score
+        // O_rec: create item-based record for each name with its score
         for (int i = 0; i < 5; i++) {
             CellDerivedItem score = scores[i];
             actions.add(new InterpretationAction(names[i],
