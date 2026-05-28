@@ -13,6 +13,7 @@ public class RtlTask75Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                [ [VAL: RT*->REC] [(BLANK? VAL: -^(LT & !BLANK)->FILL | VAL)]+ ]+
                 """;
     }
 }
