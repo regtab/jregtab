@@ -26,8 +26,8 @@ public class RtlTask69Test extends RtlTaskBase {
 
         return """
                 { SR->AVP
-                [ { BW*->REC [ATTR] [VAL#'1': (ROW & #'1')*->JOIN][VAL#'2': (ROW & #'2')*->JOIN] }+ ]
-                [ { [ATTR] [VAL]{2} }+ ]+ }
+                [ BW*->REC { [ATTR] [VAL#'1': (ROW & #'1')*->JOIN][VAL#'2': (ROW & #'2')*->JOIN] }* ]
+                [          { [ATTR] [VAL]{2} }* ]* }
                 """;
     }
 }
