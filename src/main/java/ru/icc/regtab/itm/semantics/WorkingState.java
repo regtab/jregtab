@@ -103,6 +103,7 @@ public final class WorkingState {
     // --- O_rec: rec(anchor) := <anchor, i1, ..., in> ---
 
     public void applyRec(CellDerivedItem anchor, List<? extends Item> items) {
+        if (!val.containsKey(anchor)) return;
         if (rec.containsKey(anchor)) return;
         List<Item> sequence = new ArrayList<>();
         sequence.add(anchor);
