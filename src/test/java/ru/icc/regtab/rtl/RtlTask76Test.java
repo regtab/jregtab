@@ -13,6 +13,9 @@ public class RtlTask76Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                  [ []         [VAL]+ ]
+                { [ [VAL]      [BLANK?]+ ]
+                  [ [VAL=TRIM] [!BLANK? VAL: (COL, (ST & C0), ROW)->REC]+ ]+ }+
                 """;
     }
 }
