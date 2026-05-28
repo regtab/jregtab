@@ -3,7 +3,6 @@ package ru.icc.regtab.atp;
 import ru.icc.regtab.atp.spec.ActionSpec;
 import ru.icc.regtab.atp.spec.AtomicContentSpec;
 import ru.icc.regtab.atp.spec.CellPattern;
-import ru.icc.regtab.atp.spec.FilterTerm;
 import ru.icc.regtab.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.atp.spec.ProviderSpec;
 import ru.icc.regtab.atp.spec.Quantifier;
