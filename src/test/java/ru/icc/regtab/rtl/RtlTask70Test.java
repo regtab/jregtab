@@ -13,6 +13,8 @@ public class RtlTask70Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                [ [BLANK?]+           [VAL#'H']+ ]+
+                [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: ((COL & #'H')*, (ROW & #'S')*)->REC]+ ]+
                 """;
     }
 }
