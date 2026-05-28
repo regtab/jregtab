@@ -68,6 +68,7 @@ public final class WorkingState {
     // --- O_prefix: f(anchor) := str(i1) +d ... +d str(in) +d f(anchor) ---
 
     public void applyPrefix(Item anchor, List<? extends Item> items, String delimiter) {
+        if (items.isEmpty()) return;
         String current = getValOrAttr(anchor);
         String prefix = joinStrings(items, delimiter);
         setValOrAttr(anchor, prefix + delimiter + current);
@@ -76,6 +77,7 @@ public final class WorkingState {
     // --- O_suffix: f(anchor) := f(anchor) +d str(i1) +d ... +d str(in) ---
 
     public void applySuffix(Item anchor, List<? extends Item> items, String delimiter) {
+        if (items.isEmpty()) return;
         String current = getValOrAttr(anchor);
         String suffix = joinStrings(items, delimiter);
         setValOrAttr(anchor, current + delimiter + suffix);
