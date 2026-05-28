@@ -13,6 +13,8 @@ public class RtlTask74Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                [          [ATTR]{3} ]
+                [ COL->AVP [VAL: (RT*, @'D'='d')->REC][VAL]{2} ]+
                 """;
     }
 }
