@@ -15,9 +15,9 @@ import java.util.Objects;
  * For two items a, b with cells c_a, c_b at positions (i,j) and (i',j'):
  * <ul>
  *   <li>ROW_MAJOR (→):            i &lt; i' or (i == i' and j &lt; j')</li>
- *   <li>REVERSE_ROW_MAJOR (←):    i &gt; i' or (i == i' and j &lt; j')</li>
+ *   <li>REVERSE_ROW_MAJOR (←):    i &gt; i' or (i == i' and j &gt; j')</li>
  *   <li>COLUMN_MAJOR (↓):         j &lt; j' or (j == j' and i &lt; i')</li>
- *   <li>REVERSE_COLUMN_MAJOR (↑): j &gt; j' or (j == j' and i &lt; i')</li>
+ *   <li>REVERSE_COLUMN_MAJOR (↑): j &gt; j' or (j == j' and i &gt; i')</li>
  * </ul>
  * Within the same cell, items are ordered by their index.
  */
@@ -48,7 +48,7 @@ public final class ItemLinearization {
             int br = b.cell().row(), bc = b.cell().col();
             return switch (traversalOrder) {
                 case ROW_MAJOR -> ar != br ? Integer.compare(ar, br) : Integer.compare(ac, bc);
-                case REVERSE_ROW_MAJOR -> ar != br ? Integer.compare(br, ar) : Integer.compare(ac, bc);
+                case REVERSE_ROW_MAJOR -> ar != br ? Integer.compare(br, ar) : Integer.compare(bc, ac);
                 case COLUMN_MAJOR -> ac != bc ? Integer.compare(ac, bc) : Integer.compare(ar, br);
                 case REVERSE_COLUMN_MAJOR -> ac != bc ? Integer.compare(bc, ac) : Integer.compare(br, ar);
             };
