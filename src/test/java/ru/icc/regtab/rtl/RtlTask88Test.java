@@ -24,9 +24,9 @@ public class RtlTask88Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { ROW->AVP 
-                  [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*->REC]+ [BLANK?]? }+ ]
-                  [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK?]? }+ ]+ }
+                ROW->AVP 
+                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*->REC]+ [BLANK?]? }+ ]
+                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK?]? }+ ]+
                 """;
     }
 }

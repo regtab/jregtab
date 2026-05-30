@@ -24,9 +24,9 @@ public class RtlTask69Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { SR->AVP
+                SR->AVP
                 [ BW*->REC { [ATTR] [VAL#'1': (ROW & #'1')*->JOIN][VAL#'2': (ROW & #'2')*->JOIN] }* ]
-                [          { [ATTR] [VAL]{2} }* ]* }
+                [          { [ATTR] [VAL]{2} }* ]*
                 """;
     }
 }
