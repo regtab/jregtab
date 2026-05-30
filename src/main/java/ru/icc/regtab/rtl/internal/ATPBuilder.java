@@ -25,13 +25,19 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     @Override
     public TablePattern visitTablePattern(RTLParser.TablePatternContext ctx) {
-        List<SubtablePattern> subtables = ctx.subtablePattern().stream()
-                .map(sp -> (SubtablePattern) visit(sp))
-                .toList();
-        List<RecordsetTransformation> transformations = ctx.settings() != null
-                ? buildTransformations(ctx.settings())
-                : List.of();
-        return new TablePattern(subtables, transformations);
+        List<ActionSpec> local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs()) : List.of();
+        pushInherited(local);
+        try {
+            List<SubtablePattern> subtables = ctx.subtablePattern().stream()
+                    .map(sp -> (SubtablePattern) visit(sp))
+                    .toList();
+            List<RecordsetTransformation> transformations = ctx.settings() != null
+                    ? buildTransformations(ctx.settings())
+                    : List.of();
+            return new TablePattern(subtables, transformations);
+        } finally {
+            inheritedActionsStack.pop();
+        }
     }
 
     private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx) {

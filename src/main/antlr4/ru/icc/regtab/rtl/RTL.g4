@@ -12,7 +12,7 @@ oneOrMore  : PLUS ;
 exactly    : LCURLY INT RCURLY ;
 
 // Table pattern
-tablePattern : settings? subtablePattern+ ;
+tablePattern : settings? actSpecs? subtablePattern+ ;
 
 // Optional settings prefix <NORM,ANCH(n),SPLIT("s")>
 settings     : LANGLE setting (COMMA setting)* RANGLE ;
