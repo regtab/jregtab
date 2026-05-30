@@ -158,11 +158,13 @@ Example: `(BLANK ? SKIP | VAL)` — skip blank cells, derive a value from non-bl
 provSpecs -> op
 ```
 
-`provSpecs` is either a single provider spec or a parenthesised comma-separated list.
+`provSpecs` is a single provider spec, a parenthesised comma-separated list, or empty parentheses
+`()` (no additional providers — anchor only).
 
 | Operation | Syntax | Effect |
 |---|---|---|
 | `REC` | `prov->REC` | Anchor item → record entry; provider supplies additional field values |
+| `REC` | `()->REC` | Anchor item → single-field record (no additional providers; useful after `SUFFIX`/`PREFIX`/`FILL` has enriched the anchor value) |
 | `REC(n)` | `prov->REC(n)` | Same + use attribute at position *n* as the record's attribute name |
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
