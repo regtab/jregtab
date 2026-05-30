@@ -57,6 +57,11 @@ public record AtomicContentSpec(
         return new AtomicContentSpec(ItemDerivationDirective.ATTR, null, List.of(), List.of(actions));
     }
 
+    /** Convenience: ATTR with extractor and no actions. */
+    public static AtomicContentSpec attr(StringExtractor extractor) {
+        return new AtomicContentSpec(ItemDerivationDirective.ATTR, extractor, List.of(), List.of());
+    }
+
     /** Convenience: VAL with extractor and actions. */
     public static AtomicContentSpec val(StringExtractor extractor, ActionSpec... actions) {
         return new AtomicContentSpec(ItemDerivationDirective.VAL, extractor, List.of(), List.of(actions));

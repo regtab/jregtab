@@ -56,9 +56,9 @@ public sealed interface StringExtractor permits
         public String apply(String input) { return input.trim(); }
     }
 
-    /** Extracts a substring [{@code begin}, {@code end}). RTL: {@code SUBSTR(b,e)}. */
+    /** Extracts {@code length} characters starting at {@code begin}. RTL: {@code SUBSTR(begin,length)}. */
     record Substring(int begin, int end) implements StringExtractor {
-        public String toRtl() { return "SUBSTR(" + begin + "," + end + ")"; }
+        public String toRtl() { return "SUBSTR(" + begin + "," + (end - begin) + ")"; }
         public String apply(String input) { return input.substring(begin, Math.min(end, input.length())); }
     }
 
