@@ -9,7 +9,7 @@ RTL tokens are case-insensitive.
 ## Pattern structure
 
 ```
-tablePattern     : [<settings>] subtablePattern+
+tablePattern     : [<settings>] [acts] subtablePattern+
 
 subtablePattern  : rowPattern+                          // implicit (no braces)
                  | { [cond ?] [acts] rowPattern+ } q?   // explicit
@@ -25,6 +25,11 @@ cellPattern      : [ ] q?                               // skip cell
 cellPatternBody  : cond ? [acts] contSpec   // guarded
                  | [acts] contSpec          // unguarded
 ```
+
+**Inherited action specs** — `[acts]` placed at the table, subtable, row, or subrow level are
+inherited by all descendant cells. Inherited actions are merged with any local actions on the
+cell's `contSpec`. Incompatible inherited actions (e.g. `COL->AVP` on an `ATTR` anchor) are
+silently skipped.
 
 **Quantifiers** (suffix on any `{ }` or `[ ]` block):
 
