@@ -185,6 +185,6 @@ In RTL: a cell match condition appears before `?` in a cell, subrow, row, or sub
 | `StringExtractor.UpperCase.INSTANCE` | `=UC` | To upper case |
 | `StringExtractor.LowerCase.INSTANCE` | `=LC` | To lower case |
 | `StringExtractor.Trimmed.INSTANCE` | `=TRIM` | Trim leading/trailing whitespace |
-| `StringExtractor.Substring(from, to)` | `=SUBSTR(n,m)` | Substring [n, m) |
+| `StringExtractor.Substring(begin, end)` | `=SUBSTR(n,m)` | Substring starting at *n*, length *m* (internally stored as `[begin, end)`) |
 | `StringExtractor.Replaced(pat, repl)` | `=REPL("a","b")` | Replace pattern with replacement |
 | Chained extractors | `=REPL("x","").NORM` | Applied left-to-right |

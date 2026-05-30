@@ -97,7 +97,7 @@ VAL #tag1 #tag2
 | `UC` | To upper case |
 | `LC` | To lower case |
 | `TRIM` | Trim |
-| `SUBSTR(n,m)` | Substring [n, m) |
+| `SUBSTR(n,m)` | Substring starting at position *n*, length *m* |
 | `REPL("a","b")` | Replace *a* with *b* (Java regex) |
 
 Extractors can be chained with `.`: `=REPL(" ","_").LC`.
