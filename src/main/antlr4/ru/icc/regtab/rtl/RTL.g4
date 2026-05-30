@@ -98,7 +98,7 @@ AVP    : 'AVP'    ;
 REC    : 'REC'    ;
 JOIN   : 'JOIN'   ;
 
-provSpecs : provSpec | (LPAREN provSpec (COMMA provSpec)* RPAREN) ;
+provSpecs : provSpec | (LPAREN provSpec (COMMA provSpec)* RPAREN) | LPAREN RPAREN ;
 
 // Delimited content specification
 delimContSpec : LPAREN atomContSpec RPAREN LCURLY separator RCURLY;
