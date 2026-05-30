@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_91/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask91Test}
  * <pre>
- * { [ -LT-&gt;AVP [!BLANK? ATTR] [!BLANK? VAL: ROW*-&gt;REC] { [!BLANK? ATTR] [!BLANK? VAL] }+ ]+
+ * { [ !BLANK? -LT-&gt;AVP [ATTR] [VAL: ROW*-&gt;REC] { [ATTR] [VAL] }+ ]+
  *   [ [BLANK?]+ ]? }+
  * </pre>
  */
@@ -20,7 +20,7 @@ public class RtlTask91Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ -LT->AVP [!BLANK? ATTR] [!BLANK? VAL: ROW*->REC] { [!BLANK? ATTR] [!BLANK? VAL] }+ ]+
+                { [ !BLANK? -LT->AVP [ATTR] [VAL: ROW*->REC] { [ATTR] [VAL] }+ ]+
                   [ [BLANK?]+ ]? }+
                 """;
     }
