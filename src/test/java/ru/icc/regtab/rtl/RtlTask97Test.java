@@ -18,6 +18,6 @@ public class RtlTask97Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return "[ [VAL: RT*->REC, (BW&STR)*->JOIN(0,1)] [VAL]+ ]+\n";
+        return "[ [VAL: RT*->REC, (BW&STR)*->JOIN(0,1)] [VAL]+ ]+";
     }
 }
