@@ -34,6 +34,7 @@
     "89" : { "expectedHasHeader": true },
     "91" : { "expectedHasHeader": true },
     "93" : { "expectedHasHeader": true },
-    "95" : { "expectedHasHeader": true }
+    "95" : { "expectedHasHeader": true },
+    "96" : { "expectedHasHeader": true }
   }
 }
