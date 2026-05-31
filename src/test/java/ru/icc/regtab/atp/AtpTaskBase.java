@@ -1,8 +1,8 @@
 package ru.icc.regtab.atp;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import ru.icc.regtab.itm.InterpretableTable;
 import ru.icc.regtab.interpret.SchemaConstructionStrategy;
 import ru.icc.regtab.interpret.TableInterpreter;
@@ -14,25 +14,34 @@ import ru.icc.regtab.tasks.RecordsetAssert;
 import ru.icc.regtab.tasks.RecordsetMatchOptions;
 import ru.icc.regtab.tasks.TaskMatchOptionsLoader;
 
-import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 abstract class AtpTaskBase {
 
-    @ParameterizedTest(name = "variant_{0}")
-    @ValueSource(ints = {1, 2, 3, 4, 5})
+    @TestFactory
     @DisplayName("ATP task matches Fluent API fixtures")
-    final void runTaskVariants(int variantId) throws IOException {
+    final Stream<DynamicTest> taskVariants() {
         Path tasksRoot = Path.of("src/test/resources/tasks");
         Path taskDir = tasksRoot.resolve("task_" + taskId());
+        return IntStream.rangeClosed(1, 9)
+                .filter(i -> Files.exists(taskDir.resolve("input_" + i + ".csv")))
+                .mapToObj(i -> DynamicTest.dynamicTest("variant_" + i,
+                        () -> runVariant(i, taskDir, tasksRoot)));
+    }
+
+    private void runVariant(int variantId, Path taskDir, Path tasksRoot) throws Exception {
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
         var pattern = buildPattern();
 
         InterpretableTable itm = AtpMatcher.match(pattern, syntax)
-                .orElseThrow(() -> new AssertionError("ATP Task" + taskId() + " pattern did not match variant " + variantId));
+                .orElseThrow(() -> new AssertionError(
+                        "ATP Task" + taskId() + " pattern did not match variant " + variantId));
 
         Recordset actual = pattern.transform(new TableInterpreter()
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)

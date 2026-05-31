@@ -70,7 +70,7 @@ class SchemaFlexibleTest {
                     new AvpOperation()));
         }
 
-        // O_rec: create record item sequence for each name with its score
+        // O_rec: create item-based record for each name with its score
         for (int i = 0; i < 5; i++) {
             CellDerivedItem score = scores[i];
             actions.add(new InterpretationAction(names[i],
@@ -88,7 +88,7 @@ class SchemaFlexibleTest {
                     List.of(new CellDerivedItemProvider(
                             sameNameBelow, TraversalOrder.ROW_MAJOR,
                             allCdi)),
-                    new ConcatOperation()));
+                    new JoinOperation(Set.of(0))));
         }
 
         TableSemantics semantics = new TableSemantics(allCdi, Set.of(), actions);
@@ -176,7 +176,7 @@ class SchemaFlexibleTest {
                     List.of(new CellDerivedItemProvider(
                             sameNameBelow, TraversalOrder.ROW_MAJOR,
                             allCdi)),
-                    new ConcatOperation()));
+                    new JoinOperation(Set.of(0))));
         }
 
         TableSemantics semantics = new TableSemantics(allCdi, Set.of(), actions);

@@ -22,7 +22,7 @@ public final class CsvTableLoader {
             .setDelimiter(',')
             .setQuote('"')
             .setRecordSeparator("\n")
-            .setIgnoreEmptyLines(false)
+            .setIgnoreEmptyLines(true)
             .build();
 
     /**

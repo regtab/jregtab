@@ -8,6 +8,7 @@ import ru.icc.regtab.interpret.WhitespaceNormalization;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -234,7 +235,12 @@ public final class AtpToRtlSerializer {
                 if (as.splitDelimiter() != null) yield "REC('" + escapeString(as.splitDelimiter()) + "')";
                 yield "REC";
             }
-            case CONCAT -> "CONCAT";
+            case JOIN -> {
+                Set<Integer> kp = as.keyPositions();
+                if (kp.isEmpty()) yield "JOIN";
+                String args = kp.stream().sorted().map(Object::toString).collect(Collectors.joining(", "));
+                yield "JOIN(" + args + ")";
+            }
             case FILL   -> as.delimiter().isEmpty() ? "FILL" : "FILL(\"" + escapeString(as.delimiter()) + "\")";
             case PREFIX -> as.delimiter().isEmpty() ? "PREFIX" : "PREFIX(\"" + escapeString(as.delimiter()) + "\")";
             case SUFFIX -> as.delimiter().isEmpty() ? "SUFFIX" : "SUFFIX(\"" + escapeString(as.delimiter()) + "\")";

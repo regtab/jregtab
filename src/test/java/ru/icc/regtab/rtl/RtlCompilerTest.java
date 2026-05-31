@@ -112,7 +112,9 @@ class RtlCompilerTest {
     void parse_contentConstraints() {
         compile("[ [VAL : (SR & \"pattern\")->REC] ]");
         compile("[ [VAL : (SR & BLANK)->REC] ]");
-        compile("[ [VAL : (SR & TAG #'t1' #'t2')->REC] ]");
+        compile("[ [VAL : (SR & #'t1')->REC] ]");
+        compile("[ [VAL : (SR & #'t1' | #'t2')->REC] ]");
+        compile("[ [VAL : (SR & #'t1' & #'t2')->REC] ]");
     }
 
     @Test
@@ -152,7 +154,7 @@ class RtlCompilerTest {
         compile("[ [VAL : (CL)->FILL('/')] ]");
         compile("[ [VAL : (CL)->PREFIX(' ')] ]");
         compile("[ [VAL : (CL)->SUFFIX(',')] ]");
-        compile("[ [VAL : (CL)->CONCAT] ]");
+        compile("[ [VAL : (CL)->JOIN(0)] ]");
     }
 
     @Test
@@ -291,7 +293,7 @@ class RtlCompilerTest {
         TablePattern p = compile("""
                 [ [SKIP] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
-                  [VAL : (^SC, -LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
+                  [VAL : (^SC, LT, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
                 """);
 
         var syntax = buildTable(new String[][]{

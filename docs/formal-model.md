@@ -119,7 +119,8 @@ Compound conditions: `ItemFilterConditionSpec.and(terms…)` → `(c1 & c2 & …
 |---|---|---|
 | `REC` | `ActionSpec.rec(providers…)` | Anchor item → record; providers supply the remaining fields |
 | `AVP` | `ActionSpec.avp(provider)` | Associates a VAL item (anchor) with an ATTR item from the provider |
-| `CONCAT` | `ActionSpec.concat(providers…)` | Concatenates provider values onto the anchor value |
+| `JOIN` | `ActionSpec.join(providers…)` | Joins item-based records: all items included, then dedup by named attribute (K=∅) |
+| `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Joins with key positions K dropped; `JOIN(0)` = old CONCAT |
 | `FILL` | `ActionSpec.fill(delimiter, providers…)` | Fills anchor value forward using provider values |
 | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | Prepends provider values to the anchor |
 | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | Appends provider values to the anchor |
@@ -184,6 +185,6 @@ In RTL: a cell match condition appears before `?` in a cell, subrow, row, or sub
 | `StringExtractor.UpperCase.INSTANCE` | `=UC` | To upper case |
 | `StringExtractor.LowerCase.INSTANCE` | `=LC` | To lower case |
 | `StringExtractor.Trimmed.INSTANCE` | `=TRIM` | Trim leading/trailing whitespace |
-| `StringExtractor.Substring(from, to)` | `=SUBSTR(n,m)` | Substring [n, m) |
+| `StringExtractor.Substring(begin, end)` | `=SUBSTR(n,m)` | Substring starting at *n*, length *m* (internally stored as `[begin, end)`) |
 | `StringExtractor.Replaced(pat, repl)` | `=REPL("a","b")` | Replace pattern with replacement |
 | Chained extractors | `=REPL("x","").NORM` | Applied left-to-right |

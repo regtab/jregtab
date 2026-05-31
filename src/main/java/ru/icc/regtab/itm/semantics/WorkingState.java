@@ -9,7 +9,7 @@ import java.util.*;
 
 /**
  * Working state of an ITM instance (def:working-state).
- * Tracks values, attributes, attribute-value pairs, and record item sequences
+ * Tracks values, attributes, attribute-value pairs, and item-based records
  * as they are built up during table interpretation.
  */
 public final class WorkingState {
@@ -68,6 +68,7 @@ public final class WorkingState {
     // --- O_prefix: f(anchor) := str(i1) +d ... +d str(in) +d f(anchor) ---
 
     public void applyPrefix(Item anchor, List<? extends Item> items, String delimiter) {
+        if (items.isEmpty()) return;
         String current = getValOrAttr(anchor);
         String prefix = joinStrings(items, delimiter);
         setValOrAttr(anchor, prefix + delimiter + current);
@@ -76,6 +77,7 @@ public final class WorkingState {
     // --- O_suffix: f(anchor) := f(anchor) +d str(i1) +d ... +d str(in) ---
 
     public void applySuffix(Item anchor, List<? extends Item> items, String delimiter) {
+        if (items.isEmpty()) return;
         String current = getValOrAttr(anchor);
         String suffix = joinStrings(items, delimiter);
         setValOrAttr(anchor, current + delimiter + suffix);
@@ -103,6 +105,7 @@ public final class WorkingState {
     // --- O_rec: rec(anchor) := <anchor, i1, ..., in> ---
 
     public void applyRec(CellDerivedItem anchor, List<? extends Item> items) {
+        if (!val.containsKey(anchor)) return;
         if (rec.containsKey(anchor)) return;
         List<Item> sequence = new ArrayList<>();
         sequence.add(anchor);
@@ -116,9 +119,9 @@ public final class WorkingState {
         rec.put(anchor, sequence);
     }
 
-    // --- O_concat: rec(anchor) := rec(anchor) . tail(rec(i1)) . ... . tail(rec(in)) ---
+    // --- O_join^K: rec(anchor) := dedup(rec(anchor) · drop_K(rec(i1)) · ... · drop_K(rec(in))) ---
 
-    public void applyConcat(CellDerivedItem anchor, List<? extends Item> items) {
+    public void applyJoin(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
         List<Item> anchorRec = rec.get(anchor);
         if (anchorRec == null || items.isEmpty()) return;
         List<Item> result = new ArrayList<>(anchorRec);
@@ -126,12 +129,31 @@ public final class WorkingState {
             if (!(item instanceof CellDerivedItem cdi)) continue;
             List<Item> otherRec = rec.get(cdi);
             if (otherRec == null) continue;
-            if (otherRec.size() > 1) {
-                result.addAll(otherRec.subList(1, otherRec.size()));
-            }
+            result.addAll(dropK(otherRec, keyPositions));
             rec.remove(cdi);
         }
-        rec.put(anchor, result);
+        rec.put(anchor, dedup(result));
+    }
+
+    /** drop_K(ρ̄): returns sequence with items at positions k ∈ K removed (0-based). */
+    private static List<Item> dropK(List<Item> sequence, Set<Integer> keyPositions) {
+        if (keyPositions.isEmpty()) return new ArrayList<>(sequence);
+        List<Item> result = new ArrayList<>(sequence.size());
+        for (int i = 0; i < sequence.size(); i++) {
+            if (!keyPositions.contains(i)) result.add(sequence.get(i));
+        }
+        return result;
+    }
+
+    /** dedup(ρ̄): keeps first occurrence of each named attribute; items without avp always kept. */
+    private List<Item> dedup(List<Item> sequence) {
+        Set<String> seen = new LinkedHashSet<>();
+        List<Item> result = new ArrayList<>(sequence.size());
+        for (Item item : sequence) {
+            String a = assoc(item);
+            if (a == null || seen.add(a)) result.add(item);
+        }
+        return result;
     }
 
     // --- Consistency checks ---
@@ -190,7 +212,7 @@ public final class WorkingState {
     }
 
     /**
-     * For every record item sequence, the attributes of items
+     * For every item-based record, the attributes of items
      * that have associated attributes are pairwise distinct.
      */
     public boolean isRecordAttributesDistinct() {

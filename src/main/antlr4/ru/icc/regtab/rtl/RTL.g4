@@ -12,7 +12,7 @@ oneOrMore  : PLUS ;
 exactly    : LCURLY INT RCURLY ;
 
 // Table pattern
-tablePattern : settings? subtablePattern+ ;
+tablePattern : settings? actSpecs? subtablePattern+ ;
 
 // Optional settings prefix <NORM,ANCH(n),SPLIT("s")>
 settings     : LANGLE setting (COMMA setting)* RANGLE ;
@@ -85,19 +85,20 @@ actSpecs : actSpec (COMMA actSpec)* ;
 
 // Interpretation action specification
 actSpec : provSpecs RIGHT_ARROW op ;
-op : fillOp | prefixOp | suffixOp | AVP | recOp | CONCAT ;
+op : fillOp | prefixOp | suffixOp | AVP | recOp | joinOp ;
 fillOp   : FILL   (LPAREN STRING RPAREN)? ;
 prefixOp : PREFIX (LPAREN STRING RPAREN)? ;
 suffixOp : SUFFIX (LPAREN STRING RPAREN)? ;
 recOp    : REC    (LPAREN (INT | STRING) RPAREN)? ;
+joinOp   : JOIN   (LPAREN INT (COMMA INT)* RPAREN)? ;
 FILL   : 'FILL'   ;
 PREFIX : 'PREFIX' ;
 SUFFIX : 'SUFFIX' ;
 AVP    : 'AVP'    ;
 REC    : 'REC'    ;
-CONCAT : 'CONCAT' ;
+JOIN   : 'JOIN'   ;
 
-provSpecs : provSpec | (LPAREN provSpec (COMMA provSpec)* RPAREN) ;
+provSpecs : provSpec | (LPAREN provSpec (COMMA provSpec)* RPAREN) | LPAREN RPAREN ;
 
 // Delimited content specification
 delimContSpec : LPAREN atomContSpec RPAREN LCURLY separator RCURLY;
@@ -105,7 +106,8 @@ delimContSpec : LPAREN atomContSpec RPAREN LCURLY separator RCURLY;
 separator  : STRING ;  // Separator
 
 // Compound content specification
-compContSpec : openDelim? atomContSpec (separator atomContSpec)* closeDelim? ;
+compContSpec : openDelim? compSeg (separator compSeg)* closeDelim? ;
+compSeg      : atomContSpec | delimContSpec ;
 
 openDelim  : STRING ;  // Opening delimiter
 closeDelim : STRING ;  // Closing delimiter
@@ -182,7 +184,7 @@ contConstr : regex | blank | tag | sameStr | contains ;
 contains : EXCLAMATION? TILDA STRING ;
 TILDA : '~' ;
 
-tag : EXCLAMATION? 'TAG' tagItem+ ;
+tag : EXCLAMATION? tagItem ;
 
 sameStr : STR ;
 STR : 'STR' ;

@@ -12,7 +12,9 @@ import ru.icc.regtab.rtl.RtlCompileException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /** Walks an RTL parse tree and builds the ATP spec hierarchy. */
 public final class ATPBuilder extends RTLBaseVisitor<Object> {
@@ -23,13 +25,19 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     @Override
     public TablePattern visitTablePattern(RTLParser.TablePatternContext ctx) {
-        List<SubtablePattern> subtables = ctx.subtablePattern().stream()
-                .map(sp -> (SubtablePattern) visit(sp))
-                .toList();
-        List<RecordsetTransformation> transformations = ctx.settings() != null
-                ? buildTransformations(ctx.settings())
-                : List.of();
-        return new TablePattern(subtables, transformations);
+        List<ActionSpec> local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs()) : List.of();
+        pushInherited(local);
+        try {
+            List<SubtablePattern> subtables = ctx.subtablePattern().stream()
+                    .map(sp -> (SubtablePattern) visit(sp))
+                    .toList();
+            List<RecordsetTransformation> transformations = ctx.settings() != null
+                    ? buildTransformations(ctx.settings())
+                    : List.of();
+            return new TablePattern(subtables, transformations);
+        } finally {
+            inheritedActionsStack.pop();
+        }
     }
 
     private static List<RecordsetTransformation> buildTransformations(RTLParser.SettingsContext ctx) {
@@ -197,16 +205,21 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         String closeDelim = ctx.closeDelim() != null
                 ? StringExtractorFactory.parseStringLiteral(ctx.closeDelim().STRING().getText()) : "";
 
-        var atomSpecs  = ctx.atomContSpec();
+        var segs       = ctx.compSeg();
         var separators = ctx.separator();
 
         List<CompoundSegment> segments = new ArrayList<>();
-        segments.add(new CompoundSegment(openDelim, buildAtomicContentSpec(atomSpecs.get(0))));
+        segments.add(new CompoundSegment(openDelim, buildCompSeg(segs.get(0))));
         for (int i = 0; i < separators.size(); i++) {
             String sep = StringExtractorFactory.parseStringLiteral(separators.get(i).STRING().getText());
-            segments.add(new CompoundSegment(sep, buildAtomicContentSpec(atomSpecs.get(i + 1))));
+            segments.add(new CompoundSegment(sep, buildCompSeg(segs.get(i + 1))));
         }
         return new CompoundContentSpec(segments, closeDelim);
+    }
+
+    private ContentSpec buildCompSeg(RTLParser.CompSegContext ctx) {
+        if (ctx.atomContSpec() != null) return buildAtomicContentSpec(ctx.atomContSpec());
+        return buildDelimitedContentSpec(ctx.delimContSpec());
     }
 
     private ConditionalContentSpec buildConditionalContentSpec(RTLParser.CondContSpecContext ctx) {
@@ -261,7 +274,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             return ProviderSpec.ctxAvp(name, value);
         }
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
-        if (op != null && (op.recOp() != null || op.CONCAT() != null))
+        if (op != null && (op.recOp() != null || op.joinOp() != null))
             return ProviderSpec.ctxVal(literal);
         return ProviderSpec.ctxAttr(literal);
     }
@@ -274,7 +287,11 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             String  splitDelimiter = rec.STRING() != null ? StringExtractorFactory.parseStringLiteral(rec.STRING().getText()) : null;
             return new ActionSpec(OperationType.REC, null, providers, anchorPos, splitDelimiter);
         }
-        if (ctx.CONCAT() != null) return new ActionSpec(OperationType.CONCAT, null, providers, null, null);
+        if (ctx.joinOp() != null) {
+            Set<Integer> kp = new LinkedHashSet<>();
+            for (var t : ctx.joinOp().INT()) kp.add(Integer.parseInt(t.getText()));
+            return new ActionSpec(OperationType.JOIN, null, providers, null, null, Set.copyOf(kp), false);
+        }
         if (ctx.fillOp() != null) {
             String d = ctx.fillOp().STRING() != null
                     ? StringExtractorFactory.parseStringLiteral(ctx.fillOp().STRING().getText()) : "";
@@ -365,10 +382,14 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     }
 
     private List<ActionSpec> mergeWithInherited(List<ActionSpec> local) {
-        List<ActionSpec> inherited = currentInherited();
-        if (inherited.isEmpty()) return local;
-        if (local.isEmpty())     return inherited;
-        List<ActionSpec> all = new ArrayList<>(inherited);
+        List<ActionSpec> fromStack = currentInherited();
+        if (fromStack.isEmpty()) return local;
+        // Everything from the stack is inherited at this cell level — mark it
+        List<ActionSpec> markedInherited = fromStack.stream()
+                .map(ActionSpec::asInherited)
+                .toList();
+        if (local.isEmpty()) return markedInherited;
+        List<ActionSpec> all = new ArrayList<>(markedInherited);
         all.addAll(local);
         return List.copyOf(all);
     }

@@ -28,9 +28,9 @@ final class StringExtractorFactory {
     }
 
     private static StringExtractor fromSubstr(RTLParser.SubstrContext ctx) {
-        int begin = Integer.parseInt(ctx.INT(0).getText());
-        int end   = Integer.parseInt(ctx.INT(1).getText());
-        return new StringExtractor.Substring(begin, end);
+        int begin  = Integer.parseInt(ctx.INT(0).getText());
+        int length = Integer.parseInt(ctx.INT(1).getText());
+        return new StringExtractor.Substring(begin, begin + length);
     }
 
     private static StringExtractor fromReplace(RTLParser.ReplaceContext ctx) {

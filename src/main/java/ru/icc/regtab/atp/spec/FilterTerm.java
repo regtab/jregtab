@@ -3,7 +3,6 @@ package ru.icc.regtab.atp.spec;
 import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.provider.ItemFilterCondition;
 
-import java.util.List;
 import java.util.function.BiPredicate;
 
 /**
@@ -269,21 +268,17 @@ public sealed interface FilterTerm permits
         }
     }
 
-    record Tagged(List<String> tags) implements FilterTerm {
-        public String toRtl() {
-            return "TAG " + String.join(" ", tags.stream().map(t -> t.startsWith("#") ? t : "#" + t).toList());
-        }
+    record Tagged(String tag) implements FilterTerm {
+        public String toRtl() { return tag; }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> tags.stream().anyMatch(c::hasTag);
+            return (a, c) -> c.hasTag(tag);
         }
     }
 
-    record NotTagged(List<String> tags) implements FilterTerm {
-        public String toRtl() {
-            return "!TAG " + String.join(" ", tags.stream().map(t -> t.startsWith("#") ? t : "#" + t).toList());
-        }
+    record NotTagged(String tag) implements FilterTerm {
+        public String toRtl() { return "!" + tag; }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> tags.stream().noneMatch(c::hasTag);
+            return (a, c) -> !c.hasTag(tag);
         }
     }
 

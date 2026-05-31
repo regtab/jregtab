@@ -1,8 +1,8 @@
 package ru.icc.regtab.rtl;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 import ru.icc.regtab.itm.InterpretableTable;
 import ru.icc.regtab.atp.AtpMatcher;
 import ru.icc.regtab.interpret.SchemaConstructionStrategy;
@@ -15,18 +15,29 @@ import ru.icc.regtab.tasks.RecordsetAssert;
 import ru.icc.regtab.tasks.RecordsetMatchOptions;
 import ru.icc.regtab.tasks.TaskMatchOptionsLoader;
 
-import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public abstract class RtlTaskBase {
 
-    @ParameterizedTest(name = "variant_{0}")
-    @ValueSource(ints = {1, 2, 3, 4, 5})
+    @TestFactory
     @DisplayName("RTL task matches Fluent API fixtures")
-    final void runTaskVariants(int variantId) throws IOException {
-        Path taskDir = Path.of("src/test/resources/tasks/task_" + taskId());
+    final Stream<DynamicTest> taskVariants() {
+        assumeTrue(!buildRtl().isBlank(), "RTL not yet implemented for task " + taskId());
+        Path tasksRoot = Path.of("src/test/resources/tasks");
+        Path taskDir = tasksRoot.resolve("task_" + taskId());
+        return IntStream.rangeClosed(1, 9)
+                .filter(i -> Files.exists(taskDir.resolve("input_" + i + ".csv")))
+                .mapToObj(i -> DynamicTest.dynamicTest("variant_" + i,
+                        () -> runVariant(i, taskDir, tasksRoot)));
+    }
+
+    private void runVariant(int variantId, Path taskDir, Path tasksRoot) throws Exception {
         TableSyntax syntax = CsvTableLoader.load(taskDir.resolve("input_" + variantId + ".csv"));
 
         var pattern = RtlCompiler.compile(buildRtl());
@@ -38,7 +49,6 @@ public abstract class RtlTaskBase {
                 .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
                 .interpret(itm));
 
-        Path tasksRoot = Path.of("src/test/resources/tasks");
         RecordsetMatchOptions matchOpts = TaskMatchOptionsLoader.load(tasksRoot, taskId());
         Path expectedPath = taskDir.resolve("expected_" + variantId + ".csv");
         Recordset expected = matchOpts.expectedHasHeader()

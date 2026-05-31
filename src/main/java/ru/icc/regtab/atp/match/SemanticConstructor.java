@@ -193,7 +193,7 @@ public final class SemanticConstructor {
         WorkingStateOperation operation = createOperation(actionSpec);
         List<ItemProvider> providers = new ArrayList<>();
         for (ProviderSpec ps : actionSpec.providers()) {
-            providers.add(toItemProvider(ps, allItems, contextItems));
+            providers.add(toItemProvider(ps, allItems, contextItems, actionSpec.inherited()));
         }
         return new InterpretationAction(anchor, providers, operation);
     }
@@ -201,7 +201,8 @@ public final class SemanticConstructor {
     private static ItemProvider toItemProvider(
             ProviderSpec spec,
             Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems) {
+            Set<ContextDerivedItem> contextItems,
+            boolean lenient) {
         if (spec.isContextLiteral()) {
             if (spec.contextLiteral().constValue() != null) {
                 ContextDerivedItem item = new ContextDerivedItem(
@@ -217,7 +218,9 @@ public final class SemanticConstructor {
                 spec.traversalOrder(),
                 allItems,
                 spec.cardinality(),
-                spec.targetItemKind());
+                spec.targetItemKind(),
+                true,     // excludeAnchorFromCandidates (same as 5-arg default)
+                lenient);
     }
 
     private static ContextDerivedItem getOrCreateContextItem(
@@ -241,7 +244,7 @@ public final class SemanticConstructor {
             case SUFFIX -> new SuffixOperation(delim);
             case AVP -> new AvpOperation();
             case REC -> new RecOperation();
-            case CONCAT -> new ConcatOperation();
+            case JOIN -> new JoinOperation(as.keyPositions());
         };
     }
 

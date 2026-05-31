@@ -9,7 +9,7 @@ RTL tokens are case-insensitive.
 ## Pattern structure
 
 ```
-tablePattern     : [<settings>] subtablePattern+
+tablePattern     : [<settings>] [acts] subtablePattern+
 
 subtablePattern  : rowPattern+                          // implicit (no braces)
                  | { [cond ?] [acts] rowPattern+ } q?   // explicit
@@ -25,6 +25,11 @@ cellPattern      : [ ] q?                               // skip cell
 cellPatternBody  : cond ? [acts] contSpec   // guarded
                  | [acts] contSpec          // unguarded
 ```
+
+**Inherited action specs** — `[acts]` placed at the table, subtable, row, or subrow level are
+inherited by all descendant cells. Inherited actions are merged with any local actions on the
+cell's `contSpec`. Incompatible inherited actions (e.g. `COL->AVP` on an `ATTR` anchor) are
+silently skipped.
 
 **Quantifiers** (suffix on any `{ }` or `[ ]` block):
 
@@ -97,7 +102,7 @@ VAL #tag1 #tag2
 | `UC` | To upper case |
 | `LC` | To lower case |
 | `TRIM` | Trim |
-| `SUBSTR(n,m)` | Substring [n, m) |
+| `SUBSTR(n,m)` | Substring starting at position *n*, length *m* |
 | `REPL("a","b")` | Replace *a* with *b* (Java regex) |
 
 Extractors can be chained with `.`: `=REPL(" ","_").LC`.
@@ -153,15 +158,18 @@ Example: `(BLANK ? SKIP | VAL)` — skip blank cells, derive a value from non-bl
 provSpecs -> op
 ```
 
-`provSpecs` is either a single provider spec or a parenthesised comma-separated list.
+`provSpecs` is a single provider spec, a parenthesised comma-separated list, or empty parentheses
+`()` (no additional providers — anchor only).
 
 | Operation | Syntax | Effect |
 |---|---|---|
 | `REC` | `prov->REC` | Anchor item → record entry; provider supplies additional field values |
+| `REC` | `()->REC` | Anchor item → single-field record (no additional providers; useful after `SUFFIX`/`PREFIX`/`FILL` has enriched the anchor value) |
 | `REC(n)` | `prov->REC(n)` | Same + use attribute at position *n* as the record's attribute name |
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
-| `CONCAT` | `prov->CONCAT` | Concatenate provider values onto the anchor value |
+| `JOIN` | `prov->JOIN` | Join item-based records: all items included, then dedup by named attribute (K=∅) |
+| `JOIN(K)` | `prov->JOIN(0)` | Join with key positions K dropped from each joined record before dedup; `JOIN(0)` = old CONCAT |
 | `FILL('s')` | `prov->FILL('/')` | Fill anchor value forward from provider, separated by *s* |
 | `PREFIX('s')` | `prov->PREFIX(' ')` | Prepend provider value to anchor, separated by *s* |
 | `SUFFIX('s')` | `prov->SUFFIX(' ')` | Append provider value to anchor, separated by *s* |
@@ -270,5 +278,5 @@ The item type is inferred from the action: `->AVP` → ATTR, `->REC` → VAL.
 | `^COL->AVP` | Associate with an attribute from the same column (column-major) |
 | `('LABEL')->AVP` | Associate with a fixed string attribute |
 | `(ST*)->REC` (in parentheses) | Same as `ST*->REC` but explicit grouping |
-| `CL->CONCAT` | Concatenate another item from the same cell |
+| `CL->JOIN(0)` | Join (drop anchor) another item from the same cell |
 | `(COL)->FILL('/')` | Fill forward from same-column values, delimiter `/` |

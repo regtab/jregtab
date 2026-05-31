@@ -11,9 +11,10 @@ import ru.icc.regtab.atp.spec.RowPattern;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
+
 /**
  * Task 16: flat table where each anchor cell collects one value to the right
- * via REC and concatenates same-string cells below via CONCAT.
+ * via REC and joins same-string cells below via JOIN(0).
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_16/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask16Test}
@@ -35,7 +36,7 @@ class AtpTask16Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.rec(ProviderSpec.val(1, RIGHT_OF)),
-                                        ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(AtomicContentSpec.val())
                         )

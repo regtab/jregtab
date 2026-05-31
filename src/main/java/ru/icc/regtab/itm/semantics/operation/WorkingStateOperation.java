@@ -6,5 +6,5 @@ package ru.icc.regtab.itm.semantics.operation;
  */
 public sealed interface WorkingStateOperation
         permits FillOperation, PrefixOperation, SuffixOperation,
-                AvpOperation, RecOperation, ConcatOperation {
+                AvpOperation, RecOperation, JoinOperation {
 }
