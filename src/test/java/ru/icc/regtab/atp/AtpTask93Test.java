@@ -43,7 +43,7 @@ class AtpTask93Test extends AtpTaskBase {
         ActionSpec rtRec = ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, RIGHT_OF));
 
         CellPattern notBlankAttr  = CellPattern.of(NOT_BLANK, Quantifier.oneOrMore(), AtomicContentSpec.attr());
-        CellPattern requiredBlank = CellPattern.of(BLANK, Quantifier.one(), null);
+        CellPattern optionalBlank = CellPattern.of(BLANK, Quantifier.zeroOrOne(), null);
         CellPattern anchorVal     = CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(scAvp, rtRec));
         CellPattern otherVals     = CellPattern.of(NOT_BLANK, Quantifier.oneOrMore(), AtomicContentSpec.val(scAvp));
         CellPattern manyBlanks    = CellPattern.of(BLANK, Quantifier.oneOrMore(), null);
@@ -51,9 +51,9 @@ class AtpTask93Test extends AtpTaskBase {
         return TablePattern.of(
                 SubtablePattern.of(Quantifier.oneOrMore(),
                         RowPattern.of(Quantifier.one(),
-                                SubrowPattern.of(Quantifier.oneOrMore(), notBlankAttr, requiredBlank)),
+                                SubrowPattern.of(Quantifier.oneOrMore(), notBlankAttr, optionalBlank)),
                         RowPattern.of(Quantifier.oneOrMore(),
-                                SubrowPattern.of(Quantifier.oneOrMore(), anchorVal, otherVals, requiredBlank)),
+                                SubrowPattern.of(Quantifier.oneOrMore(), anchorVal, otherVals, optionalBlank)),
                         RowPattern.of(Quantifier.zeroOrOne(), manyBlanks)
                 )
         );
