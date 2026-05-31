@@ -21,6 +21,6 @@ public class RtlTask99Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return "[ [ATTR '=' VAL: (CL&P0)->AVP, CL*->REC '\r\n' ATTR '=' VAL: (CL&P2)->AVP '\r\n' ATTR '=' VAL: (CL&P4)->AVP]+ ]+\n";
+        return "[ [ATTR '=' VAL: (CL&P0)->AVP, CL*->REC '\r\n' ATTR '=' VAL: (CL&P2)->AVP '\r\n' ATTR '=' VAL: (CL&P4)->AVP]+ ]+";
     }
 }
