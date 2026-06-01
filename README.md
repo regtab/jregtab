@@ -119,7 +119,7 @@ The `ru.icc.regtab.atp.spec` package provides the formal ATP types. Build a `Tab
 RTL (Regular Table Language) is a compact textual DSL that compiles to ATP.
 Use `RtlCompiler.compile(rtl)` to obtain a `TablePattern`, then proceed identically to the ATP path.
 
-**Example — Task 01** (two-row repeating subtables):
+**Example — Task 001** (two-row repeating subtables):
 
 ```java
 import ru.icc.regtab.rtl.RtlCompiler;
@@ -157,6 +157,8 @@ RegTab has been evaluated on the **Foofah benchmark** — a well-established col
 
 All 50 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **500 test variants (250 ATP + 250 RTL)** are transformed correctly (100 % accuracy).
 
+In addition to the Foofah benchmark, jRegTab includes extended task tests (tasks 051–101) covering advanced RTL features.
+
 The benchmark data (input and expected CSV files) is available at:
 <https://github.com/umich-dbgroup/foofah>
 
@@ -173,15 +175,15 @@ The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Tes
 ```
 src/test/java/ru/icc/regtab/atp/
     AtpTaskBase.java          # parameterised base: loads CSV, runs matcher, asserts output
-    AtpTask01Test.java
-    AtpTask02Test.java
+    AtpTask001Test.java
+    AtpTask002Test.java
     ...
-    AtpTask50Test.java
+    AtpTask101Test.java
 ```
 
 Each test class overrides two methods:
 
-- `taskId()` — returns the two-digit task number (e.g. `"01"`)
+- `taskId()` — returns the three-digit task number (e.g. `"001"`)
 - `buildPattern()` — constructs and returns the `TablePattern` for that task
 
 `AtpTaskBase` runs five JUnit parameterized test variants (`@ValueSource(ints = {1,2,3,4,5})`), one per source table. For each variant it:
@@ -194,7 +196,7 @@ Each test class overrides two methods:
 
 All 50 tasks have dedicated `AtpTask{NN}Test` classes.
 
-**Example — Task 01** (subtables with a `rec` action using the `sameSubtable` predicate):
+**Example — Task 001** (subtables with a `rec` action using the `sameSubtable` predicate):
 
 ```java
 import ru.icc.regtab.atp.spec.*;
@@ -228,15 +230,15 @@ The `rtl` package mirrors the ATP benchmark: each `RtlTask{NN}Test` implements t
 ```
 src/test/java/ru/icc/regtab/rtl/
     RtlTaskBase.java          # loads CSV, compiles RTL → ATP, runs matcher, asserts output
-    RtlTask01Test.java
-    RtlTask02Test.java
+    RtlTask001Test.java
+    RtlTask002Test.java
     ...
-    RtlTask50Test.java
+    RtlTask101Test.java
 ```
 
 Each test class overrides two methods:
 
-- `taskId()` — returns the two-digit task number (e.g. `"01"`)
+- `taskId()` — returns the three-digit task number (e.g. `"001"`)
 - `buildRtl()` — returns the RTL string for that task
 
 **Example — Task 01:**
@@ -257,13 +259,18 @@ Source and expected tables are stored as CSV files:
 
 ```
 src/test/resources/tasks/
-    task_01/
+    task_001/
         input_1.csv  …  input_5.csv
         expected_1.csv  …  expected_5.csv
-    task_02/
+    task_002/
         ...
     ...
-    task_50/
+    task_050/
+        ...
+    task_051/
+        ...
+    ...
+    task_101/
         ...
 ```
 
@@ -290,7 +297,7 @@ mvn test -Dtest="RtlTask*Test"
 To run a single task:
 
 ```bash
-mvn test -Dtest="AtpTask01Test"
+mvn test -Dtest="AtpTask001Test"
 ```
 
 ---

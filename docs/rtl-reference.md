@@ -9,7 +9,7 @@ RTL tokens are case-insensitive.
 ## Pattern structure
 
 ```
-tablePattern     : [<settings>] [acts] subtablePattern+
+tablePattern     : [cond ?] [<settings>] [acts] subtablePattern+
 
 subtablePattern  : rowPattern+                          // implicit (no braces)
                  | { [cond ?] [acts] rowPattern+ } q?   // explicit
