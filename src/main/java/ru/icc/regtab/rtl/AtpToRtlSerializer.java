@@ -30,6 +30,9 @@ public final class AtpToRtlSerializer {
 
     public static String serialize(TablePattern pattern) {
         String settings = serializeSettings(pattern.transformations());
+        String cond = pattern.condition() != null
+                ? serializeCellMatchConstr(pattern.condition()) + "? "
+                : "";
         List<SubtablePattern> subtables = pattern.subtablePatterns();
         String body;
         if (subtables.size() == 1 && isImplicitSubtable(subtables.get(0))) {
@@ -39,7 +42,7 @@ public final class AtpToRtlSerializer {
                     .map(AtpToRtlSerializer::serializeExplicitSubtable)
                     .collect(Collectors.joining(" "));
         }
-        return settings + body;
+        return settings + cond + body;
     }
 
     private static String serializeSettings(List<RecordsetTransformation> transformations) {
