@@ -11,12 +11,14 @@ import java.util.Objects;
 
 /**
  * Table pattern (def:atp): the root of the ATP hierarchy.
- * P_tbl = ⟨P_st¹, …, P_stᵏ⟩, k ≥ 1.
+ * P_tbl = (λ, ⟨P_st¹, …, P_stᵏ⟩), k ≥ 1.
  *
+ * @param condition        optional cell-match condition λ applied to all rows (null = no restriction)
  * @param subtablePatterns ordered sequence of subtable patterns (≥ 1)
  * @param transformations  optional post-processing transformations applied after interpretation
  */
 public record TablePattern(
+        CellMatchCondition condition,
         List<SubtablePattern> subtablePatterns,
         List<RecordsetTransformation> transformations
 ) {
@@ -35,12 +37,12 @@ public record TablePattern(
      */
     public static TablePattern of(SubtablePattern... subtables) {
         List<SubtablePattern> list = List.of(subtables);
-        return new TablePattern(list, extractInlineTransformations(list));
+        return new TablePattern(null, list, extractInlineTransformations(list));
     }
 
     /** Returns a copy of this pattern with the given post-processing transformations attached. */
     public TablePattern withTransformations(RecordsetTransformation... transforms) {
-        return new TablePattern(subtablePatterns, List.of(transforms));
+        return new TablePattern(condition, subtablePatterns, List.of(transforms));
     }
 
     /** Applies all transformations in order to the given recordset. */

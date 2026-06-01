@@ -32,11 +32,15 @@ public final class SyntaxMatcher {
 
     public static MatchResult match(TablePattern atp, TableSyntax syntax) {
         MatchState state = new MatchState();
-        MatchOutcome outcome = matchPatterns(atp.subtablePatterns(), syntax.rows(), 0, state, StructureKind.ROW_SEQUENCE, -1);
-        if (outcome.success() && outcome.nextIndex() == syntax.rows().size()) {
-            return MatchResult.success(state.matchedPairs, state.matchedSubtables, state.matchedSubrows);
+        List<Row> rows = syntax.rows();
+        MatchOutcome outcome = matchPatterns(atp.subtablePatterns(), rows, 0, state, StructureKind.ROW_SEQUENCE, -1);
+        if (!outcome.success() || outcome.nextIndex() != rows.size()) {
+            return MatchResult.failure();
         }
-        return MatchResult.failure();
+        if (!rowsSatisfyCondition(rows, 0, rows.size(), atp.condition())) {
+            return MatchResult.failure();
+        }
+        return MatchResult.success(state.matchedPairs, state.matchedSubtables, state.matchedSubrows);
     }
 
     private static <P, E> MatchOutcome matchPatterns(

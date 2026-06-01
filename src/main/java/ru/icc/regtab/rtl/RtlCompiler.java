@@ -56,7 +56,7 @@ public final class RtlCompiler {
         List<RecordsetTransformation> transforms = buildTransformations(tree.settings(), inline);
         TablePattern tablePattern = new ATPBuilder().visitTablePattern(tree);
         if (transforms.isEmpty()) return tablePattern;
-        return new TablePattern(tablePattern.subtablePatterns(), transforms);
+        return new TablePattern(tablePattern.condition(), tablePattern.subtablePatterns(), transforms);
     }
 
     private record InlineRecParams(Integer anchorPos, String splitDelimiter) {}

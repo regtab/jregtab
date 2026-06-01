@@ -214,6 +214,13 @@ class RtlCompilerTest {
     }
 
     @Test
+    void parse_tableLevelCondition_present() {
+        TablePattern p = compile("!BLANK? [ [VAL] ]+");
+        assertNotNull(p.condition(), "table-level condition must be non-null");
+        assertNull(compile("[ [VAL] ]+").condition(), "no condition → null");
+    }
+
+    @Test
     void parse_invalidRtl_throwsRtlCompileException() {
         assertThrows(RtlCompileException.class, () -> compile("[ [INVALID_TOKEN] ]"));
         assertThrows(RtlCompileException.class, () -> compile(""));
