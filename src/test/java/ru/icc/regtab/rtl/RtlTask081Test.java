@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 81: repeating two-row subtables — first row VAL anchors with BW-&gt;REC (single cell

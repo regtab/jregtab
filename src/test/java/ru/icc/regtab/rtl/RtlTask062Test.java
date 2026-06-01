@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 62: repeating subtables with a fixed header row (skip + VALs), one-or-more data rows

@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 11: cross-table unpivot with a column-header row and data rows using

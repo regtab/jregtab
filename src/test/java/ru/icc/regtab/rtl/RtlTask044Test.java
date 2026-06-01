@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 44: repeated subtables with one-or-more three-cell data rows (non-blank

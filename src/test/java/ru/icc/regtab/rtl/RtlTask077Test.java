@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 77: exactly 2 anchor VAL rows — each cell collects the cell 2 rows below (BW &amp; R+2)

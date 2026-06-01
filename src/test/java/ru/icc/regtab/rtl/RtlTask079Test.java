@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 79: single header row of VAL anchors (BW*-&gt;REC) followed by one-or-more data rows

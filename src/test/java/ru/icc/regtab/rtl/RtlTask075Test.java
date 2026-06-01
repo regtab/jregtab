@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 75: repeating rows — anchor VAL (RT*-&gt;REC) and conditional cells: blank cells are

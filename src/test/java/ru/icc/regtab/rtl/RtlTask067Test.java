@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 67: ATTR header; repeating data rows with inherited COL-&gt;AVP — first cell is REC

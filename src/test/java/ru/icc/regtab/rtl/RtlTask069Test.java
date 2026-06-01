@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 69: single non-repeating subtable with SR-&gt;AVP; first row anchors BW*-&gt;REC with

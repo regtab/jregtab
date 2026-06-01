@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 87: repeating rows, each with one-or-more explicit subrows — every subrow has an

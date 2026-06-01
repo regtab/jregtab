@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 88: explicit subtable with subtable-level ROW-&gt;AVP; an anchor row and one-or-more

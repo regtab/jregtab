@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 83: implicit ATTR header subtable; repeating explicit subtables — first row has

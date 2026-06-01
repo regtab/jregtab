@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 68: header rows with blank skip cell and tagged #HEAD VAL columns; data rows with

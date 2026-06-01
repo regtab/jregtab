@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 56: two-row-type table — first row anchors BW*-&gt;REC and gets ROW-&gt;AVP;

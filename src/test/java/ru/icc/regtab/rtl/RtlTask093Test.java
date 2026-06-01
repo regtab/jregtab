@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 93: repeating subtables, each with a grouped ATTR header row (groups separated by

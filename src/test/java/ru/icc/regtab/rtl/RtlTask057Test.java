@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 57: repeating two-cell rows — an anchor VAL (RT-&gt;REC, single right) and a compound

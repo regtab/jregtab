@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 54: flat table with repeating subrow groups — header subrows (skip + non-blank VALs)

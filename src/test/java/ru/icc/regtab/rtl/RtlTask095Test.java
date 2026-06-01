@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 95: repeated subtables where each cell is a compound ATTR=VAL; the first

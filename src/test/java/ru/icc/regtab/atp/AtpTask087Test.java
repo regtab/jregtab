@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.atp;
+package ru.icc.regtab.atp;
 
 import ru.icc.regtab.atp.spec.ActionSpec;
 import ru.icc.regtab.atp.spec.AtomicContentSpec;

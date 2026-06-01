@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 92: rows with one label VAL followed by grouped value VALs separated by blank cells;

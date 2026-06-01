@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 48: a fixed 2-row×2-cell skip header, then repeated person subtables

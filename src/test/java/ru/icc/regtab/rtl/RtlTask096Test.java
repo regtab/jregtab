@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 96: two header rows set up three attributes (A at col 0, B and C both at col 1),

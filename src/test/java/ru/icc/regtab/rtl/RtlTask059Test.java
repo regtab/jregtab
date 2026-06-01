@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 59: repeating three-slot rows — anchor VAL (RT-&gt;REC, single right), a VAL that

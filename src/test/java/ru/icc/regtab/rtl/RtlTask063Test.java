@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 63: repeating data rows with reverse-traversal COL-&gt;AVP (row-level), anchor VAL

@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 90: one header row of VAL cells (asterisks stripped via REPL), below data rows are AUX.

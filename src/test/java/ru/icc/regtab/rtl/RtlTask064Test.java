@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 64: two-row-type table — first row anchors BW*-&gt;REC and gets reverse ROW-&gt;AVP

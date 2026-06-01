@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 85: fixed 3×3 grid with three anchors at absolute row/column positions — each

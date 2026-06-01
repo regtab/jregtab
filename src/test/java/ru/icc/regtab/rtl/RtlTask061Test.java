@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 61: repeating rows where each cell is a three-segment compound: an anchor VAL

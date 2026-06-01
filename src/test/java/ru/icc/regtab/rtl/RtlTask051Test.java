@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 51: cross-table unpivot with compound cell values ("ND Mon") split by space —

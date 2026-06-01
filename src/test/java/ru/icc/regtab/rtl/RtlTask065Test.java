@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 65: repeating rows — anchor VAL appends a suffix from its single right neighbour

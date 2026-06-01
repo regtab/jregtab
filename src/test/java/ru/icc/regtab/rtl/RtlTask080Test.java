@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 80: header VAL row; repeating data rows where each VAL cell uses COL-&gt;REC(1) —

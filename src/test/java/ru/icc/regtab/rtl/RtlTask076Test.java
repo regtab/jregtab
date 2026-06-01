@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 76: implicit header subtable (skip + VALs); repeating explicit subtables each with

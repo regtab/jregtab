@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 84: repeating rows with a leading plain VAL and one-or-more explicit subrows each

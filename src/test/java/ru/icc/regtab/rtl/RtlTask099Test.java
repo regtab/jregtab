@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 99: each cell is a compound "KEY=VAL\r\nKEY=VAL\r\nKEY=VAL" value —

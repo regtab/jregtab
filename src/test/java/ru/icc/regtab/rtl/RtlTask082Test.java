@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 82: repeating subtables with inherited SC-&gt;AVP (same-subcol) — each subtable has

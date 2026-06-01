@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 78: single non-repeating subtable with ROW-&gt;AVP — first row has ATTR + VAL anchors

@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 66: repeating rows of conditional cells — if the cell contains '=', it is parsed

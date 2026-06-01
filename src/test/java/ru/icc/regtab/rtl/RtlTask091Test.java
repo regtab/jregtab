@@ -1,4 +1,4 @@
-﻿package ru.icc.regtab.rtl;
+package ru.icc.regtab.rtl;
 
 /**
  * Task 91: repeating rows with inline ATTR/VAL pairs; -LT->AVP (inherited) assigns
