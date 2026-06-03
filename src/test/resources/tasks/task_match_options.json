@@ -36,6 +36,8 @@
     "093" : { "expectedHasHeader": true },
     "095" : { "expectedHasHeader": true },
     "096" : { "expectedHasHeader": true },
-    "099" : { "expectedHasHeader": true }
+    "099" : { "expectedHasHeader": true },
+    "102" : { "expectedHasHeader": true },
+    "103" : { "expectedHasHeader": true }
   }
 }
