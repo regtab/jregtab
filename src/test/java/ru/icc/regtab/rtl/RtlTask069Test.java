@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask069Test}
  * <pre>
  * { SR-&gt;AVP
- * [ BW*-&gt;REC { [ATTR] [VAL#'1': (ROW &amp; #'1')*-&gt;JOIN][VAL#'2': (ROW &amp; #'2')*-&gt;JOIN] }* ]
+ * [ BW*-&gt;REC { [ATTR] [VAL#'1': ROW&amp;#'1'*-&gt;JOIN][VAL#'2': ROW&amp;#'2'*-&gt;JOIN] }* ]
  * [          { [ATTR] [VAL]{2} }* ]* }
  * </pre>
  * The SR-&gt;AVP subtable-level action propagates attribute lookup from the same subrow.
@@ -25,7 +25,7 @@ public class RtlTask069Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 SR->AVP
-                [ BW*->REC { [ATTR] [VAL#'1': (ROW & #'1')*->JOIN][VAL#'2': (ROW & #'2')*->JOIN] }* ]
+                [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->JOIN][VAL#'2': ROW&#'2'*->JOIN] }* ]
                 [          { [ATTR] [VAL]{2} }* ]*
                 """;
     }

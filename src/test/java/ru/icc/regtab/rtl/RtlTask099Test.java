@@ -7,9 +7,9 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_099/}
  * ATP spec: {@link ru.icc.regtab.atp.AtpTask099Test}
  * <pre>
- * [ [ATTR '=' VAL: (CL&P0)->AVP, CL*->REC '\r\n'
- *    ATTR '=' VAL: (CL&P2)->AVP '\r\n'
- *    ATTR '=' VAL: (CL&P4)->AVP]+ ]+
+ * [ [ATTR '=' VAL: CL&P0->AVP, CL*->REC '\r\n'
+ *    ATTR '=' VAL: CL&P2->AVP '\r\n'
+ *    ATTR '=' VAL: CL&P4->AVP]+ ]+
  * </pre>
  * The separators '\r\n' contain actual CR+LF bytes, matching the cell content
  * of input_*.csv where fields use CRLF as the internal line separator.
@@ -21,6 +21,6 @@ public class RtlTask099Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return "[ [ATTR '=' VAL: (CL&P0)->AVP, CL*->REC '\r\n' ATTR '=' VAL: (CL&P2)->AVP '\r\n' ATTR '=' VAL: (CL&P4)->AVP]+ ]+";
+        return "[ [ATTR '=' VAL: CL&P0->AVP, CL*->REC '\r\n' ATTR '=' VAL: CL&P2->AVP '\r\n' ATTR '=' VAL: CL&P4->AVP]+ ]+";
     }
 }

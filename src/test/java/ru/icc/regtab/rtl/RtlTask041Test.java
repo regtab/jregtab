@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask041Test}
  * <pre>
  * { [ [!BLANK? VAL : ''->FILL, (CL, RT)->REC "" VAL] [!BLANK? VAL] ]?
- *   [ [!BLANK? VAL : (RT, '')->REC] [BLANK?] ]? }+
+ *   [ [!BLANK? VAL : (RT, '')->REC] [BLANK] ]? }+
  * </pre>
  * First optional row: non-blank compound cell with empty-literal FILL and REC
  * from both same-cell (CL) and right-of (RT) providers, concatenated with a
@@ -25,7 +25,7 @@ public class RtlTask041Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 { [ [!BLANK? VAL : ''->FILL, (CL, RT)->REC "" VAL] [!BLANK? VAL] ]?
-                  [ [!BLANK? VAL : (RT, '')->REC] [BLANK?] ]? }+
+                  [ [!BLANK? VAL : (RT, '')->REC] [BLANK] ]? }+
                 """;
     }
 }

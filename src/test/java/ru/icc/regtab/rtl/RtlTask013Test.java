@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask013Test}
  * <pre>
  * [ [ATTR]{5} []+ ]
- * [ [VAL : SC->AVP, ((SR & C2), (SR & C4), (SR & C1), (SR & C3))->REC] [VAL : SC->AVP]{4} []+ ]+
+ * [ [VAL : SC->AVP, (SR&C2, SR&C4, SR&C1, SR&C3)->REC] [VAL : SC->AVP]{4} []+ ]+
  * </pre>
  * Header row: exactly 5 ATTR cells (column names) then trailing skips. Data
  * rows: anchor VAL uses SC->AVP (column-header attribute) and a four-provider
@@ -24,7 +24,7 @@ public class RtlTask013Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [ATTR]{5} []+ ]
-                [ [VAL : SC->AVP, ((SR & C2), (SR & C4), (SR & C1), (SR & C3))->REC] [VAL : SC->AVP]{4} []+ ]+
+                [ [VAL : SC->AVP, (SR&C2, SR&C4, SR&C1, SR&C3)->REC] [VAL : SC->AVP]{4} []+ ]+
                 """;
     }
 }

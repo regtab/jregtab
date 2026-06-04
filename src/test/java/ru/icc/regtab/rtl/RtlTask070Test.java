@@ -8,8 +8,8 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_070/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask070Test}
  * <pre>
- * [ [BLANK?]+           [VAL#'H']+ ]+
- * [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: ((COL &amp; #'H')*, (ROW &amp; #'S')*)-&gt;REC]+ ]+
+ * [ [BLANK]+           [VAL#'H']+ ]+
+ * [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: (COL&amp;#'H'*, ROW&amp;#'S'*)-&gt;REC]+ ]+
  * </pre>
  * The !\d+ cell condition distinguishes label (#S) columns from value columns. Digit-valued
  * cells build their record by merging column headers (same-column #H items) with row labels
@@ -23,8 +23,8 @@ public class RtlTask070Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [BLANK?]+           [VAL#'H']+ ]+
-                [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: ((COL & #'H')*, (ROW & #'S')*)->REC]+ ]+
+                [ [BLANK]+           [VAL#'H']+ ]+
+                [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: (COL&#'H'*, ROW&#'S'*)->REC]+ ]+
                 """;
     }
 }

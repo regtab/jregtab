@@ -102,27 +102,27 @@ class RtlCompilerTest {
 
     @Test
     void parse_spatialConstraints() {
-        compile("[ [VAL : ^(BW & C+0)->REC] ]");
-        compile("[ [VAL : ^(BW & R-1)->REC] ]");
-        compile("[ [VAL : (CL & P0..5)->REC] ]");
-        compile("[ [VAL : (SR & C+0..-1)->REC] ]");
+        compile("[ [VAL : ^BW&C+0->REC] ]");
+        compile("[ [VAL : ^BW&R-1->REC] ]");
+        compile("[ [VAL : CL&P0..5->REC] ]");
+        compile("[ [VAL : SR&C+0..-1->REC] ]");
     }
 
     @Test
     void parse_contentConstraints() {
-        compile("[ [VAL : (SR & \"pattern\")->REC] ]");
-        compile("[ [VAL : (SR & BLANK)->REC] ]");
-        compile("[ [VAL : (SR & #'t1')->REC] ]");
-        compile("[ [VAL : (SR & #'t1' | #'t2')->REC] ]");
-        compile("[ [VAL : (SR & #'t1' & #'t2')->REC] ]");
+        compile("[ [VAL : SR&\"pattern\"->REC] ]");
+        compile("[ [VAL : SR&BLANK->REC] ]");
+        compile("[ [VAL : SR&#'t1'->REC] ]");
+        compile("[ [VAL : (SR&#'t1'|#'t2')->REC] ]");
+        compile("[ [VAL : SR&#'t1'&#'t2'->REC] ]");
     }
 
     @Test
     void parse_orConstraints() {
-        compile("[ [VAL : (LT | RT)->REC] ]");
-        compile("[ [VAL : (SR & C2 | SR & C5)->REC] ]");
-        compile("[ [VAL : (SR & (C2 | C4 | C1 | C3))->REC] ]");
-        compile("[ [VAL : (BLANK | SR & C0)->REC] ]");
+        compile("[ [VAL : (LT|RT)->REC] ]");
+        compile("[ [VAL : (SR&C2|SR&C5)->REC] ]");
+        compile("[ [VAL : (SR&(C2|C4|C1|C3))->REC] ]");
+        compile("[ [VAL : (BLANK|SR&C0)->REC] ]");
     }
 
     @Test

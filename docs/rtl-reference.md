@@ -22,7 +22,8 @@ subrowPattern    : cellPattern+                         // implicit
 cellPattern      : [ ] q?                               // skip cell
                  | [ cellPatternBody ] q?
 
-cellPatternBody  : cond ? [acts] contSpec   // guarded
+cellPatternBody  : cond ? [acts] contSpec   // guarded: ? required when contSpec follows
+                 | cond                    // condition-only: no ? (skip cell with guard)
                  | [acts] contSpec          // unguarded
 ```
 
@@ -59,7 +60,7 @@ Example: `<NORM, ANCH(2)> [ … ]` — normalise and anchor at position 2.
 
 ## Cell match conditions
 
-A cell match condition (before `?`) guards pattern application; it tests the **cell**, not the item.
+A cell match condition guards pattern application; it tests the **cell**, not the item.
 
 | Syntax | Condition |
 |---|---|
@@ -69,7 +70,17 @@ A cell match condition (before `?`) guards pattern application; it tests the **c
 | `!BLANK ?` | Cell text is not blank |
 | `~"sub" ?` | Cell text contains the substring |
 
-Example: `[!BLANK ? VAL : (ST*)->REC]` — match only on non-blank cells.
+The `?` separator is required when a `contSpec` follows the condition (guarded form).
+When the cell body contains **only** a condition and nothing else, `?` must be omitted:
+
+| Form | Meaning |
+|---|---|
+| `[!BLANK ? VAL : …]` | Guarded cell — match non-blank, derive VAL |
+| `[!BLANK]` | Condition-only skip cell — consume non-blank, produce no item |
+| `[BLANK]` | Condition-only skip cell — consume blank, produce no item |
+
+Examples: `[!BLANK ? VAL : (ST*)->REC]` — match only non-blank cells and build a record.
+`[BLANK]*` — skip zero or more blank cells (separator columns).
 
 ---
 
@@ -181,7 +192,7 @@ provSpecs -> op
 ### Cell-derived provider (tblProvSpec)
 
 ```
-[traversal] (spatConstr | (constraints)) [cardinality]
+[traversal] (spatConstr | spatConstr & constr & … | (constraints)) [cardinality]
 ```
 
 **Traversal order** (prefix, default = ROW_MAJOR):
@@ -193,7 +204,7 @@ provSpecs -> op
 | `^` | COLUMN_MAJOR |
 | `-^` | REVERSE_COLUMN_MAJOR |
 
-**Spatial constraints** (single bare form or inside parentheses):
+**Spatial constraints** (single bare form, bare `&`-conjunction, or inside parentheses):
 
 | Token | Condition |
 |---|---|
@@ -239,12 +250,19 @@ provSpecs -> op
 
 **Compound constraints** with `&` and `|`:
 
+Parentheses are required for `|`-disjunctions and for constraints starting with a string literal.
+For `&`-conjunctions starting with a `spatConstr` keyword, parentheses are **optional**:
+
 ```
-(ST & !BLANK)          — same subtable AND not blank
-(ROW | COL)            — same row OR same column
+RT&P0              — right-of AND position 0  (no parens needed)
+CL&P2              — same-cell AND position 2
+-LT&P0             — reverse-traversal, left-of AND position 0
+(ST & !BLANK)      — same subtable AND not blank  (parens required: starts with spatConstr, but !BLANK is a content constraint — still works without parens since !BLANK is also not a STRING)
+(ROW | COL)        — same row OR same column  (parens required for |)
+('regex' & RT)     — parens required: starts with a string literal
 ```
 
-**Cardinality** (suffix):
+**Cardinality** (suffix, applies after the whole constraint expression):
 
 | Token | Meaning |
 |---|---|
@@ -254,6 +272,7 @@ provSpecs -> op
 
 Examples:
 - `ST*` — all items in the same subtable
+- `RT&P0*` — all right-of items at position 0 (bare conjunction + unbounded cardinality)
 - `SC{2}` — at most 2 items in the same subcolumn
 - `^COL` — items in the same column, column-major traversal
 

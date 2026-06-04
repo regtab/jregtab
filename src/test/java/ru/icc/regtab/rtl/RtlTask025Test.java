@@ -8,11 +8,11 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_025/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask025Test}
  * <pre>
- * [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->JOIN(0)] [VAL]+ ]+
+ * [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
  * </pre>
  * Each data row: anchor VAL uses RT->SUFFIX('/') (appends the immediately
- * right cell with '/'), (RT & C+2..)*->REC('/') (slash-delimited REC of all
- * same-row cells from relative column +2 onward), and (BW & STR)*->JOIN(0)
+ * right cell with '/'), RT&C+2..*->REC('/') (slash-delimited REC of all
+ * same-row cells from relative column +2 onward), and BW&STR*->JOIN(0)
  * (concatenates anchors in rows below that share the same ID string). One-or-more
  * plain VAL cells follow.
  */
@@ -24,7 +24,7 @@ public class RtlTask025Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : RT->SUFFIX('/'), (RT & C+2..)*->REC('/'), (BW & STR)*->JOIN(0)] [VAL]+ ]+
+                [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
                 """;
     }
 }

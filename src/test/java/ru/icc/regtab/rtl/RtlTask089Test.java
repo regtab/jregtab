@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * COL-&gt;AVP
  *   [ [ATTR]+ ]
  * { [ [VAL: RT*-&gt;REC] [VAL]+ ]
- *   [ [BLANK?]+ ] }+
+ *   [ [BLANK]+ ] }+
  *   [ [ATTR]+ ]
  *   [ [VAL: RT*-&gt;REC] [VAL]+ ]+
  * </pre>
@@ -28,7 +28,7 @@ public class RtlTask089Test extends RtlTaskBase {
                 COL->AVP
                   [ [ATTR]+ ]
                 { [ [VAL: RT*->REC] [VAL]+ ]
-                  [ [BLANK?]+ ] }+
+                  [ [BLANK]+ ] }+
                   [ [ATTR]+ ]
                   [ [VAL: RT*->REC] [VAL]+ ]+
                 """;

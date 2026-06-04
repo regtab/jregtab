@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * { SC-&gt;AVP
  *   [ [ATTR]+ ]
  *   [ [!BLANK? VAL: RT*-&gt;REC] [VAL]+ ]+
- *   [ [BLANK?]+ ]? }+
+ *   [ [BLANK]+ ]? }+
  * </pre>
  * SC-&gt;AVP looks up attributes in the same subcol, binding each VAL to its ATTR header
  * within the subrow column group. The !BLANK? guard on the anchor ensures rows with a
@@ -28,7 +28,7 @@ public class RtlTask082Test extends RtlTaskBase {
                 { SC->AVP
                   [ [ATTR]+ ]
                   [ [!BLANK? VAL: RT*->REC] [VAL]+ ]+
-                  [ [BLANK?]+ ]? }+
+                  [ [BLANK]+ ]? }+
                 """;
     }
 }

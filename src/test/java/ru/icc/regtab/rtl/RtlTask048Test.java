@@ -8,13 +8,13 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask048Test}
  * <pre>
  * [ []{2} ]{2}
- * { [ [!BLANK? VAL : ''->AVP, (ST & C1)*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
- *   [ [BLANK?] [!BLANK? ATTR ":" VAL : CL->AVP] ]
- *   [ [BLANK?]{2} ]? }+
+ * { [ [!BLANK? VAL : ''->AVP, ST&C1*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+ *   [ [BLANK] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+ *   [ [BLANK]{2} ]? }+
  * </pre>
  * Two skip rows (2 cells each) precede the person blocks. Each person subtable:
  * first row has a non-blank anchor VAL with empty-literal AVP and unbounded REC
- * over same-subtable column 1 (ST & C1), plus a compound ATTR:VAL cell with
+ * over same-subtable column 1 ST&C1, plus a compound ATTR:VAL cell with
  * CL->AVP. Second row: blank guard and another ATTR:VAL compound. Optional third
  * row: two blank cells.
  */
@@ -27,9 +27,9 @@ public class RtlTask048Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ []{2} ]{2}
-                { [ [!BLANK? VAL : ''->AVP, (ST & C1)*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
-                  [ [BLANK?] [!BLANK? ATTR ":" VAL : CL->AVP] ]
-                  [ [BLANK?]{2} ]? }+
+                { [ [!BLANK? VAL : ''->AVP, ST&C1*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+                  [ [BLANK] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+                  [ [BLANK]{2} ]? }+
                 """;
     }
 }

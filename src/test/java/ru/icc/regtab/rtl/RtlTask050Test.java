@@ -7,11 +7,11 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_050/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask050Test}
  * <pre>
- * [ [!BLANK? VAL : ''->AVP, SR*->REC, (BW & STR)*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+
+ * [ [!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+
  * </pre>
  * Same pattern as task 46 but without the outer subtable repetition ({...}+).
  * Each non-blank row: anchor VAL with empty-literal AVP, SR*->REC (unbounded
- * same-subrow collection), and (BW & STR)*->JOIN(0) (grouping rows with the
+ * same-subrow collection), and BW&STR*->JOIN(0) (grouping rows with the
  * same string below); non-blank ATTR cell; non-blank VAL with SR->AVP (same-subrow
  * attribute lookup).
  */
@@ -23,7 +23,7 @@ public class RtlTask050Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [!BLANK? VAL : ''->AVP, SR*->REC, (BW & STR)*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+
+                [ [!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+
                 """;
     }
 }

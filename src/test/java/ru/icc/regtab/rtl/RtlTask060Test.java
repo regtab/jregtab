@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * [ [ATTR]+ ]
  * { COL-&gt;AVP
  *   [ [!BLANK? VAL: RT*-&gt;REC] [(BLANK? VAL: -(AV &amp; !BLANK)-&gt;FILL | VAL)]+ ]+
- *   [ [BLANK?]+ ]? }+
+ *   [ [BLANK]+ ]? }+
  * </pre>
  * The COL-&gt;AVP action is inherited by all cells in the explicit subtable. FILL uses
  * reverse-row-major traversal (-(AV &amp; !BLANK)) to look upward for the nearest non-blank
@@ -28,8 +28,8 @@ public class RtlTask060Test extends RtlTaskBase {
                 return """
                   [ [ATTR]+ ]
                 { COL->AVP
-                  [ [!BLANK? VAL: RT*->REC] [(BLANK? VAL: -(AV & !BLANK)->FILL | VAL)]+ ]+
-                  [ [BLANK?]+ ]? }+
+                  [ [!BLANK? VAL: RT*->REC] [(BLANK? VAL: -AV&!BLANK->FILL | VAL)]+ ]+
+                  [ [BLANK]+ ]? }+
                 """;
     }
 }

@@ -95,7 +95,6 @@ class AtpSpecTest {
     void patternHierarchyConstruction() {
         var cellVal = CellPattern.of(AtomicContentSpec.val());
         var cellSkip = CellPattern.skip();
-        var subrow = SubrowPattern.of(cellVal, cellSkip);
         var row = RowPattern.of(Quantifier.oneOrMore(), cellVal, cellSkip);
         var subtable = SubtablePattern.of(Quantifier.oneOrMore(), row);
         var table = TablePattern.of(subtable);
