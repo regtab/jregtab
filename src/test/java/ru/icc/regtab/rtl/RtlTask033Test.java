@@ -7,10 +7,10 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_033/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask033Test}
  * <pre>
- * [ [VAL : SR*->REC, (BW & STR)*->JOIN(0)] [VAL]+ ]+
+ * [ [VAL : SR*->REC, BW&STR*->JOIN(0)] [VAL]+ ]+
  * </pre>
  * Each data row: anchor VAL with SR*->REC (unbounded same-subrow collection)
- * and (BW & STR)*->JOIN(0) (unbounded concatenation of cells that are both below
+ * and BW&STR*->JOIN(0) (unbounded concatenation of cells that are both below
  * and share the same string as the anchor). One-or-more plain VAL cells follow.
  */
 public class RtlTask033Test extends RtlTaskBase {
@@ -21,7 +21,7 @@ public class RtlTask033Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : SR*->REC, (BW & STR)*->JOIN(0)] [VAL]+ ]+
+                [ [VAL : SR*->REC, BW&STR*->JOIN(0)] [VAL]+ ]+
                 """;
     }
 }

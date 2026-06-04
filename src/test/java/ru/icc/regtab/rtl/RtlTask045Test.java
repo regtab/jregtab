@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_045/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask045Test}
  * <pre>
- * [ [!BLANK? VAL] [!BLANK? (VAL : (SR & C0)->REC(1)){','}] ]+
+ * [ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
  * </pre>
  * Each data row: a non-blank plain VAL anchor, then a non-blank delimited cell
  * where each comma-separated token is a VAL with REC(1) using provider SR & C0
@@ -21,7 +21,7 @@ public class RtlTask045Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [!BLANK? VAL] [!BLANK? (VAL : (SR & C0)->REC(1)){','}] ]+
+                [ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
                 """;
     }
 }

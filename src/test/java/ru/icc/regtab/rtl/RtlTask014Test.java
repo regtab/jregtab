@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask014Test}
  * <pre>
  * { [ [!BLANK ? VAL]{2} [BLANK] ]
- *   [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST & C0), (ST & C1), SR{2})->REC(4)] ]+ }+
+ *   [ [!BLANK ? VAL]{2} [!BLANK ? VAL : (ST&C0, ST&C1, SR{2})->REC(4)] ]+ }+
  * </pre>
  * Header row: two non-blank VAL cells then an optional blank sentinel. Data
  * rows: two non-blank VAL prefix cells, then a non-blank anchor producing
@@ -24,7 +24,7 @@ public class RtlTask014Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 { [ [!BLANK ? VAL]{2} [BLANK] ]
-                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST & C0), (ST & C1), SR{2})->REC(4)] ]+ }+
+                  [ [!BLANK ? VAL]{2} [!BLANK ? VAL : (ST&C0, ST&C1, SR{2})->REC(4)] ]+ }+
                 """;
     }
 }

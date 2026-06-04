@@ -8,9 +8,9 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_075/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask075Test}
  * <pre>
- * [ [VAL: RT*-&gt;REC] [(BLANK? VAL: -(LT &amp; !BLANK)-&gt;FILL | VAL)]+ ]+
+ * [ [VAL: RT*-&gt;REC] [(BLANK? VAL: -LT&amp;!BLANK-&gt;FILL | VAL)]+ ]+
  * </pre>
- * FILL uses -(LT &amp; !BLANK) — reverse-row-major traversal restricted to non-blank left-of
+ * FILL uses -LT&amp;!BLANK — reverse-row-major traversal restricted to non-blank left-of
  * cells — to propagate values rightward into blank cells within the same row.
  */
 public class RtlTask075Test extends RtlTaskBase {
@@ -21,7 +21,7 @@ public class RtlTask075Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL: RT*->REC] [(BLANK? VAL: -(LT & !BLANK)->FILL | VAL)]+ ]+
+                [ [VAL: RT*->REC] [(BLANK? VAL: -LT&!BLANK->FILL | VAL)]+ ]+
                 """;
     }
 }

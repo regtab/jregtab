@@ -28,7 +28,7 @@ public class RtlTask060Test extends RtlTaskBase {
                 return """
                   [ [ATTR]+ ]
                 { COL->AVP
-                  [ [!BLANK? VAL: RT*->REC] [(BLANK? VAL: -(AV & !BLANK)->FILL | VAL)]+ ]+
+                  [ [!BLANK? VAL: RT*->REC] [(BLANK? VAL: -AV&!BLANK->FILL | VAL)]+ ]+
                   [ [BLANK]+ ]? }+
                 """;
     }

@@ -95,7 +95,29 @@ final class ProviderTemplateResolver {
             return toSpec(parts);
         }
         if (ctx.constraints() != null) return buildConstraints(ctx.constraints());
+        if (ctx.bareConjConstraints() != null) return buildBareConj(ctx.bareConjConstraints());
         return ItemFilterConditionSpec.bare(new FilterTerm.SameCell());
+    }
+
+    private static ItemFilterConditionSpec buildBareConj(RTLParser.BareConjConstraintsContext ctx) {
+        List<FilterTerm> spatParts = new ArrayList<>();
+        addSpatConstrParts(ctx.spatConstr(), spatParts);
+        List<List<FilterTerm>> distributed = new ArrayList<>();
+        distributed.add(spatParts);
+        for (var bc : ctx.baseConstr()) {
+            List<List<FilterTerm>> bcAlts = expandBaseConstr(bc);
+            List<List<FilterTerm>> next = new ArrayList<>();
+            for (List<FilterTerm> existing : distributed)
+                for (List<FilterTerm> alt : bcAlts) {
+                    List<FilterTerm> combined = new ArrayList<>(existing);
+                    combined.addAll(alt);
+                    next.add(combined);
+                }
+            distributed = next;
+        }
+        if (distributed.size() == 1) return toSpec(distributed.get(0));
+        return new ItemFilterConditionSpec.Or(
+                distributed.stream().map(ProviderTemplateResolver::toAndSpec).toList());
     }
 
     private static ItemFilterConditionSpec buildConstraints(RTLParser.ConstraintsContext ctx) {

@@ -126,8 +126,12 @@ provSpec : tblProvSpec | ctxProvSpec | ctxAvpSpec ;
 
 // Cell derived item provider specification
 // Single bare form: spatConstr only (avoids ambiguity with ctxProvSpec STRING).
-// Multiple or content constraints require parentheses.
-tblProvSpec : traversalOrderMark? (spatConstr | LPAREN constraints RPAREN) cardinality? ;
+// Bare & -conjunction starting with spatConstr is also unambiguous (keywords, not STRING).
+// Disjunctions (|) and content-only constraints still require parentheses.
+tblProvSpec : traversalOrderMark? (spatConstr | LPAREN constraints RPAREN | bareConjConstraints) cardinality? ;
+
+// Bare & -conjunction of constraints starting with a spatConstr keyword
+bareConjConstraints : spatConstr (AMP baseConstr)+ ;
 
 // Traversal order mark (absence = ROW_MAJOR)
 traversalOrderMark : reverseRowMajor | columnMajor | reverseColumnMajor ;

@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_100/}
  * ATP spec: {@link ru.icc.regtab.atp.AtpTask100Test}
  * <pre>
- * [ [VAL: (RT&amp;P0)*-&gt;REC '\n' VAL: (RT&amp;P1)*-&gt;REC '\n' VAL: (RT&amp;P2)*-&gt;REC]
+ * [ [VAL: RT&amp;P0*-&gt;REC '\n' VAL: RT&amp;P1*-&gt;REC '\n' VAL: RT&amp;P2*-&gt;REC]
  *   [VAL '\n' VAL '\n' VAL]{2} ]+
  * </pre>
  * The separator '\n' (backslash + n, 2 chars) matches the literal escape sequence
@@ -21,7 +21,7 @@ public class RtlTask100Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL: (RT&P0)*->REC '\\n' VAL: (RT&P1)*->REC '\\n' VAL: (RT&P2)*->REC]
+                [ [VAL: RT&P0*->REC '\\n' VAL: RT&P1*->REC '\\n' VAL: RT&P2*->REC]
                   [VAL '\\n' VAL '\\n' VAL]{2} ]+
                 """;
     }
