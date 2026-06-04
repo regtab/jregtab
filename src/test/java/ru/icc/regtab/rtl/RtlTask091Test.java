@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask091Test}
  * <pre>
  * { [ !BLANK? -LT-&gt;AVP [ATTR] [VAL: ROW*-&gt;REC] { [ATTR] [VAL] }+ ]+
- *   [ [BLANK?]+ ]? }+
+ *   [ [BLANK]+ ]? }+
  * </pre>
  */
 public class RtlTask091Test extends RtlTaskBase {
@@ -21,7 +21,7 @@ public class RtlTask091Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 { [ !BLANK? -LT->AVP [ATTR] [VAL: ROW*->REC] { [ATTR] [VAL] }+ ]+
-                  [ [BLANK?]+ ]? }+
+                  [ [BLANK]+ ]? }+
                 """;
     }
 }

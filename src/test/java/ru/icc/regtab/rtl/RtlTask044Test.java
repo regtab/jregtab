@@ -7,8 +7,8 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_044/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask044Test}
  * <pre>
- * { [ [!BLANK? VAL : SR->REC] [!BLANK? VAL] [BLANK?] ]+
- *   [ [BLANK?]{2} [!BLANK? VAL "," VAL : CL*->REC] ]? }+
+ * { [ [!BLANK? VAL : SR->REC] [!BLANK? VAL] [BLANK] ]+
+ *   [ [BLANK]{2} [!BLANK? VAL "," VAL : CL*->REC] ]? }+
  * </pre>
  * Data rows: non-blank anchor VAL with SR->REC (same-subrow, cardinality 1),
  * a non-blank plain VAL, and an optional blank guard. Optional footer row: two
@@ -23,8 +23,8 @@ public class RtlTask044Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [!BLANK? VAL : SR->REC] [!BLANK? VAL] [BLANK?] ]+
-                  [ [BLANK?]{2} [!BLANK? VAL "," VAL : CL*->REC] ]? }+
+                { [ [!BLANK? VAL : SR->REC] [!BLANK? VAL] [BLANK] ]+
+                  [ [BLANK]{2} [!BLANK? VAL "," VAL : CL*->REC] ]? }+
                 """;
     }
 }

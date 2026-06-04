@@ -10,8 +10,8 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask088Test}
  * <pre>
  * { ROW-&gt;AVP
- *   [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*-&gt;REC]+ [BLANK?]? }+ ]
- *   [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK?]? }+ ]+ }
+ *   [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*-&gt;REC]+ [BLANK]? }+ ]
+ *   [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK]? }+ ]+ }
  * </pre>
  * "NameA" -&gt; "A" (SUBSTR extracts one char starting at position 4).
  * BW* on each anchor-row VAL collects all below-column values into one record per column group.
@@ -25,8 +25,8 @@ public class RtlTask088Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 ROW->AVP 
-                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*->REC]+ [BLANK?]? }+ ]
-                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK?]? }+ ]+
+                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL: BW*->REC]+ [BLANK]? }+ ]
+                [ [ATTR=SUBSTR(4,1)] { [!BLANK? VAL]+ [BLANK]? }+ ]+
                 """;
     }
 }

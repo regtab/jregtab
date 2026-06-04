@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ [ATTR] []+ ]
  * { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]
- *   [ [BLANK?]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
+ *   [ [BLANK]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
  * </pre>
  */
 public class RtlTask102Test extends RtlTaskBase {
@@ -24,7 +24,7 @@ public class RtlTask102Test extends RtlTaskBase {
         return """
                 [ [ATTR] []+ ]
                 { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]
-                  [ [BLANK?]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
+                  [ [BLANK]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
                 """;
     }
 }

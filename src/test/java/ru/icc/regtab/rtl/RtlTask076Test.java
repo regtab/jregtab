@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask076Test}
  * <pre>
  *   [ []         [VAL]+ ]
- * { [ [VAL]      [BLANK?]+ ]
+ * { [ [VAL]      [BLANK]+ ]
  *   [ [VAL=TRIM] [!BLANK? VAL: (COL, (ST &amp; C0), ROW)-&gt;REC]+ ]+ }+
  * </pre>
  * (ST &amp; C0) targets column 0 within the same subtable, providing the subtable's own label
@@ -24,7 +24,7 @@ public class RtlTask076Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                   [ []         [VAL]+ ]
-                { [ [VAL]      [BLANK?]+ ]
+                { [ [VAL]      [BLANK]+ ]
                   [ [VAL=TRIM] [!BLANK? VAL: (COL, (ST & C0), ROW)->REC]+ ]+ }+
                 """;
     }

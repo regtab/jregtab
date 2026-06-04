@@ -8,8 +8,8 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_054/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask054Test}
  * <pre>
- * [ { []    [!BLANK? VAL]+               [BLANK?]? }+ ]
- * [ { [VAL] [!BLANK? VAL: (SC,SR)-&gt;REC]+ [BLANK?]? }+ ]+
+ * [ { []    [!BLANK? VAL]+               [BLANK]? }+ ]
+ * [ { [VAL] [!BLANK? VAL: (SC,SR)-&gt;REC]+ [BLANK]? }+ ]+
  * </pre>
  * The first subtable groups header subrows: a skip cell followed by one or more non-blank
  * VAL header labels. Repeating data subtables: the first cell is a VAL anchor; subsequent
@@ -23,8 +23,8 @@ public class RtlTask054Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ { []    [!BLANK? VAL]+               [BLANK?]? }+ ]
-                [ { [VAL] [!BLANK? VAL: (SC,SR)->REC]+ [BLANK?]? }+ ]+
+                [ { []    [!BLANK? VAL]+               [BLANK]? }+ ]
+                [ { [VAL] [!BLANK? VAL: (SC,SR)->REC]+ [BLANK]? }+ ]+
                 """;
     }
 }

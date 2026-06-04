@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_068/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask068Test}
  * <pre>
- * [ [BLANK?] [VAL #'HEAD']+ ]+
+ * [ [BLANK] [VAL #'HEAD']+ ]+
  * [ [!BLANK? VAL] [VAL: ((COL &amp; #'HEAD')*, ROW)-&gt;REC]+ ]+
  * </pre>
  * Header cells are tagged #HEAD to allow data cells to look them up by column. Each data
@@ -23,7 +23,7 @@ public class RtlTask068Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [BLANK?] [VAL #'HEAD']+ ]+
+                [ [BLANK] [VAL #'HEAD']+ ]+
                 [ [!BLANK? VAL] [VAL: ((COL & #'HEAD')*, ROW)->REC]+ ]+
                 """;
     }

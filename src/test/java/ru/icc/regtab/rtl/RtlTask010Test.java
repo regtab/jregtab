@@ -7,9 +7,9 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_010/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask010Test}
  * <pre>
- * { [ []{4} [BLANK?] []{3} ]*
+ * { [ []{4} [BLANK] []{3} ]*
  *   [ [VAL : SR*->REC] [VAL]+ ]
- *   [ [BLANK?]+ ]? }+
+ *   [ [BLANK]+ ]? }+
  * </pre>
  * Each subtable starts with zero-or-more skip rows (4 skipped, 1 optional
  * blank guard, 3 skipped). The single data row has an anchor VAL with
@@ -24,9 +24,9 @@ public class RtlTask010Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ []{4} [BLANK?] []{3} ]*
+                { [ []{4} [BLANK] []{3} ]*
                   [ [VAL : SR*->REC] [VAL]+ ]
-                  [ [BLANK?]+ ]? }+
+                  [ [BLANK]+ ]? }+
                 """;
     }
 }

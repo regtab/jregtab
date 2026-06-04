@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_107/}
  * <pre>
- * [ [BLANK?]+ [!BLANK ? VAL#'H'] [(BLANK ? VAL#'H': -(LT & !BLANK)->FILL | VAL#'H')]+ ]+
+ * [ [BLANK]+ [!BLANK ? VAL#'H'] [(BLANK ? VAL#'H': -(LT & !BLANK)->FILL | VAL#'H')]+ ]+
  * {
  * [ ['\\D.*' ? VAL#'S']+ ['\\d+' ? VAL: ((COL & #'H')*,(ROW & #'S')*)->REC]+ ]
  * [ [BLANK ? VAL#'S': SC->FILL]+ ['\\D.*' ? VAL#'S']+ ['\\d+' ? VAL: ((COL & #'H')*,(ROW & #'S')*)->REC]+ ]*
@@ -23,7 +23,7 @@ public class RtlTask107Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [BLANK?]+ [!BLANK ? VAL#'H'] [(BLANK ? VAL#'H': -(LT & !BLANK)->FILL | VAL#'H')]+ ]+
+                [ [BLANK]+ [!BLANK ? VAL#'H'] [(BLANK ? VAL#'H': -(LT & !BLANK)->FILL | VAL#'H')]+ ]+
                 {
                 [ ['\\D.*' ? VAL#'S']+ ['\\d+' ? VAL: ((COL & #'H')*,(ROW & #'S')*)->REC]+ ]
                 [ [BLANK ? VAL#'S': SC->FILL]+ ['\\D.*' ? VAL#'S']+ ['\\d+' ? VAL: ((COL & #'H')*,(ROW & #'S')*)->REC]+ ]*

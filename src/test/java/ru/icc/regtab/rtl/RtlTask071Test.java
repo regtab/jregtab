@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_071/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask071Test}
  * <pre>
- * [ [BLANK?]+       [VAL#'H': (BW &amp; #'H')*-&gt;SUFFIX('/')]+ ]+
+ * [ [BLANK]+       [VAL#'H': (BW &amp; #'H')*-&gt;SUFFIX('/')]+ ]+
  * [ [!'\\d+'? VAL#'S': (RT &amp; #'S')*-&gt;SUFFIX('/')]+ ['\\d+'? VAL: (COL, ROW)-&gt;REC]+ ]+
  * </pre>
  * SUFFIX('/') builds a slash-separated path from multiple #H or #S neighbours, allowing
@@ -22,7 +22,7 @@ public class RtlTask071Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [BLANK?]+       [VAL#'H': (BW & #'H')*->SUFFIX('/')]+ ]+
+                [ [BLANK]+       [VAL#'H': (BW & #'H')*->SUFFIX('/')]+ ]+
                 [ [!'\\d+'? VAL#'S': (RT & #'S')*->SUFFIX('/')]+ ['\\d+'? VAL: (COL, ROW)->REC]+ ]+
                 """;
     }

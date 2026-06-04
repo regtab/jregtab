@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * { [ [VAL=NORM] [] ]{2}
  *   [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
- *   [ [BLANK?]  [] ]? }+
+ *   [ [BLANK]  [] ]? }+
  * </pre>
  * Header rows: 2 repetitions, VAL with whitespace normalisation. Data rows:
  * non-blank anchor with REC(2) — providers SC{2} (2 attrs from same subcol)
@@ -27,7 +27,7 @@ public class RtlTask002Test extends RtlTaskBase {
         return """
                 { [ [VAL=NORM] [] ]{2}
                   [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
-                  [ [BLANK?] [] ]? }+
+                  [ [BLANK] [] ]? }+
                 """;
     }
 }

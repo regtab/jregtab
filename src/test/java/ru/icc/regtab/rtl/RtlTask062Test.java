@@ -10,7 +10,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * { [       []    [VAL]+ ]
  *   [ !"x"? [VAL] [VAL: (AV, LT)-&gt;REC]+ ]+
- *   [       ['x'?]+ ]? }+
+ *   [       ['x']+ ]? }+
  * </pre>
  * The header row has a skip cell and column-header VALs. Data rows are guarded by !"x"?
  * (first cell does not match the literal "x"): the first cell is a plain VAL, subsequent
@@ -26,7 +26,7 @@ public class RtlTask062Test extends RtlTaskBase {
         return """
             { [       []    [VAL]+ ]
               [ !"x"? [VAL] [VAL: (AV, LT)->REC]+ ]+
-              [       ['x'?]+ ]? }+
+              [       ['x']+ ]? }+
              """;
     }
 }

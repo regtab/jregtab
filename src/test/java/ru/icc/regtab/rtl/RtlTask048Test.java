@@ -9,8 +9,8 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ []{2} ]{2}
  * { [ [!BLANK? VAL : ''->AVP, (ST & C1)*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
- *   [ [BLANK?] [!BLANK? ATTR ":" VAL : CL->AVP] ]
- *   [ [BLANK?]{2} ]? }+
+ *   [ [BLANK] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+ *   [ [BLANK]{2} ]? }+
  * </pre>
  * Two skip rows (2 cells each) precede the person blocks. Each person subtable:
  * first row has a non-blank anchor VAL with empty-literal AVP and unbounded REC
@@ -28,8 +28,8 @@ public class RtlTask048Test extends RtlTaskBase {
         return """
                 [ []{2} ]{2}
                 { [ [!BLANK? VAL : ''->AVP, (ST & C1)*->REC] [!BLANK? ATTR ":" VAL : CL->AVP] ]
-                  [ [BLANK?] [!BLANK? ATTR ":" VAL : CL->AVP] ]
-                  [ [BLANK?]{2} ]? }+
+                  [ [BLANK] [!BLANK? ATTR ":" VAL : CL->AVP] ]
+                  [ [BLANK]{2} ]? }+
                 """;
     }
 }

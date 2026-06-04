@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_014/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask014Test}
  * <pre>
- * { [ [!BLANK ? VAL]{2} [BLANK?] ]
+ * { [ [!BLANK ? VAL]{2} [BLANK] ]
  *   [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST & C0), (ST & C1), SR{2})->REC(4)] ]+ }+
  * </pre>
  * Header row: two non-blank VAL cells then an optional blank sentinel. Data
@@ -23,7 +23,7 @@ public class RtlTask014Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [!BLANK ? VAL]{2} [BLANK?] ]
+                { [ [!BLANK ? VAL]{2} [BLANK] ]
                   [ [!BLANK ? VAL]{2} [!BLANK ? VAL : ((ST & C0), (ST & C1), SR{2})->REC(4)] ]+ }+
                 """;
     }
