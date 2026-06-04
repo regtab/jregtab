@@ -47,7 +47,7 @@ subrowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? cellPattern+ ;
 
 // Cell pattern
 cellPattern : LSQUARE cellPatternBody? RSQUARE quantifier? ;
-cellPatternBody : cellMatchCond QUESTION (actSpecs? contSpec)?
+cellPatternBody : cellMatchCond QUESTION actSpecs? contSpec
                | cellMatchCond
                | actSpecs? contSpec
                ;

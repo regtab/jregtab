@@ -114,7 +114,11 @@ public final class AtpToRtlSerializer {
         boolean hasBody = cp.condition() != null || cp.contentSpec() != null;
         if (hasBody) {
             sb.append(" ");
-            if (cp.condition() != null) sb.append(serializeCellMatchConstr(cp.condition())).append("? ");
+            if (cp.condition() != null) {
+                sb.append(serializeCellMatchConstr(cp.condition()));
+                if (cp.contentSpec() != null) sb.append("? ");
+                else sb.append(" ");
+            }
             if (cp.contentSpec() != null) sb.append(serializeContentSpec(cp.contentSpec())).append(" ");
         }
         sb.append("]").append(serializeQuantifier(cp.quantifier()));
