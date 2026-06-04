@@ -215,7 +215,7 @@ TablePattern pattern = TablePattern.of(
 ```
 { [ [VAL=NORM] [] ]{2}
   [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
-  [ [BLANK?] [] ]? }+
+  [ [BLANK] [] ]? }+
 ```
 
 ### How it works
@@ -227,7 +227,7 @@ TablePattern pattern = TablePattern.of(
   - `SC{2}` — collect up to 2 items from the same subcolumn (the two header rows above).
   - `SR` — collect 1 item from the same subrow (the adjacent value cell).
   - `REC(2)` — the item at position 2 in the sequence (the second header) becomes the attribute name.
-- `[ [BLANK?] [] ]?` — an optional footer row; the first cell must be blank (`BLANK?` is the match condition).
+- `[ [BLANK] [] ]?` — an optional footer row; the first cell must be blank (`BLANK` is the condition-only guard).
 
 ### Running the test
 

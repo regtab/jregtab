@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_108/}
  * <pre>
- * [ [ATTR]+ ]
+ *   [ [ATTR]+ ]
  * { COL->AVP
  *   [ { [!BLANK] [!BLANK? VAL: RT->REC] [!BLANK? VAL] [BLANK]* }+ ]
  *   [ [BLANK]+ ]*
@@ -22,7 +22,7 @@ public class RtlTask108Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [ATTR]+ ]
+                  [ [ATTR]+ ]
                 { COL->AVP
                   [ { [!BLANK] [!BLANK? VAL: RT->REC] [!BLANK? VAL] [BLANK]* }+ ]
                   [ [BLANK]+ ]*

@@ -163,7 +163,10 @@ All levels except `TablePattern` carry a `Quantifier` (zeroOrOne / zeroOrMore / 
 `CellMatchCondition` wraps a `CellPredicate` applied to the cell (not the item) at match time.
 Available predicates: `CellPredicate.Blank`, `CellPredicate.NotBlank`, `CellPredicate.Regex(pattern)`, `CellPredicate.NotRegex(pattern)`.
 
-In RTL: a cell match condition appears before `?` in a cell, subrow, row, or subtable pattern, e.g. `[!BLANK ? VAL : …]`.
+In RTL, a cell match condition appears at several levels:
+- **Cell (guarded):** `[cond ? contSpec]` — the `?` is a required separator before the content spec, e.g. `[!BLANK ? VAL : …]`.
+- **Cell (condition-only):** `[cond]` — no `?`; the cell is consumed if the condition holds but produces no item, e.g. `[BLANK]*` or `[!BLANK]`.
+- **Subrow / row / subtable / table:** `{ cond ? … }` or `[ cond ? … ]` — `?` is always required at these levels since content always follows.
 
 ### Quantifier
 
