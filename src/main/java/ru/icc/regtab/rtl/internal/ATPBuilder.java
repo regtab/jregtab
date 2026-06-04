@@ -25,6 +25,8 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     @Override
     public TablePattern visitTablePattern(RTLParser.TablePatternContext ctx) {
+        CellMatchCondition cond = ctx.cellMatchCond() != null
+                ? buildCellMatchCondition(ctx.cellMatchCond()) : null;
         List<ActionSpec> local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs()) : List.of();
         pushInherited(local);
         try {
@@ -34,7 +36,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             List<RecordsetTransformation> transformations = ctx.settings() != null
                     ? buildTransformations(ctx.settings())
                     : List.of();
-            return new TablePattern(subtables, transformations);
+            return new TablePattern(cond, subtables, transformations);
         } finally {
             inheritedActionsStack.pop();
         }

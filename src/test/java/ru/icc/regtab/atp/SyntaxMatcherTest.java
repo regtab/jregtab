@@ -6,6 +6,8 @@ import ru.icc.regtab.atp.match.SyntaxMatcher;
 import ru.icc.regtab.atp.spec.*;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -280,6 +282,138 @@ class SyntaxMatcherTest {
 
         MatchResult result = SyntaxMatcher.match(atp, syntax);
         assertFalse(result.success());
+    }
+
+    // -------- T1–T7: table-level λ and conjunction semantics --------
+
+    @Test
+    void T1_tableLambda_absent_noEffect() {
+        var syntax = table(new String[][]{{"A", "B"}, {"C", "D"}});
+        var atp = TablePattern.of(
+                SubtablePattern.of(Quantifier.oneOrMore(),
+                        RowPattern.of(CellPattern.of(AtomicContentSpec.val()),
+                                      CellPattern.of(AtomicContentSpec.val()))
+                )
+        );
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(4, result.matchedPairs().size());
+    }
+
+    @Test
+    void T2_tableLambda_cellLevelOnly_rejectsNonMatching() {
+        var syntax = table(new String[][]{{"abc", "2"}});
+        var numeric = new CellMatchCondition(new CellPredicate.RegexMatched("\\d+"));
+        var atp = TablePattern.of(
+                SubtablePattern.of(
+                        RowPattern.of(
+                                CellPattern.of(numeric, Quantifier.one(), AtomicContentSpec.val()),
+                                CellPattern.of(AtomicContentSpec.val())
+                        )
+                )
+        );
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T3_tableLambda_onTable_allNonBlank_succeeds() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var syntax = table(new String[][]{{"A", "B"}});
+        var atp = new TablePattern(notBlank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(CellPattern.of(AtomicContentSpec.val()),
+                                      CellPattern.of(AtomicContentSpec.val())))),
+                List.of());
+        assertTrue(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T3b_tableLambda_onTable_blankCellPresent_fails() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var syntax = table(new String[][]{{"A", ""}});
+        var atp = new TablePattern(notBlank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(CellPattern.of(AtomicContentSpec.val()),
+                                      CellPattern.of(AtomicContentSpec.val())))),
+                List.of());
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T4_tableLambda_tableAndCell_conjunctionBothPass() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var numeric  = new CellMatchCondition(new CellPredicate.RegexMatched("\\d+"));
+        var syntax = table(new String[][]{{"42"}});
+        var atp = new TablePattern(notBlank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(CellPattern.of(numeric, Quantifier.one(), AtomicContentSpec.val())))),
+                List.of());
+        assertTrue(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T4b_tableLambda_tableAndCell_tableLambdaFails() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var numeric  = new CellMatchCondition(new CellPredicate.RegexMatched("\\d+"));
+        var syntax = table(new String[][]{{"", "2"}});
+        var atp = new TablePattern(notBlank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(
+                                CellPattern.of(numeric, Quantifier.one(), AtomicContentSpec.val()),
+                                CellPattern.of(AtomicContentSpec.val())))),
+                List.of());
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T5_tableLambda_threeAncestorLevels_allPass() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var numeric  = new CellMatchCondition(new CellPredicate.RegexMatched("\\d+"));
+        var syntax = table(new String[][]{{"1", "2"}});
+        var rowPat     = RowPattern.of(numeric, Quantifier.one(),
+                CellPattern.of(AtomicContentSpec.val()), CellPattern.of(AtomicContentSpec.val()));
+        var subtablePat = new SubtablePattern(numeric, Quantifier.one(), List.of(rowPat));
+        var atp = new TablePattern(notBlank, List.of(subtablePat), List.of());
+        assertTrue(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T5b_tableLambda_threeAncestorLevels_midLevelFails() {
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var numeric  = new CellMatchCondition(new CellPredicate.RegexMatched("\\d+"));
+        var syntax = table(new String[][]{{"1", "abc"}});
+        var rowPat     = RowPattern.of(numeric, Quantifier.one(),
+                CellPattern.of(AtomicContentSpec.val()), CellPattern.of(AtomicContentSpec.val()));
+        var subtablePat = new SubtablePattern(numeric, Quantifier.one(), List.of(rowPat));
+        var atp = new TablePattern(notBlank, List.of(subtablePat), List.of());
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T6_tableLambda_contradictingConditions_fails() {
+        // λ_table = NOT_BLANK, λ_cell = BLANK: non-blank cell fails cell λ; blank cell fails table pre-check
+        var notBlank = new CellMatchCondition(CellPredicate.NotBlank.INSTANCE);
+        var blank    = new CellMatchCondition(CellPredicate.Blank.INSTANCE);
+        var syntax = table(new String[][]{{"A"}});
+        var atp = new TablePattern(notBlank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(CellPattern.of(blank, Quantifier.one(), AtomicContentSpec.val())))),
+                List.of());
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
+    }
+
+    @Test
+    void T7_tableLambda_preCheck_rejectsBeforeStructuralMatch() {
+        // Table λ = BLANK; cells are "A","B" (non-blank). The structural pattern [VAL][VAL]
+        // would succeed without a pre-check. Pre-check must reject immediately.
+        var blank = new CellMatchCondition(CellPredicate.Blank.INSTANCE);
+        var syntax = table(new String[][]{{"A", "B"}});
+        var atp = new TablePattern(blank,
+                List.of(SubtablePattern.of(
+                        RowPattern.of(CellPattern.of(AtomicContentSpec.val()),
+                                      CellPattern.of(AtomicContentSpec.val())))),
+                List.of());
+        assertFalse(SyntaxMatcher.match(atp, syntax).success());
     }
 
     @Test

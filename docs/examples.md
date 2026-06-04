@@ -5,7 +5,7 @@ For each task the ATP pattern and its RTL equivalent are shown side by side.
 
 ---
 
-## Example 1 — Task 01: repeating subtables, flat record
+## Example 1 — Task 001: repeating subtables, flat record
 
 **Input layout** (Foofah task 01, variant 1):
 
@@ -63,8 +63,8 @@ TablePattern pattern = TablePattern.of(
 ### Running the test
 
 ```bash
-mvn test -Dtest="AtpTask01Test"
-mvn test -Dtest="RtlTask01Test"
+mvn test -Dtest="AtpTask001Test"
+mvn test -Dtest="RtlTask001Test"
 ```
 
 ---
@@ -155,7 +155,7 @@ mvn test -Dtest="AtpIllustrativeExampleTest"
 
 ---
 
-## Example 3 — Task 02: cell match condition, string extraction, cardinality
+## Example 3 — Task 002: cell match condition, string extraction, cardinality
 
 **Input layout** (Foofah task 02, variant 1):
 
@@ -232,8 +232,8 @@ TablePattern pattern = TablePattern.of(
 ### Running the test
 
 ```bash
-mvn test -Dtest="AtpTask02Test"
-mvn test -Dtest="RtlTask02Test"
+mvn test -Dtest="AtpTask002Test"
+mvn test -Dtest="RtlTask002Test"
 ```
 
 ---

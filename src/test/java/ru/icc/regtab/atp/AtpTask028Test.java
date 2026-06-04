@@ -1,0 +1,45 @@
+package ru.icc.regtab.atp;
+
+import ru.icc.regtab.atp.spec.ActionSpec;
+import ru.icc.regtab.atp.spec.AtomicContentSpec;
+import ru.icc.regtab.atp.spec.CellPattern;
+import ru.icc.regtab.atp.spec.ItemFilterConditionSpec;
+import ru.icc.regtab.atp.spec.ProviderSpec;
+import ru.icc.regtab.atp.spec.Quantifier;
+import ru.icc.regtab.atp.spec.RowPattern;
+import ru.icc.regtab.atp.spec.SubtablePattern;
+import ru.icc.regtab.atp.spec.TablePattern;
+
+/**
+ * Task 28: flat table with a header row (anchor collecting all same-subtable values)
+ * followed by one-or-more multi-cell data rows feeding into that anchor's REC.
+ * <p>
+ * Fixtures: {@code src/test/resources/tasks/task_028/}
+ * RTL: {@link ru.icc.regtab.rtl.RtlTask028Test}
+ */
+class AtpTask028Test extends AtpTaskBase {
+
+    private static final ItemFilterConditionSpec SAME_SUBTABLE = ItemFilterConditionSpec.sameSubtable();
+
+    @Override
+    protected String taskId() {
+        return "028";
+    }
+
+    @Override
+    protected TablePattern buildPattern() {
+        return TablePattern.of(
+                SubtablePattern.of(
+                        RowPattern.of(
+                                CellPattern.of(AtomicContentSpec.val(
+                                        ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBTABLE))
+                                )),
+                                CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
+                        ),
+                        RowPattern.of(Quantifier.oneOrMore(),
+                                CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
+                        )
+                )
+        );
+    }
+}
