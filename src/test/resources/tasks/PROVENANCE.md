@@ -75,18 +75,75 @@ Test data sourced from the [Foofah](https://github.com/umich-dbgroup/foofah) ben
 
 ---
 
-## Collection 2: RegTab (tasks 51–…)
+## Collection 2: RegTab (tasks 51–110)
 
 Test data created as part of the jRegTab project to cover table patterns not present in Foofah.
 
 **Source:** authored by the jRegTab team.
 
-**Structure:** 5 variants per task. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
+**Structure:** 60 tasks × 5 variants = 300 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
 
 ### Task mapping: task_XX ↔ regtab_id
 
 | task_id | regtab_id |
 |---------|-----------|
-| 51 | illus_exp_1 |
-| 52 | illus_exp_2 |
-| 53 | illus_exp_3 |
+| 51 | synthetic_0051 |
+| 52 | synthetic_0052 |
+| 53 | synthetic_0053 |
+| 54 | synthetic_0054 |
+| 55 | synthetic_0055 |
+| 56 | synthetic_0056 |
+| 57 | synthetic_0057 |
+| 58 | synthetic_0058 |
+| 59 | synthetic_0059 |
+| 60 | synthetic_0060 |
+| 61 | synthetic_0061 |
+| 62 | synthetic_0062 |
+| 63 | synthetic_0063 |
+| 64 | synthetic_0064 |
+| 65 | synthetic_0065 |
+| 66 | synthetic_0066 |
+| 67 | synthetic_0067 |
+| 68 | synthetic_0068 |
+| 69 | synthetic_0069 |
+| 70 | synthetic_0070 |
+| 71 | synthetic_0071 |
+| 72 | synthetic_0072 |
+| 73 | synthetic_0073 |
+| 74 | synthetic_0074 |
+| 75 | synthetic_0075 |
+| 76 | synthetic_0076 |
+| 77 | synthetic_0077 |
+| 78 | synthetic_0078 |
+| 79 | synthetic_0079 |
+| 80 | synthetic_0080 |
+| 81 | synthetic_0081 |
+| 82 | synthetic_0082 |
+| 83 | synthetic_0083 |
+| 84 | synthetic_0084 |
+| 85 | synthetic_0085 |
+| 86 | synthetic_0086 |
+| 87 | synthetic_0087 |
+| 88 | synthetic_0088 |
+| 89 | synthetic_0089 |
+| 90 | synthetic_0090 |
+| 91 | synthetic_0091 |
+| 92 | synthetic_0092 |
+| 93 | synthetic_0093 |
+| 94 | synthetic_0094 |
+| 95 | synthetic_0095 |
+| 96 | synthetic_0096 |
+| 97 | synthetic_0097 |
+| 98 | synthetic_0098 |
+| 99 | synthetic_0099 |
+| 100 | synthetic_0100 |
+| 101 | synthetic_0101 |
+| 102 | synthetic_0102 |
+| 103 | synthetic_0103 |
+| 104 | synthetic_0104 |
+| 105 | synthetic_0105 |
+| 106 | synthetic_0106 |
+| 107 | synthetic_0107 |
+| 108 | synthetic_0108 |
+| 109 | synthetic_0109 |
+| 110 | synthetic_0110 |
