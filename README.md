@@ -239,19 +239,45 @@ Key building blocks:
 RTL (Regular Table Language) is a compact textual DSL that compiles to ATP.
 Use `RtlCompiler.compile(rtl)` to obtain a `TablePattern`, then proceed identically to the ATP path.
 
-**Example — Task 001** (two-row repeating subtables):
+**Example** — same cross-tabulation as the two sections above, expressed as an RTL string:
 
 ```java
-import ru.icc.regtab.rtl.RtlCompiler;
+import ru.icc.regtab.atp.AtpMatcher;
 import ru.icc.regtab.atp.spec.TablePattern;
+import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.syntax.TableSyntax;
+import ru.icc.regtab.recordset.Recordset;
+import ru.icc.regtab.rtl.RtlCompiler;
+
+// Same 3 × 3 table
+TableSyntax syntax = new TableSyntax(3, 3);
+syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
+syntax.getCell(0, 2).setText("HU");
+syntax.getCell(1, 0).setText("IKT"); syntax.getCell(1, 1).setText("5");
+syntax.getCell(1, 2).setText("3");
+syntax.getCell(2, 0).setText("SVO"); syntax.getCell(2, 1).setText("31");
+syntax.getCell(2, 2).setText("40");
 
 TablePattern pattern = RtlCompiler.compile("""
-        { [ [VAL : ST*->REC] [VAL]{2} []+ ]
-          [ []               [VAL]{4} []+ ] }+
+        [ [] [VAL: 'AIRLINE'->AVP]+ ]
+        [ [VAL: 'AIRPORT'->AVP] [VAL: 'ND'->AVP, (COL,ROW)->REC]+ ]+
         """);
+
+Recordset result = AtpMatcher.match(pattern, syntax)
+        .map(itm -> new TableInterpreter().interpret(itm))
+        .orElseThrow(() -> new IllegalStateException("Pattern did not match"));
+// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
+// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
 ```
 
-The equivalent ATP pattern for Task 001 is shown in `AtpTask001Test`.
+The RTL string is a compact encoding of the ATP pattern shown in the previous section:
+
+| RTL token | ATP equivalent |
+|-----------|---------------|
+| `[]` | `CellPattern.skip()` |
+| `[VAL: 'AIRLINE'->AVP]+` | `CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val(ActionSpec.avp("AIRLINE")))` |
+| `(COL,ROW)->REC` | `ActionSpec.rec(1, ItemFilterConditionSpec.sameCol(), ItemFilterConditionSpec.sameRow())` |
+| `[ ... ]+` | `RowPattern.of(Quantifier.oneOrMore(), ...)` |
 
 ### Illustrative example
 
