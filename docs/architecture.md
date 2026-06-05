@@ -1,5 +1,17 @@
 # Architecture
 
+The library is organised around the following components:
+
+| Component | Package | Description |
+|---|---|---|
+| **ITM Syntax** | `ru.icc.regtab.itm.syntax` | Syntactic layer of ITM: `TableSyntax`, `Cell`, `Row`, `Subrow`, `Subtable` |
+| **ITM Semantics** | `ru.icc.regtab.itm.semantics` | Semantic layer of ITM: `TableSemantics`, `CellDerivedItem`, `ContextDerivedItem`, interpretation actions and providers |
+| **ATP Spec** | `ru.icc.regtab.atp.spec` | Formal ATP types: `TablePattern`, `SubtablePattern`, `RowPattern`, `SubrowPattern`, `CellPattern`, content specifications (`AtomicContentSpec`, `DelimitedContentSpec`, `CompoundContentSpec`, `ConditionalContentSpec`), item provider specifications, and interpretation action specifications |
+| **ATP Matcher** | `ru.icc.regtab.atp.match` | Matches an ATP instance against an ITM instance; on success populates the semantic layer |
+| **RTL Compiler** | `ru.icc.regtab.rtl` | Compiles RTL DSL strings to ATP (`RtlCompiler`, ANTLR4 grammar) |
+| **Table Interpreter** | `ru.icc.regtab.interpret` | `TableInterpreter` derives a `Recordset` from an `InterpretableTable`; supports configurable `SchemaConstructionStrategy` and post-processing steps (`WhitespaceNormalization`, `FieldSplitting`, `SchemaReordering`) |
+| **Recordset** | `ru.icc.regtab.recordset` | `Recordset`, `Record`, `Schema` |
+
 ## Package map
 
 ```
