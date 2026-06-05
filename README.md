@@ -48,7 +48,7 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 mvn compile
 ```
 
-To compile and run the full test suite (all 50 Foofah benchmark tasks, 500 variants (250 ATP + 250 RTL)):
+To compile and run the full test suite (110 tasks, 1100 variants (550 ATP + 550 RTL)):
 
 ```bash
 mvn test
@@ -137,14 +137,16 @@ mvn test -Dtest="AtpIllustrativeExampleTest"
 
 ## Evaluation
 
-RegTab has been evaluated on the **Foofah benchmark** — a well-established collection of 50 tabular data transformation tasks assembled by Jin et al. (2017) from real-world forums and related work (37 real-world cases, 13 synthetic). Each task provides five source tables from the same class and five corresponding target recordsets.
+RegTab has been evaluated on two benchmarks.
 
-All 50 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **500 test variants (250 ATP + 250 RTL)** are transformed correctly (100 % accuracy).
-
-In addition to the Foofah benchmark, jRegTab includes extended task tests (tasks 051–101) covering advanced RTL features.
+**Foofah benchmark (tasks 001–050)** — a well-established collection of 50 tabular data transformation tasks assembled by Jin et al. (2017) from real-world forums and related work (37 real-world cases, 13 synthetic). Each task provides five source tables from the same class and five corresponding target recordsets.
 
 The benchmark data (input and expected CSV files) is available at:
 <https://github.com/umich-dbgroup/foofah>
+
+**RegTab benchmark (tasks 051–110)** — an original collection of 60 tasks designed to cover advanced RegTab features not present in the Foofah benchmark: multi-level headers, cross-tabulations, conditional and delimited content, grouped and tagged rows, and compound provider specifications.
+
+All 110 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **1100 test variants (550 ATP + 550 RTL)** are transformed correctly (100 % accuracy).
 
 ---
 
@@ -154,15 +156,18 @@ The test suite lives under `src/test/java/ru/icc/regtab/` and is split into two 
 
 ### ATP benchmark tests
 
-The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one Foofah task as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
+The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one task (Foofah benchmark: 001–050, RegTab benchmark: 051–110) as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
 
 ```
 src/test/java/ru/icc/regtab/atp/
     AtpTaskBase.java          # parameterised base: loads CSV, runs matcher, asserts output
-    AtpTask001Test.java
+    AtpTask001Test.java       # Foofah benchmark tasks 001–050
     AtpTask002Test.java
     ...
-    AtpTask101Test.java
+    AtpTask050Test.java
+    AtpTask051Test.java       # RegTab benchmark tasks 051–110
+    ...
+    AtpTask110Test.java
 ```
 
 Each test class overrides two methods:
@@ -178,7 +183,7 @@ Each test class overrides two methods:
 4. Applies optional post-processing (e.g. `WhitespaceNormalization`)
 5. Asserts the result against `src/test/resources/tasks/task_{NN}/expected_{V}.csv`
 
-All 50 tasks have dedicated `AtpTask{NN}Test` classes.
+All 110 tasks have dedicated `AtpTask{NN}Test` classes.
 
 **Example — Task 001** (subtables with a `rec` action using the `sameSubtable` predicate):
 
@@ -209,15 +214,18 @@ protected TablePattern buildPattern() {
 
 ### RTL benchmark tests
 
-The `rtl` package mirrors the ATP benchmark: each `RtlTask{NN}Test` implements the same Foofah task as an RTL string. These tests verify that the RTL compiler produces an ATP pattern equivalent to the hand-crafted ATP counterpart.
+The `rtl` package mirrors the ATP benchmark: each `RtlTask{NN}Test` implements the same task as a compact RTL string. These tests verify that the RTL compiler produces an ATP pattern equivalent to the hand-crafted ATP counterpart.
 
 ```
 src/test/java/ru/icc/regtab/rtl/
     RtlTaskBase.java          # loads CSV, compiles RTL → ATP, runs matcher, asserts output
-    RtlTask001Test.java
+    RtlTask001Test.java       # Foofah benchmark tasks 001–050
     RtlTask002Test.java
     ...
-    RtlTask101Test.java
+    RtlTask050Test.java
+    RtlTask051Test.java       # RegTab benchmark tasks 051–110
+    ...
+    RtlTask110Test.java
 ```
 
 Each test class overrides two methods:
@@ -254,7 +262,7 @@ src/test/resources/tasks/
     task_051/
         ...
     ...
-    task_101/
+    task_110/
         ...
 ```
 
