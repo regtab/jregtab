@@ -131,7 +131,7 @@ The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4`.
 
 ```
 TablePattern  ──►  AtpToRtlSerializer.serialize()  ──►  RTL string
-     ▲                                                        │
+     ▲                                                       │
      └────────────  RtlCompiler.compile()  ◄─────────────────┘
 ```
 
