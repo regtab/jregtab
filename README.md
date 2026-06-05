@@ -283,18 +283,18 @@ The RTL string is a compact encoding of the ATP pattern shown in the previous se
 
 ### Illustrative example
 
-`AtpIllustrativeExampleTest` implements the worked example from Section VI of the paper — a table class listing the numbers of airline departures from airports by month. The target schema is `⟨ND, AIRLINE, AIRPORT, MON⟩`.
+`AtpIllustrativeExampleTest` and `RtlIllustrativeExampleTest` implement the worked example from Section VI of the paper — a table class listing the numbers of airline departures from airports by month. The target schema is `⟨ND, AIRLINE, AIRPORT, MON⟩`. The ATP and RTL tests are exact counterparts: same tables, same assertions, different pattern representation.
 
-The test covers three cases:
+Each test covers three cases:
 
 - `paperExample_3x3_table_t0` — matches the 3 × 3 table from Figure 7 and verifies all four extracted records
 - `extendedTable_4airlines_3airports` — matches a 4 × 5 table (4 airlines, 3 airports) and verifies 12 records
 - `malformedTable_bodyCell_missingDelimiter_fails` — verifies that a table with malformed body cells does not match
 
-To run it:
+To run both:
 
 ```bash
-mvn test -Dtest="AtpIllustrativeExampleTest"
+mvn test -Dtest="AtpIllustrativeExampleTest,RtlIllustrativeExampleTest"
 ```
 
 ---
