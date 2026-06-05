@@ -58,17 +58,21 @@ mvn test
 
 ## Usage
 
-### Low-level ITM construction
-
-An `InterpretableTable` can be constructed directly by assembling the syntactic and semantic layers programmatically. This approach gives full control over items and interpretation actions, and is suited to use cases where the ATP pattern language does not suffice. For most cases, the ATP and RTL paths are simpler.
-
-The example below builds a cross-tabulation with schema `⟨ND, AIRLINE, AIRPORT⟩`:
+The three sections below use a common running example — a simplified cross-tabulation with schema `⟨ND, AIRLINE, AIRPORT⟩`:
 
 ```
        | CA | HU
 IKT    |  5 |  3
 SVO    | 31 | 40
 ```
+
+This is a stripped-down version of the illustrative example from Section VI of the paper (see [Illustrative example](#illustrative-example) below). The full paper example adds a `MON` field extracted from compound cells like `"0 Jan"`, which requires `CompoundContentSpec` and a third `sameCell()` provider in the `rec` action. The simplified version isolates the core pattern structure without the compound-cell machinery.
+
+### Low-level ITM construction
+
+An `InterpretableTable` can be constructed directly by assembling the syntactic and semantic layers programmatically. This approach gives full control over items and interpretation actions, and is suited to use cases where the ATP pattern language does not suffice. For most cases, the ATP and RTL paths are simpler.
+
+The example below builds this cross-tabulation from scratch:
 
 ```java
 import ru.icc.regtab.itm.InterpretableTable;
@@ -173,7 +177,7 @@ For cells that yield multiple items (e.g. `"0 Jan"` → `"0"` and `"Jan"`), crea
 
 The `ru.icc.regtab.atp.spec` package provides the formal ATP types. A `TablePattern` is assembled hierarchically from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances. Each `CellPattern` carries a `ContentSpec` that says how items are derived from the matched cell and which interpretation actions to apply. `AtpMatcher.match()` then performs structural matching against a `TableSyntax`, populates the semantic layer automatically, and returns an `InterpretableTable` ready for interpretation.
 
-**Example** — same cross-tabulation as the low-level section above, expressed as an ATP pattern:
+**Example** — the same cross-tabulation expressed as an ATP pattern:
 
 ```java
 import ru.icc.regtab.atp.AtpMatcher;
@@ -182,7 +186,6 @@ import ru.icc.regtab.interpret.TableInterpreter;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 import ru.icc.regtab.recordset.Recordset;
 
-// Same 3 × 3 table
 TableSyntax syntax = new TableSyntax(3, 3);
 syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
 syntax.getCell(0, 2).setText("HU");
@@ -239,7 +242,7 @@ Key building blocks:
 RTL (Regular Table Language) is a compact textual DSL that compiles to ATP.
 Use `RtlCompiler.compile(rtl)` to obtain a `TablePattern`, then proceed identically to the ATP path.
 
-**Example** — same cross-tabulation as the two sections above, expressed as an RTL string:
+**Example** — the same cross-tabulation expressed as an RTL string:
 
 ```java
 import ru.icc.regtab.atp.AtpMatcher;
@@ -249,7 +252,6 @@ import ru.icc.regtab.itm.syntax.TableSyntax;
 import ru.icc.regtab.recordset.Recordset;
 import ru.icc.regtab.rtl.RtlCompiler;
 
-// Same 3 × 3 table
 TableSyntax syntax = new TableSyntax(3, 3);
 syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
 syntax.getCell(0, 2).setText("HU");
