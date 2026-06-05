@@ -9,6 +9,7 @@ The library is organised around the following components:
 | **ATP Spec** | `ru.icc.regtab.atp.spec` | Formal ATP types: `TablePattern`, `SubtablePattern`, `RowPattern`, `SubrowPattern`, `CellPattern`, content specifications (`AtomicContentSpec`, `DelimitedContentSpec`, `CompoundContentSpec`, `ConditionalContentSpec`), item provider specifications, and interpretation action specifications |
 | **ATP Matcher** | `ru.icc.regtab.atp.match` | Matches an ATP instance against an ITM instance; on success populates the semantic layer |
 | **RTL Compiler** | `ru.icc.regtab.rtl` | Compiles RTL DSL strings to ATP (`RtlCompiler`, ANTLR4 grammar) |
+| **ATP→RTL Serializer** | `ru.icc.regtab.rtl` | Inverse direction: serializes a `TablePattern` back to an RTL string (`AtpToRtlSerializer`) |
 | **Table Interpreter** | `ru.icc.regtab.interpret` | `TableInterpreter` derives a `Recordset` from an `InterpretableTable`; supports configurable `SchemaConstructionStrategy` and post-processing steps (`WhitespaceNormalization`, `FieldSplitting`, `SchemaReordering`) |
 | **Recordset** | `ru.icc.regtab.recordset` | `Recordset`, `Record`, `Schema` |
 
@@ -121,4 +122,36 @@ RTL string
 ```
 
 The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4`.
-`AtpToRtlSerializer` performs the inverse: a `TablePattern` built via the ATP API can be round-tripped back to an RTL string (used in `AtpRtlRoundTripTest`).
+
+---
+
+## ATP→RTL serialization
+
+`AtpToRtlSerializer.serialize(TablePattern)` is the inverse of `RtlCompiler.compile()`: it traverses a `TablePattern` object graph and produces the corresponding RTL string.
+
+```
+TablePattern  ──►  AtpToRtlSerializer.serialize()  ──►  RTL string
+     ▲                                                        │
+     └────────────  RtlCompiler.compile()  ◄─────────────────┘
+```
+
+The round-trip property — serialize then compile gives back the original pattern — is verified in `AtpRtlRoundTripTest` for all 50 Foofah benchmark tasks (001–050).
+
+**What is serialized:**
+
+| ATP construct | RTL output |
+|---|---|
+| `SubtablePattern` with `Quantifier.ONE` and no condition | implicit (no `{ }`) |
+| `SubtablePattern` with other quantifier or condition | `{ ... }q` |
+| `RowPattern`, `SubrowPattern`, `CellPattern` | `[ ... ]q`, `{ ... }q`, `[ ... ]q` |
+| `AtomicContentSpec` with tags | `VAL #'tag'` |
+| `AtomicContentSpec` with extractor | `VAL = TRIM` |
+| `ActionSpec` (avp, rec, join, fill, prefix, suffix) | `'NAME'->AVP`, `(prov…)->REC`, etc. |
+| `ProviderSpec` with traversal order | leading `-` / `^` / `-^` |
+| `ProviderSpec` with cardinality | `{n}` / `*` |
+| `RecordsetTransformation` settings | `<NORM>`, `<ANCH(n)>`, `<SPLIT("d")>` |
+
+**Limitations:**
+
+- Actions are emitted at the atom level (after `:`). Inherited action specs — those declared at subtable, row, or subrow level and merged down into `AtomicContentSpec.actions()` — are not reconstructed at their original level; they appear as cell-level actions in the output.
+- `CellPredicate.Custom` and `ItemFilterConditionSpec.Custom` throw `UnsupportedOperationException` — only patterns without custom predicates can be serialized.
