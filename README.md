@@ -171,7 +171,68 @@ For cells that yield multiple items (e.g. `"0 Jan"` → `"0"` and `"Jan"`), crea
 
 ### Using ATP patterns
 
-The `ru.icc.regtab.atp.spec` package provides the formal ATP types. Build a `TablePattern` from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances with their content and action specifications, then use the ATP Matcher to match it against an ITM instance and populate the semantic layer automatically.
+The `ru.icc.regtab.atp.spec` package provides the formal ATP types. A `TablePattern` is assembled hierarchically from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances. Each `CellPattern` carries a `ContentSpec` that says how items are derived from the matched cell and which interpretation actions to apply. `AtpMatcher.match()` then performs structural matching against a `TableSyntax`, populates the semantic layer automatically, and returns an `InterpretableTable` ready for interpretation.
+
+**Example** — same cross-tabulation as the low-level section above, expressed as an ATP pattern:
+
+```java
+import ru.icc.regtab.atp.AtpMatcher;
+import ru.icc.regtab.atp.spec.*;
+import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.syntax.TableSyntax;
+import ru.icc.regtab.recordset.Recordset;
+
+// Same 3 × 3 table
+TableSyntax syntax = new TableSyntax(3, 3);
+syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
+syntax.getCell(0, 2).setText("HU");
+syntax.getCell(1, 0).setText("IKT"); syntax.getCell(1, 1).setText("5");
+syntax.getCell(1, 2).setText("3");
+syntax.getCell(2, 0).setText("SVO"); syntax.getCell(2, 1).setText("31");
+syntax.getCell(2, 2).setText("40");
+
+TablePattern pattern = TablePattern.of(
+        SubtablePattern.of(
+                // header row: skip first cell, then one-or-more airline-code cells
+                RowPattern.of(
+                        CellPattern.skip(),
+                        CellPattern.of(Quantifier.oneOrMore(),
+                                AtomicContentSpec.val(ActionSpec.avp("AIRLINE")))
+                ),
+                // data rows: airport cell + one-or-more ND cells
+                RowPattern.of(Quantifier.oneOrMore(),
+                        CellPattern.of(AtomicContentSpec.val(ActionSpec.avp("AIRPORT"))),
+                        CellPattern.of(Quantifier.oneOrMore(),
+                                AtomicContentSpec.val(
+                                        ActionSpec.avp("ND"),
+                                        ActionSpec.rec(1,
+                                                ItemFilterConditionSpec.sameCol(), // airline, same column
+                                                ItemFilterConditionSpec.sameRow()  // airport, same row
+                                        )
+                                )
+                        )
+                )
+        )
+);
+
+Recordset result = AtpMatcher.match(pattern, syntax)
+        .map(itm -> new TableInterpreter().interpret(itm))
+        .orElseThrow(() -> new IllegalStateException("Pattern did not match"));
+// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
+// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
+```
+
+Key building blocks:
+
+| Type | Role |
+|------|------|
+| `TablePattern` / `SubtablePattern` / `RowPattern` / `CellPattern` | Structural hierarchy mirroring the ITM |
+| `Quantifier` | How many times a pattern element repeats (`one()`, `oneOrMore()`, `zeroOrMore()`, `exactly(n)`) |
+| `AtomicContentSpec` | How one item is derived from a cell (`val`, `attr`, `aux`, `skip`) |
+| `ActionSpec` | Interpretation action: `avp("NAME")` names a field, `rec(k, …)` creates a record |
+| `ItemFilterConditionSpec` | Predicate selecting provider items: `sameCol()`, `sameRow()`, `sameSubtable()`, … |
+| `ProviderSpec` | Bundles a filter condition with cardinality and traversal order |
+| `AtpMatcher.match()` | Structural matching + automatic semantic-layer construction |
 
 ### Using RTL patterns
 
@@ -190,7 +251,7 @@ TablePattern pattern = RtlCompiler.compile("""
         """);
 ```
 
-The RTL string above encodes the same pattern as the ATP example below.
+The equivalent ATP pattern for Task 001 is shown in `AtpTask001Test`.
 
 ### Illustrative example
 
