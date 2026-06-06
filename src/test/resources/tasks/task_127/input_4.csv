@@ -1,0 +1,15 @@
+Hydrobiont groups,2018,2018,2018,2018,2018,2019,2019,2019,2019,2019
+,Survey time,Abundance,Abundance,Abundance,Area km2,Survey time,Abundance,Abundance,Abundance,Area km2
+,Survey time,Total for survey,Background,Pollution zone,Area km2,Survey time,Total for survey,Background,Pollution zone,Area km2
+"Bacterioplankton, cells/ml",II-III,1-364<br>17,1-12<br>6,28-75<br>49,5.6,III,1-57<br>11,3-18<br>9,21-36<br>25,4.1
+"Bacterioplankton, cells/ml",VI,2-1600<br>172,4-14<br>8,87-469<br>257,11.3,VI,18-4520<br>701,18-119<br>65,1076-4520<br>2717,8.7
+"Bacterioplankton, cells/ml",VIII-IX,1-6688<br>505,1-71<br>23,137-212<br>174,9.8,VIII,28-688<br>279,37-209<br>130,348-434<br>373,9.1
+"Phytoplankton, thousand cells/l",II-III,84-373<br>205,120-186<br>161,262-304<br>276,7.6,III,93-523<br>245,93-134<br>121,268-502<br>333,11.6
+"Phytoplankton, thousand cells/l",VI,248-5093<br>880,412-694<br>598,955-2914<br>1791,4.9,VI,86-2780<br>1207,492-1155<br>956,1648-2780<br>1870,7.9
+"Phytoplankton, thousand cells/l",VIII-IX,219-1177<br>661,219-504<br>411,868-1177<br>983,9.5,VIII,272-1473<br>572,342-454<br>383,845-1135<br>946,8.4
+"Zooplankton, mg/m3",II-III,3-109<br>50,55-109<br>75,3-32<br>21,11.5,III,14-635<br>152,467-635<br>538,14-202<br>117,29.4
+"Zooplankton, mg/m3",VI,18-579<br>144,184-290<br>236,18-96<br>62,24.7,VI,8-120<br>49,59-70<br>65,8-31<br>22,7.6
+"Zooplankton, mg/m3",VIII-IX,46-1345<br>343,509-1345<br>736,46-329<br>190,15.5,VIII,14-1580<br>369,511-1580<br>840,14-358<br>282,24.0
+"Bacteriobenthos, thousand cells/g wet silt",II-III,"1.3-24<br>7","1.3-7<br>4",15-25<br>20,1,III,1-13<br>5,1-4<br>3,8-13<br>10,2.3
+"Bacteriobenthos, thousand cells/g wet silt",VIII-IX,"1.4-27<br>7","1.4-6<br>4",11-27<br>18,2.2,IX,2-97<br>22,2-18<br>9,60-97<br>71,3.4
+"Zoobenthos, g/m2",III,"0.02-17<br>2",,,,III,"0.02-94<br>9","0.1-10<br>4","0.02-94<br>10",
