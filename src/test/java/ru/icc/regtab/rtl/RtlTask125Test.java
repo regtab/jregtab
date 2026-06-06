@@ -22,7 +22,7 @@ public class RtlTask125Test extends RtlTaskBase {
         return """
                 [ []{2} [VAL: 'MONTH'->AVP]+ ]
                 [ [] [VAL: 'INDICATOR'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW&C1,COL&R0)->REC)]+ ]+
+                  [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW&C1,COL)->REC)]+ ]+
                 """;
     }
 }
