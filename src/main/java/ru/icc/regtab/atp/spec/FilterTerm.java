@@ -27,6 +27,7 @@ public sealed interface FilterTerm permits
         FilterTerm.ColAbsoluteRange,
         FilterTerm.RowExact,
         FilterTerm.RowOffset,
+        FilterTerm.RowAbsoluteRange,
         FilterTerm.PosExact,
         FilterTerm.PosOffset,
         FilterTerm.PosRange,
@@ -193,6 +194,16 @@ public sealed interface FilterTerm permits
         }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.cell().row() == a.cell().row() + delta;
+        }
+    }
+
+    /** Absolute row range Ra..b — row is between lo and hi (inclusive, 0-based). */
+    record RowAbsoluteRange(int lo, int hi) implements FilterTerm {
+        public String toRtl() {
+            return hi == Integer.MAX_VALUE ? "R" + lo + ".." : "R" + lo + ".." + hi;
+        }
+        public ItemFilterCondition toCondition() {
+            return (a, c) -> c.cell().row() >= lo && (hi == Integer.MAX_VALUE || c.cell().row() <= hi);
         }
     }
 

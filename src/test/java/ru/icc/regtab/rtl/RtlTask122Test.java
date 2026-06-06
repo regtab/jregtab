@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * [ [] [VAL: 'MONTH'-&gt;AVP]+ ]
  * { [ [] [('\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP)]{6} [] ]
  *   [ [VAL: 'INDICATOR'-&gt;AVP]
- *     [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW&amp;C0,-AV{2},COL&amp;R0,COL&amp;R1)-&gt;REC)]{6} [] ] }+
+ *     [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW,-AV{2},COL&amp;R0..1)-&gt;REC)]{6} [] ] }+
  * </pre>
  */
 public class RtlTask122Test extends RtlTaskBase {
@@ -27,7 +27,7 @@ public class RtlTask122Test extends RtlTaskBase {
                 [ [] [VAL: 'MONTH'->AVP]+ ]
                 { [ [] [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP)]{6} [] ]
                   [ [VAL: 'INDICATOR'->AVP]
-                    [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL&R0,COL&R1)->REC)]{6} [] ] }+
+                    [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL&R0..1*)->REC)]{6} [] ] }+
                 """;
     }
 }

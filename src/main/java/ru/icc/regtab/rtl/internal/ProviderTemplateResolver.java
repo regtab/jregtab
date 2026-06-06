@@ -231,9 +231,12 @@ final class ProviderTemplateResolver {
 
     private static FilterTerm rowConstraint(RTLParser.RowContext ctx) {
         if (ctx.range() != null) {
+            boolean hiOpen = ctx.range().end() == null;
+            boolean startIsOffset = ctx.range().start().offset() != null;
             int lo = boundaryValue(ctx.range().start(), 0);
-            if (ctx.range().start().offset() != null) return new FilterTerm.RowOffset(lo);
-            return new FilterTerm.RowExact(lo);
+            int hi = hiOpen ? Integer.MAX_VALUE : boundaryValue(ctx.range().end(), Integer.MAX_VALUE);
+            if (startIsOffset) return new FilterTerm.RowOffset(lo); // R+n.. not yet needed
+            return new FilterTerm.RowAbsoluteRange(lo, hi);
         }
         if (ctx.offset() != null) return new FilterTerm.RowOffset(parseOffset(ctx.offset()));
         return new FilterTerm.RowExact(Integer.parseInt(ctx.INT().getText()));
