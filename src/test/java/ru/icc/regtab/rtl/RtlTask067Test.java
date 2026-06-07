@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask067Test}
  * <pre>
  * [          [ATTR]+ ]
- * [ COL-&gt;AVP [RT*-&gt;REC (BLANK? VAL: -AV&amp;!BLANK-&gt;FILL | VAL)]
+ * [ COL-&gt;AVP [RT*-&gt;REC BLANK? VAL: -AV&amp;!BLANK-&gt;FILL | VAL]
  *            [BLANK? VAL: -AV&amp;!BLANK-&gt;FILL | VAL]+ ]+
  * </pre>
  * COL-&gt;AVP is a row-level inherited action applied to all VAL cells. FILL uses
@@ -25,7 +25,7 @@ public class RtlTask067Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [          [ATTR]+ ]
-                [ COL->AVP [RT*->REC (BLANK? VAL: -AV&!BLANK->FILL | VAL)]
+                [ COL->AVP [RT*->REC BLANK? VAL: -AV&!BLANK->FILL | VAL]
                            [BLANK? VAL: -AV&!BLANK->FILL | VAL]+ ]+
          """;
     }

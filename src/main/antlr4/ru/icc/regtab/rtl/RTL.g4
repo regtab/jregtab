@@ -48,7 +48,6 @@ subrowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? cellPattern+ ;
 // Cell pattern
 cellPattern : LSQUARE cellPatternBody? RSQUARE quantifier? ;
 cellPatternBody : cellMatchCond QUESTION actSpecs? contSpec
-               | cellMatchCond QUESTION xContSpec VBAR xContSpec
                | cellMatchCond
                | actSpecs? contSpec
                ;
@@ -115,7 +114,7 @@ openDelim  : STRING ;  // Opening delimiter
 closeDelim : STRING ;  // Closing delimiter
 
 // Conditional content specification
-condContSpec : LPAREN cellMatchCond QUESTION (xContSpec VBAR xContSpec) RPAREN;
+condContSpec : LPAREN? cellMatchCond QUESTION (xContSpec VBAR xContSpec) RPAREN?;
 xContSpec    : atomContSpec | delimContSpec | compContSpec ;
 
 // Cell match condition
