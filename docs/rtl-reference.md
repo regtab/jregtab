@@ -22,9 +22,10 @@ subrowPattern    : cellPattern+                         // implicit
 cellPattern      : [ ] q?                               // skip cell
                  | [ cellPatternBody ] q?
 
-cellPatternBody  : cond ? [acts] contSpec   // guarded: ? required when contSpec follows
-                 | cond                    // condition-only: no ? (skip cell with guard)
-                 | [acts] contSpec          // unguarded
+cellPatternBody  : cond ? [acts] contSpec          // guarded: ? required when contSpec follows
+                 | cond ? trueSpec | falseSpec     // bare conditional (no [acts] before cond)
+                 | cond                            // condition-only: no ? (skip cell with guard)
+                 | [acts] contSpec                  // unguarded
 ```
 
 **Inherited action specs** — `[acts]` placed at the table, subtable, row, or subrow level are
@@ -154,12 +155,21 @@ Example: `VAL " " VAL` — cell text is two tokens separated by a space (like `"
 ### Conditional
 
 ```
-(cond ? trueSpec | falseSpec)
+cond ? trueSpec | falseSpec
 ```
 
 Branches on a cell match condition; both branches must be `atomContSpec`, `delimContSpec`, or `compContSpec`.
 
-Example: `(BLANK ? SKIP | VAL)` — skip blank cells, derive a value from non-blank ones.
+Parentheses around the conditional are **optional** when no action specs precede it in the cell body.
+When an action spec does precede the conditional, the parenthesised form `(cond ? x | y)` is required:
+
+```
+[BLANK ? _ | VAL]                    — bare form; no actSpecs in the cell
+[(BLANK ? _ | VAL)]                  — equivalent parenthesised form
+[RT*->REC (BLANK ? _ | VAL)]         — parens required: actSpec precedes the conditional
+```
+
+Example: `[BLANK ? _ | VAL]` — skip blank cells, derive a value from non-blank ones.
 
 ---
 
