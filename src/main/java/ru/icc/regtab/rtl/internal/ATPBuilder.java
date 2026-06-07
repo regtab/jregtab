@@ -153,20 +153,21 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     public CellPattern visitCellPattern(RTLParser.CellPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
         var body = ctx.cellPatternBody();
-        // [] and [BLANK?] (no contSpec) are shorthand for [SKIP]
-        if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
-            CellMatchCondition cond = body != null && body.cellMatchCond() != null
-                    ? buildCellMatchCondition(body.cellMatchCond()) : null;
-            return new CellPattern(cond, q, null);
-        }
         // Alt 1b: bare conditional — cellMatchCond QUESTION xContSpec VBAR xContSpec
-        if (!body.xContSpec().isEmpty()) {
+        // Must be checked before the contSpec==null guard (Alt 1b has no contSpec).
+        if (body != null && !body.xContSpec().isEmpty()) {
             CellMatchCondition innerCond = buildCellMatchCondition(body.cellMatchCond());
             ContentSpec cs = new ConditionalContentSpec(
                     innerCond,
                     buildXContSpec(body.xContSpec().get(0)),
                     buildXContSpec(body.xContSpec().get(1)));
             return new CellPattern(null, q, cs);
+        }
+        // [] and [BLANK?] (no contSpec) are shorthand for [SKIP]
+        if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
+            CellMatchCondition cond = body != null && body.cellMatchCond() != null
+                    ? buildCellMatchCondition(body.cellMatchCond()) : null;
+            return new CellPattern(cond, q, null);
         }
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;

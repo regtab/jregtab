@@ -31,7 +31,7 @@ public class RtlTask132Test extends RtlTaskBase {
                 [ []{2} [VAL: 'YEAR'->AVP]{2} []{2} ]
                 { [ [VAL#'IND': 'POLLUTANT'->AVP] [!BLANK ? VAL#'UNIT': 'UNIT'->AVP] []{4} ]
                   [ [VAL: 'LOCATION'->AVP] [BLANK]
-                    [('\\s*-?\\s*' ? _ | VAL: 'VALUE'->AVP, (ROW,COL&R1,ST&C0&#'IND',ST&C1&#'UNIT')->REC)]{2}
+                    ['\\s*-?\\s*' ? _ | VAL: 'VALUE'->AVP, (ROW,COL&R1,ST&C0&#'IND',ST&C1&#'UNIT')->REC]{2}
                     []{2}
                   ]+
                 }+
