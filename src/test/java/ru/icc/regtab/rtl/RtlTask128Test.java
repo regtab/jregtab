@@ -10,7 +10,8 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ []{2} [VAL: 'LOCATION'-&gt;AVP]+ ]
  * [ [VAL: 'HYDROBIONT_GROUP'-&gt;AVP] [VAL: 'TIME'-&gt;AVP ' ' VAL: 'YEAR'-&gt;AVP]
- *   [('\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '&lt;br&gt;' VAL: 'AVE'-&gt;AVP, (CL*,ROW&amp;C1*,COL&amp;R0)-&gt;REC)]+ ]+
+ *   [('\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '&lt;br&gt;' 
+ *                      VAL: 'AVE'-&gt;AVP, (CL*,ROW&amp;C1*,COL&amp;R0)-&gt;REC)]+ ]+
  * </pre>
  */
 public class RtlTask128Test extends RtlTaskBase {
@@ -23,7 +24,8 @@ public class RtlTask128Test extends RtlTaskBase {
         return """
                 [ []{2} [VAL: 'LOCATION'->AVP]+ ]
                 [ [VAL: 'HYDROBIONT_GROUP'->AVP] [VAL: 'TIME'->AVP ' ' VAL: 'YEAR'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL&R0)->REC)]+ ]+
+                  [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
+                                       VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL&R0)->REC)]+ ]+
                 """;
     }
 }
