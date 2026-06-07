@@ -122,7 +122,8 @@
         {"task_id": "107", "regtab_id": "synthetic_0107"},
         {"task_id": "108", "regtab_id": "synthetic_0108"},
         {"task_id": "109", "regtab_id": "synthetic_0109"},
-        {"task_id": "110", "regtab_id": "synthetic_0110"}
+        {"task_id": "110", "regtab_id": "synthetic_0110"},
+        {"task_id": "111", "regtab_id": "real_baikal_0111"}
       ]
     }
   ]

@@ -1,3 +1,0 @@
-﻿[[SKIP][VAL: SCHEMA='INDICATOR']
-[@TEXT MATCHES '\s*-?\s*' ? SKIP | 
-(VAL: SCHEMA='MIN' '-' VAL: SCHEMA='MAX' '<br>' VAL: SCHEMA='AVE'; RECORD=(CELL;(ROW:C1)))]+]+
