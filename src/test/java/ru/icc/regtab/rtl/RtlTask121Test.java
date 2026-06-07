@@ -24,8 +24,8 @@ public class RtlTask121Test extends RtlTaskBase {
         return """
                 [ []{2} [VAL: 'MONTH'->AVP]+ ]
                 [ [] [VAL: 'INDICATOR'->AVP]
-                  [('\\s*-?\\s*' ? _ |
-                  VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' VAL: 'AVE'->AVP, (CL*,ROW&C1,COL)->REC)]+ ]+
+                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
+                                      VAL: 'AVE'->AVP, (CL*,ROW&C1,COL)->REC]+ ]+
                 """;
     }
 }

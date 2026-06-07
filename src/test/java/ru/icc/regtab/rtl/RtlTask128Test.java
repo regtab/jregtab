@@ -24,8 +24,8 @@ public class RtlTask128Test extends RtlTaskBase {
         return """
                 [ [] [] [VAL: 'LOCATION'->AVP]+ ]
                 [ [VAL: 'HYDROBIONT_GROUP'->AVP] [VAL: 'TIME'->AVP ' ' VAL: 'YEAR'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
-                                       VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL)->REC)]+ ]+
+                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
+                                      VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL)->REC]+ ]+
                 """;
     }
 }

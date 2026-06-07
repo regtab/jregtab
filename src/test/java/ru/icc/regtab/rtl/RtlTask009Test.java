@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask009Test}
  * <pre>
  * [ [] [VAL = REPL('\s+', '')]{5} ]
- * [ { [VAL] [(BLANK? _ | VAL : (SR, SC)->REC(2))]+ } ]+
+ * [ { [VAL] [BLANK? _ | VAL : (SR, SC)->REC(2)]+ } ]+
  * </pre>
  * Header row: skip cell then exactly 5 column-header VALs with whitespace
  * stripped via REPL. Data rows use an explicit subrow block: a row-key VAL
@@ -25,7 +25,7 @@ public class RtlTask009Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [] [VAL = REPL('\\s+', '')]{5} ]
-                [ { [VAL] [(BLANK? _ | VAL : (SR, SC)->REC(2))]+ } ]+
+                [ { [VAL] [BLANK? _ | VAL : (SR, SC)->REC(2)]+ } ]+
                 """;
     }
 }

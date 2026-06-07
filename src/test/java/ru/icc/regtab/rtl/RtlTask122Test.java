@@ -10,9 +10,9 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ [] [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]+ ]
  * [ [] [VAL: 'MONTH'-&gt;AVP]+ ]
- * { [ [] [('\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP)]{6} [] ]
+ * { [ [] ['\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP]{6} [] ]
  *   [ [VAL: 'INDICATOR'-&gt;AVP]
- *     [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW,-AV{2},COL{2})-&gt;REC)]{6} [] ] }+
+ *     ['\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW,-AV{2},COL{2})-&gt;REC]{6} [] ] }+
  * </pre>
  */
 public class RtlTask122Test extends RtlTaskBase {
@@ -25,9 +25,9 @@ public class RtlTask122Test extends RtlTaskBase {
         return """
                 [ [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]+ ]
                 [ [] [VAL: 'MONTH'->AVP]+ ]
-                { [ [] [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP)]{6} [] ]
+                { [ [] ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP]{6} [] ]
                   [ [VAL: 'INDICATOR'->AVP]
-                    [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL{2})->REC)]{6} [] ] }+
+                    ['\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL{2})->REC]{6} [] ] }+
                 """;
     }
 }

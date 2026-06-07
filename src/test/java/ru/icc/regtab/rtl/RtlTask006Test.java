@@ -7,8 +7,8 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_006/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask006Test}
  * <pre>
- * { [ [VAL : ST*->REC] [(BLANK ? _ | VAL)]+ ]
- *   [ [(BLANK ? _ | VAL)]+ ]{4} }+
+ * { [ [VAL : ST*->REC] [BLANK ? _ | VAL]+ ]
+ *   [ [BLANK ? _ | VAL]+ ]{4} }+
  * </pre>
  * First row of each subtable: anchor VAL with REC collecting all same-subtable
  * values (ST, unbounded), followed by one-or-more cells that skip if blank or
@@ -22,8 +22,8 @@ public class RtlTask006Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                { [ [VAL : ST*->REC] [(BLANK ? _ | VAL)]+ ]
-                  [ [(BLANK ? _ | VAL)]+ ]{4} }+
+                { [ [VAL : ST*->REC] [BLANK ? _ | VAL]+ ]
+                  [ [BLANK ? _ | VAL]+ ]{4} }+
                 """;
     }
 }

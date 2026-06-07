@@ -15,7 +15,7 @@ package ru.icc.regtab.rtl;
  * [ []{2} [VAL: 'YEAR'-&gt;AVP]{2} []{2} ]
  * { [ [VAL#'IND': 'POLLUTANT'-&gt;AVP] [!BLANK ? VAL#'UNIT': 'UNIT'-&gt;AVP] []{4} ]
  *   [ [VAL: 'LOCATION'-&gt;AVP] [BLANK]
- *     [('\s*-?\s*' ? _ | VAL: 'VALUE'-&gt;AVP, (ROW&amp;C0,COL&amp;R1,ST&amp;C0&amp;#'IND',ST&amp;C1&amp;#'UNIT')-&gt;REC)]{2}
+ *     ['\s*-?\s*' ? _ | VAL: 'VALUE'-&gt;AVP, (ROW&amp;C0,COL&amp;R1,ST&amp;C0&amp;#'IND',ST&amp;C1&amp;#'UNIT')-&gt;REC]{2}
  *     []{2} ]+ }+
  * </pre>
  */

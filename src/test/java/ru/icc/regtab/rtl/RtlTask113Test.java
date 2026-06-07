@@ -22,7 +22,8 @@ public class RtlTask113Test extends RtlTaskBase {
         return """
                 [ []+ ]
                 [ [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]{7} []* ]
-                [ [VAL: 'POLLUTANT'->AVP] [VAL: 'EMISSION'->AVP, ROW->REC]{7} []* ]+
+                [ [VAL: 'POLLUTANT'->AVP] [VAL: 'EMISSION'->AVP, ROW->REC]{7} []*
+                ]+
                 """;
     }
 }

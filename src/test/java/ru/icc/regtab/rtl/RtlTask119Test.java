@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * [ []+ ]
  * [ [VAL: 'INDICATOR'-&gt;AVP]
  *   [VAL: 'YEAR'-&gt;AVP] { [VAL: 'MIN'-&gt;AVP] [VAL: 'MAX'-&gt;AVP]
- *   [(BLANK ? _ | VAL: 'AVE'-&gt;AVP, (ROW{2},-LT{2},COL)-&gt;REC)] }+ ]+
+ *   [BLANK ? _ | VAL: 'AVE'-&gt;AVP, (ROW{2},-LT{2},COL)-&gt;REC] }+ ]+
  * </pre>
  */
 public class RtlTask119Test extends RtlTaskBase {
@@ -26,7 +26,7 @@ public class RtlTask119Test extends RtlTaskBase {
                 [ []+ ]
                 [ [VAL: 'INDICATOR'->AVP]
                   [VAL: 'YEAR'->AVP] { [VAL: 'MIN'->AVP] [VAL: 'MAX'->AVP]
-                  [(BLANK ? _ | VAL: 'AVE'->AVP, (ROW{2},-LT{2},COL)->REC)] }+ ]+
+                  [BLANK ? _ | VAL: 'AVE'->AVP, (ROW{2},-LT{2},COL)->REC] }+ ]+
                 """;
     }
 }

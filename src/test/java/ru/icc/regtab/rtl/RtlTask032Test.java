@@ -8,7 +8,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask032Test}
  * <pre>
  * [ [] [VAL]+ ]
- * [ [VAL] [(BLANK ? _ | VAL : (SR, SC)->REC(2))]+ ]+
+ * [ [VAL] [BLANK ? _ | VAL : (SR, SC)->REC(2)]+ ]+
  * </pre>
  * Header row: one skip cell then one-or-more column-header VALs. Data rows:
  * a plain VAL row-key anchor followed by one-or-more conditional cells — blank
@@ -24,7 +24,7 @@ public class RtlTask032Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [] [VAL]+ ] 
-                [ [VAL] [(BLANK ? _ | VAL : (SR, SC)->REC(2))]+ ]+
+                [ [VAL] [BLANK ? _ | VAL : (SR, SC)->REC(2)]+ ]+
                 """;
     }
 }

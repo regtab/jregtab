@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * [ [VAL: 'ORGANIZATION'-&gt;AVP ',' VAL=TRIM: 'LOCATION'-&gt;AVP]
  *   [VAL: 'YEAR'-&gt;AVP]
  *   [VAL: 'FUEL_TYPE'-&gt;AVP]
- *   [(BLANK ? _ | VAL: 'FUEL_CONSUMPTION'-&gt;AVP, ROW&amp;(C0..2|C4..5)*-&gt;REC)]
+ *   [BLANK ? _ | VAL: 'FUEL_CONSUMPTION'-&gt;AVP, ROW&amp;(C0..2|C4..5)*-&gt;REC]
  *   [VAL: 'SULPHUR_CONTENT'-&gt;AVP]
  *   [VAL: 'ASH_CONTENT'-&gt;AVP]
  *   []+ ]+
@@ -30,7 +30,7 @@ public class RtlTask114Test extends RtlTaskBase {
                 [ [VAL: 'ORGANIZATION'->AVP ',' VAL=TRIM: 'LOCATION'->AVP] 
                   [VAL: 'YEAR'->AVP] 
                   [VAL: 'FUEL_TYPE'->AVP]
-                  [(BLANK ? _ | VAL: 'FUEL_CONSUMPTION'->AVP, ROW&(C0..2|C4..5)*->REC)]
+                  [BLANK ? _ | VAL: 'FUEL_CONSUMPTION'->AVP, ROW&(C0..2|C4..5)*->REC]
                   [VAL: 'SULPHUR_CONTENT'->AVP]
                   [VAL: 'ASH_CONTENT'->AVP]
                   []+

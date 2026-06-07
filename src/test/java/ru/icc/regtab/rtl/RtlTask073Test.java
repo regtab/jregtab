@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask073Test}
  * <pre>
  * [ [VAL]+ ]
- * [ [(BLANK? _ | VAL: COL-&gt;REC)]+ ]+
+ * [ [BLANK? _ | VAL: COL-&gt;REC]+ ]+
  * </pre>
  * COL-&gt;REC uses the header VAL row as the source of column-anchor items. Blank data cells
  * are silently skipped rather than creating empty records.
@@ -23,7 +23,7 @@ public class RtlTask073Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [VAL]+ ]
-                [ [(BLANK? _ | VAL: COL->REC)]+ ]+
+                [ [BLANK? _ | VAL: COL->REC]+ ]+
                 """;
     }
 }

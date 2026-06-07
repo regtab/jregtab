@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_038/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask038Test}
  * <pre>
- * [ [VAL : SR*->REC] [VAL] [(BLANK ? VAL : -AV->FILL | VAL)] ]+
+ * [ [VAL : SR*->REC] [VAL] [BLANK ? VAL : -AV->FILL | VAL] ]+
  * </pre>
  * Each data row: anchor VAL with SR*->REC (unbounded same-subrow collection);
  * a plain VAL; and a conditional third cell — if blank, uses -AV->FILL to take
@@ -22,7 +22,7 @@ public class RtlTask038Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [VAL : SR*->REC] [VAL] [(BLANK ? VAL : -AV->FILL | VAL)] ]+
+                [ [VAL : SR*->REC] [VAL] [BLANK ? VAL : -AV->FILL | VAL] ]+
                 """;
     }
 }

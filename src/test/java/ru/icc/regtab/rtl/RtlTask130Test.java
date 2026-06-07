@@ -10,7 +10,7 @@ package ru.icc.regtab.rtl;
  * [ [] [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]{4} [] ]
  * [ []+ ]
  * [ [VAL: 'INDICATOR'-&gt;AVP]
- *   { [('\s*-?\s*' ? _ | VAL: 'MPC_MIN'-&gt;AVP '-' VAL: 'MPC_MAX'-&gt;AVP)]
+ *   { ['\s*-?\s*' ? _ | VAL: 'MPC_MIN'-&gt;AVP '-' VAL: 'MPC_MAX'-&gt;AVP]
  *     [VAL: 'AVE'-&gt;AVP, (ROW,-LT{2},COL,@'UNIT'='MG/DM3')-&gt;REC] }{2}
  *   [] ]+
  * </pre>
@@ -26,7 +26,7 @@ public class RtlTask130Test extends RtlTaskBase {
                 [ [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]{4} [] ]
                 [ []+ ]
                 [ [VAL: 'INDICATOR'->AVP]
-                  { [('\\s*-?\\s*' ? _ | VAL: 'MPC_MIN'->AVP '-' VAL: 'MPC_MAX'->AVP)]
+                  { ['\\s*-?\\s*' ? _ | VAL: 'MPC_MIN'->AVP '-' VAL: 'MPC_MAX'->AVP]
                     [VAL: 'AVE'->AVP, (ROW,-LT{2},COL,@'UNIT'='MG/DM3')->REC] }{2}
                   []
                 ]+

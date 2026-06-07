@@ -35,12 +35,12 @@ public class RtlTask127Test extends RtlTaskBase {
                 [ [] { [] [VAL: -AV->PREFIX, 'INDICATOR'->AVP]{3} [] }+ ]
                 [ [VAL: 'HYDROBIONT_GROUP'->AVP ',' VAL=TRIM: 'UNIT'->AVP]
                   [VAL: 'TIME'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
-                                       VAL: 'AVE'->AVP, (CL*,ROW{3},COL,COL&R2,ROW&C5)->REC)]{3}
+                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
+                                      VAL: 'AVE'->AVP, (CL*,ROW{3},COL,COL&R2,ROW&C5)->REC]{3}
                   [VAL: 'AREA'->AVP]
                   [VAL: 'TIME'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
-                                       VAL: 'AVE'->AVP, (CL*,ROW{2},ROW&C6,COL,COL&R2,ROW&C10)->REC)]{3}
+                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
+                                      VAL: 'AVE'->AVP, (CL*,ROW{2},ROW&C6,COL,COL&R2,ROW&C10)->REC]{3}
                   [VAL: 'AREA'->AVP] ]+
                 """;
     }

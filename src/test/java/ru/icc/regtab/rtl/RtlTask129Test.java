@@ -24,8 +24,8 @@ public class RtlTask129Test extends RtlTaskBase {
         return """
                 [ [] [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]+ ]
                 [ [] [VAL: 'HYDROBIONT_GROUP'->AVP ',' VAL=TRIM: 'UNIT'->AVP]
-                  [('\\s*-\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
-                                      VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL)->REC)]+ ]+
+                  ['\\s*-\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
+                                     VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL)->REC]+ ]+
                 """;
     }
 }

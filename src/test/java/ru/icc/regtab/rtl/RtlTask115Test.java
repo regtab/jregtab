@@ -28,7 +28,7 @@ public class RtlTask115Test extends RtlTaskBase {
                 [ []{7} [VAL: 'POLLUTANT'->AVP]+ ]
                 { [ [VAL: 'ORGANIZATION'->AVP ',' VAL=TRIM: 'LOCATION'->AVP]
                     [VAL: 'YEAR'->AVP] []{5}
-                    [VAL: 'EMISSION'->AVP, (ROW{3},COL&R1)->REC]+ ]
+                    [VAL: 'EMISSION'->AVP, (ROW{3},COL&R1)->REC]+]
                   [ []+ ]
                 }+
                 """;

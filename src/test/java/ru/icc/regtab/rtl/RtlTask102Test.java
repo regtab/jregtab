@@ -10,8 +10,8 @@ package ru.icc.regtab.rtl;
  * ATP spec: {@link ru.icc.regtab.atp.AtpTask102Test}
  * <pre>
  * [ [ATTR] []+ ]
- * { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]
- *   [ [BLANK]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
+ * { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]
+ *   [ [BLANK]                          { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]+ }+
  * </pre>
  */
 public class RtlTask102Test extends RtlTaskBase {
@@ -23,8 +23,8 @@ public class RtlTask102Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [ [ATTR] []+ ]
-                { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]
-                  [ [BLANK]                          { [(BLANK ? _ | ATTR)] [(BLANK ? _ | VAL: SR->AVP)] }+ ]+ }+
+                { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]
+                  [ [BLANK]                          { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]+ }+
                 """;
     }
 }

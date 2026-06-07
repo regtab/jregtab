@@ -24,7 +24,8 @@ public class RtlTask111Test extends RtlTaskBase {
                 [ []{2} [VAL: 'UNIT'->AVP]+ ]
                 [ []+ ]
                 [ [VAL: 'INDICATOR'->AVP] [VAL: 'YEAR'->AVP] [VAL: 'MIN'->AVP] [VAL: 'MAX'->AVP]
-                  [VAL: 'AVE'->AVP, (ROW*,COL)->REC] ]+
+                  [VAL: 'AVE'->AVP, (ROW*,COL)->REC]
+                ]+
                 """;
     }
 }

@@ -10,7 +10,7 @@ package ru.icc.regtab.rtl;
  * [ []+ ]
  * [ []{2} [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]{2} [] ]
  * [ [VAL: 'POLLUTANT'-&gt;AVP] [VAL: 'MPC'-&gt;AVP]
- *   [(~'*' ? _ | VAL: 'MPC_EXCEEDING_FREQUENCY'-&gt;AVP, (ROW{2},ROW&amp;C4,COL&amp;R1)-&gt;REC)]{2}
+ *   [~'*' ? _ | VAL: 'MPC_EXCEEDING_FREQUENCY'-&gt;AVP, (ROW{2},ROW&amp;C4,COL&amp;R1)-&gt;REC]{2}
  *   [] ]+
  * </pre>
  */
@@ -25,7 +25,7 @@ public class RtlTask131Test extends RtlTaskBase {
                 [ []+ ]
                 [ []{2} [VAL=SUBSTR(0,4): 'YEAR'->AVP]{2} [] ]
                 [ [VAL: 'POLLUTANT'->AVP] [VAL: 'MPC'->AVP]
-                  [(~'*' ? _ | VAL: 'MPC_EXCEEDING_FREQUENCY'->AVP, (ROW{2},ROW&C4,COL&R1)->REC)]{2}
+                  [~'*' ? _ | VAL: 'MPC_EXCEEDING_FREQUENCY'->AVP, (ROW{2},ROW&C4,COL&R1)->REC]{2}
                   [] 
                 ]+
                 """;

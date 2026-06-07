@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ []{2} [VAL: 'MONTH'-&gt;AVP]+ ]
  * [ [] [VAL: 'INDICATOR'-&gt;AVP]
- *   [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW&amp;C1,COL&amp;R0)-&gt;REC)]+ ]+
+ *   ['\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW&amp;C1,COL&amp;R0)-&gt;REC]+ ]+
  * </pre>
  */
 public class RtlTask125Test extends RtlTaskBase {
@@ -22,7 +22,7 @@ public class RtlTask125Test extends RtlTaskBase {
         return """
                 [ []{2} [VAL: 'MONTH'->AVP]+ ]
                 [ [] [VAL: 'INDICATOR'->AVP]
-                  [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW&C1,COL)->REC)]+ ]+
+                  ['\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW&C1,COL)->REC]+ ]+
                 """;
     }
 }

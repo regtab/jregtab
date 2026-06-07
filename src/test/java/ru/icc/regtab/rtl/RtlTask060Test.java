@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ [ATTR]+ ]
  * { COL-&gt;AVP
- *   [ [!BLANK? VAL: RT*-&gt;REC] [(BLANK? VAL: -(AV &amp; !BLANK)-&gt;FILL | VAL)]+ ]+
+ *   [ [!BLANK? VAL: RT*-&gt;REC] [BLANK? VAL: -(AV &amp; !BLANK)-&gt;FILL | VAL]+ ]+
  *   [ [BLANK]+ ]? }+
  * </pre>
  * The COL-&gt;AVP action is inherited by all cells in the explicit subtable. FILL uses
@@ -28,7 +28,7 @@ public class RtlTask060Test extends RtlTaskBase {
                 return """
                   [ [ATTR]+ ]
                 { COL->AVP
-                  [ [!BLANK? VAL: RT*->REC] [(BLANK? VAL: -AV&!BLANK->FILL | VAL)]+ ]+
+                  [ [!BLANK? VAL: RT*->REC] [BLANK? VAL: -AV&!BLANK->FILL | VAL]+ ]+
                   [ [BLANK]+ ]? }+
                 """;
     }

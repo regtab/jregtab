@@ -9,7 +9,7 @@ package ru.icc.regtab.rtl;
  * ATP: {@link ru.icc.regtab.atp.AtpTask072Test}
  * <pre>
  * [          [ATTR]+ ]
- * [ COL-&gt;AVP [(BLANK? _ | VAL: RT*-&gt;REC)] [(BLANK? _ | VAL)]+ ]+
+ * [ COL-&gt;AVP [BLANK? _ | VAL: RT*-&gt;REC] [BLANK? _ | VAL]+ ]+
  * </pre>
  * The _ (skip) branch in the conditional discards blank cells without creating any item.
  * This differs from a plain BLANK? cell which would create a blank item; here blank cells
@@ -24,7 +24,7 @@ public class RtlTask072Test extends RtlTaskBase {
     protected String buildRtl() {
         return """
                 [          [ATTR]+ ]
-                [ COL->AVP [(BLANK? _ | VAL: RT*->REC)] [(BLANK? _ | VAL)]+ ]+
+                [ COL->AVP [BLANK? _ | VAL: RT*->REC] [BLANK? _ | VAL]+ ]+
                 """;
     }
 }
