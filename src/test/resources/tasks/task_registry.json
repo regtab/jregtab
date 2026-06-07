@@ -122,8 +122,35 @@
         {"task_id": "107", "regtab_id": "synthetic_0107"},
         {"task_id": "108", "regtab_id": "synthetic_0108"},
         {"task_id": "109", "regtab_id": "synthetic_0109"},
-        {"task_id": "110", "regtab_id": "synthetic_0110"},
-        {"task_id": "111", "regtab_id": "real_baikal_0111"}
+        {"task_id": "110", "regtab_id": "synthetic_0110"}
+      ]
+    },
+    {
+      "name": "Baikal",
+      "description": "Tasks based on real environmental monitoring tables from the Lake Baikal region",
+      "tasks": [
+        {"task_id": "111", "regtab_id": "real_baikal_0001"},
+        {"task_id": "112", "regtab_id": "real_baikal_0002"},
+        {"task_id": "113", "regtab_id": "real_baikal_0003"},
+        {"task_id": "114", "regtab_id": "real_baikal_0004"},
+        {"task_id": "115", "regtab_id": "real_baikal_0005"},
+        {"task_id": "116", "regtab_id": "real_baikal_0006"},
+        {"task_id": "117", "regtab_id": "real_baikal_0007"},
+        {"task_id": "118", "regtab_id": "real_baikal_0008"},
+        {"task_id": "119", "regtab_id": "real_baikal_0009"},
+        {"task_id": "120", "regtab_id": "real_baikal_0010"},
+        {"task_id": "121", "regtab_id": "real_baikal_0011"},
+        {"task_id": "122", "regtab_id": "real_baikal_0012"},
+        {"task_id": "123", "regtab_id": "real_baikal_0013"},
+        {"task_id": "124", "regtab_id": "real_baikal_0014"},
+        {"task_id": "125", "regtab_id": "real_baikal_0015"},
+        {"task_id": "126", "regtab_id": "real_baikal_0016"},
+        {"task_id": "127", "regtab_id": "real_baikal_0017"},
+        {"task_id": "128", "regtab_id": "real_baikal_0018"},
+        {"task_id": "129", "regtab_id": "real_baikal_0019"},
+        {"task_id": "130", "regtab_id": "real_baikal_0020"},
+        {"task_id": "131", "regtab_id": "real_baikal_0021"},
+        {"task_id": "132", "regtab_id": "real_baikal_0022"}
       ]
     }
   ]
