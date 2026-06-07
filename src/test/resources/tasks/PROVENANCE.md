@@ -83,16 +83,6 @@ Test data created as part of the jRegTab project to cover table patterns not pre
 
 **Structure:** 60 tasks × 5 variants = 300 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
 
----
-
-## Collection 3: Baikal (tasks 111–132)
-
-Test data based on real environmental monitoring tables from the Lake Baikal region.
-
-**Source:** authored by the jRegTab team; derived from public ecological reports.
-
-**Structure:** 22 tasks × 5 variants = 110 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
-
 ### Task mapping: task_XX ↔ regtab_id
 
 | task_id | regtab_id |
@@ -157,6 +147,16 @@ Test data based on real environmental monitoring tables from the Lake Baikal reg
 | 108 | synthetic_0058 |
 | 109 | synthetic_0059 |
 | 110 | synthetic_0060 |
+
+---
+
+## Collection 3: Baikal (tasks 111–132)
+
+Test data based on real environmental monitoring tables from the Lake Baikal region.
+
+**Source:** authored by the jRegTab team; derived from public ecological reports.
+
+**Structure:** 22 tasks × 5 variants = 110 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
 
 ### Task mapping: task_XX ↔ regtab_id (Baikal)
 
