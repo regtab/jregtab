@@ -3,8 +3,8 @@ package ru.icc.regtab.rtl;
 /**
  * Task 122: cross-tabulation with YEAR/MONTH headers, explicit subtable pairing MIN-MAX row
  * with AVE row. SUBSTR(0,4) extracts 4-char year. condContSpec guards empty/dash-only cells.
- * REC on AVE collects INDICATOR at col 0 (ROW&amp;C0), MIN/MAX from row above (-AV{2}),
- * and YEAR/MONTH at rows 0-1 in same column (COL&amp;R0..1).
+ * REC on AVE collects INDICATOR at col 0 (ROW), MIN/MAX from row above (-AV{2}),
+ * and YEAR/MONTH in same column (COL{2}).
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_122/}
  * <pre>
@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * [ [] [VAL: 'MONTH'-&gt;AVP]+ ]
  * { [ [] [('\s*-?\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP)]{6} [] ]
  *   [ [VAL: 'INDICATOR'-&gt;AVP]
- *     [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW,-AV{2},COL&amp;R0..1)-&gt;REC)]{6} [] ] }+
+ *     [('\s*-?\s*' ? _ | VAL: 'AVE'-&gt;AVP, (ROW,-AV{2},COL{2})-&gt;REC)]{6} [] ] }+
  * </pre>
  */
 public class RtlTask122Test extends RtlTaskBase {
@@ -27,7 +27,7 @@ public class RtlTask122Test extends RtlTaskBase {
                 [ [] [VAL: 'MONTH'->AVP]+ ]
                 { [ [] [('\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP)]{6} [] ]
                   [ [VAL: 'INDICATOR'->AVP]
-                    [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL&R0..1*)->REC)]{6} [] ] }+
+                    [('\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW,-AV{2},COL{2})->REC)]{6} [] ] }+
                 """;
     }
 }

@@ -11,8 +11,8 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ []+ ]
  * [ [] [VAL: 'TERRITORY'-&gt;AVP]+ ]
- * [ []+ ]
- * [ 'LOCATION'-&gt;AVP [] { [VAL: -AV-&gt;PREFIX]{4} [VAL] [] }{2} { [VAL: -AV-&gt;PREFIX]{2} [VAL] [] }? ]
+ * [ [AUX]+ ]
+ * [ 'LOCATION'-&gt;AVP [] { [VAL: -AV{1}-&gt;PREFIX]{4} [VAL] [] }{2} { [VAL: -AV-&gt;PREFIX]{2} [VAL] [] }? ]
  * { [ [VAL#'IND': 'INDICATOR'-&gt;AVP ',' VAL: 'UNIT'-&gt;AVP]+ ]
  *   [ ['20\\d\\d' ? VAL: 'YEAR'-&gt;AVP]
  *     { [VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]{5} [] }{2}
@@ -32,7 +32,7 @@ public class RtlTask116Test extends RtlTaskBase {
                 [ []+ ]
                 [ [] [VAL: 'TERRITORY'->AVP]+ ]
                 [ [AUX]+ ]
-                [ 'LOCATION'->AVP [] { [VAL: -AV{1}->PREFIX]{4} [VAL] [] }{2} { [VAL: -AV->PREFIX]{2} [VAL] [] }? ]
+                [ 'LOCATION'->AVP [] { [VAL: -AV->PREFIX]{4} [VAL] [] }{2} { [VAL: -AV->PREFIX]{2} [VAL] [] }? ]
                 { [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
                   [ ['20\\d\\d' ? VAL: 'YEAR'->AVP]
                     { [VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]{5} [] }{2}

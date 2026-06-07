@@ -13,7 +13,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ []+ ]
  * [ []{2} [VAL: 'YEAR'-&gt;AVP]{2} []{2} ]
- * { [ [VAL#IND: 'POLLUTANT'-&gt;AVP] [!BLANK ? VAL#UNIT: 'UNIT'-&gt;AVP] []{4} ]
+ * { [ [VAL#'IND': 'POLLUTANT'-&gt;AVP] [!BLANK ? VAL#'UNIT': 'UNIT'-&gt;AVP] []{4} ]
  *   [ [VAL: 'LOCATION'-&gt;AVP] [BLANK]
  *     [('\s*-?\s*' ? _ | VAL: 'VALUE'-&gt;AVP, (ROW&amp;C0,COL&amp;R1,ST&amp;C0&amp;#'IND',ST&amp;C1&amp;#'UNIT')-&gt;REC)]{2}
  *     []{2} ]+ }+
@@ -31,8 +31,10 @@ public class RtlTask132Test extends RtlTaskBase {
                 [ []{2} [VAL: 'YEAR'->AVP]{2} []{2} ]
                 { [ [VAL#'IND': 'POLLUTANT'->AVP] [!BLANK ? VAL#'UNIT': 'UNIT'->AVP] []{4} ]
                   [ [VAL: 'LOCATION'->AVP] [BLANK]
-                    [('\\s*-?\\s*' ? _ | VAL: 'VALUE'->AVP, (ROW&C0,COL&R1,ST&C0&#'IND',ST&C1&#'UNIT')->REC)]{2}
-                    []{2} ]+ }+
+                    [('\\s*-?\\s*' ? _ | VAL: 'VALUE'->AVP, (ROW,COL&R1,ST&C0&#'IND',ST&C1&#'UNIT')->REC)]{2}
+                    []{2}
+                  ]+
+                }+
                 """;
     }
 }

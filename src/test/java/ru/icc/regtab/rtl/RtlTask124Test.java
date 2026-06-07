@@ -4,7 +4,7 @@ package ru.icc.regtab.rtl;
  * Task 124: cross-tabulation with separate YEAR/MONTH header rows and compound
  * MIN-MAX&lt;br&gt;AVE(IN_NW) data cells.
  * REC on AVE collects same-cell attributes (CL*), INDICATOR at col 0 (ROW),
- * and YEAR/MONTH from rows 0-1 in same column (COL&amp;R0..1*).
+ * and YEAR/MONTH in same column (COL{2}).
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_124/}
  * <pre>
@@ -12,7 +12,7 @@ package ru.icc.regtab.rtl;
  * [ [] [VAL: 'MONTH'-&gt;AVP]{6} []{2} ]
  * [ [VAL: 'INDICATOR'-&gt;AVP]
  *   [VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '&lt;br&gt;' VAL=TRIM: 'AVE'-&gt;AVP, 
- *   (CL*,ROW,COL&amp;R0..1*)-&gt;REC '(' VAL: 'IN_NORTHWESTERN_SECTION'-&gt;AVP ')']{6}
+ *   (CL*,ROW,COL{2})-&gt;REC '(' VAL: 'IN_NORTHWESTERN_SECTION'-&gt;AVP ')']{6}
  *   []{2} ]+
  * </pre>
  */
@@ -28,7 +28,7 @@ public class RtlTask124Test extends RtlTaskBase {
                 [ [] [VAL: 'MONTH'->AVP]{6} []{2} ]
                 [ [VAL: 'INDICATOR'->AVP]
                   [VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' VAL=TRIM: 'AVE'->AVP, 
-                  (CL*,ROW,COL&R0..1*)->REC '(' VAL: 'IN_NORTHWESTERN_SECTION'->AVP ')']{6}
+                  (CL*,ROW,COL{2})->REC '(' VAL: 'IN_NORTHWESTERN_SECTION'->AVP ')']{6}
                   []{2} ]+
                 """;
     }

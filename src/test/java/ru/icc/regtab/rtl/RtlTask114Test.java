@@ -33,7 +33,8 @@ public class RtlTask114Test extends RtlTaskBase {
                   [(BLANK ? _ | VAL: 'FUEL_CONSUMPTION'->AVP, ROW&(C0..2|C4..5)*->REC)]
                   [VAL: 'SULPHUR_CONTENT'->AVP]
                   [VAL: 'ASH_CONTENT'->AVP]
-                  []+ ]+
+                  []+
+                ]+
                 """;
     }
 }

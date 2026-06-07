@@ -2,8 +2,8 @@ package ru.icc.regtab.rtl;
 
 /**
  * Task 130: cross-tabulation with YEAR header, explicit subrow pairs {[MPC][AVE]}{2}.
- * REC on AVE collects INDICATOR at col 0 (ROW&amp;C0), MPC_MIN/MPC_MAX left of anchor (-LT{2}),
- * YEAR from row 0 in same column (COL&amp;R0), and constant UNIT='MG/DM3' (@'UNIT'='MG/DM3').
+ * REC on AVE collects INDICATOR (ROW), MPC_MIN/MPC_MAX left of anchor (-LT{2}),
+ * YEAR in same column (COL), and constant UNIT='MG/DM3' (@'UNIT'='MG/DM3').
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_130/}
  * <pre>
@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * [ []+ ]
  * [ [VAL: 'INDICATOR'-&gt;AVP]
  *   { [('\s*-?\s*' ? _ | VAL: 'MPC_MIN'-&gt;AVP '-' VAL: 'MPC_MAX'-&gt;AVP)]
- *     [VAL: 'AVE'-&gt;AVP, (ROW&amp;C0,-LT{2},COL&amp;R0,@'UNIT'='MG/DM3')-&gt;REC] }{2}
+ *     [VAL: 'AVE'-&gt;AVP, (ROW,-LT{2},COL,@'UNIT'='MG/DM3')-&gt;REC] }{2}
  *   [] ]+
  * </pre>
  */
@@ -27,8 +27,9 @@ public class RtlTask130Test extends RtlTaskBase {
                 [ []+ ]
                 [ [VAL: 'INDICATOR'->AVP]
                   { [('\\s*-?\\s*' ? _ | VAL: 'MPC_MIN'->AVP '-' VAL: 'MPC_MAX'->AVP)]
-                    [VAL: 'AVE'->AVP, (ROW&C0,-LT{2},COL&R0,@'UNIT'='MG/DM3')->REC] }{2}
-                  [] ]+
+                    [VAL: 'AVE'->AVP, (ROW,-LT{2},COL,@'UNIT'='MG/DM3')->REC] }{2}
+                  []
+                ]+
                 """;
     }
 }

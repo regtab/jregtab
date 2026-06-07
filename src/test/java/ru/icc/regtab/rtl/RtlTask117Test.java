@@ -10,9 +10,9 @@ package ru.icc.regtab.rtl;
  * [ []+ ]
  * [ [] [ATTR] [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]{5} [] ]
  * [ [] [VAL: 'POLLUTANT'-&gt;AVP]
- *   [VAL: 'EMISSION'-&gt;AVP, ((ROW&amp;C1), (COL&amp;R1), @'UNIT'='MLN M3')-&gt;REC]{5} [] ]
+ *   [VAL: 'EMISSION'-&gt;AVP, (ROW&amp;C1,COL&amp;R1,@'UNIT'='MLN M3')-&gt;REC]{5} [] ]
  * [ [] [VAL: 'POLLUTANT'-&gt;AVP]
- *   [VAL: 'EMISSION'-&gt;AVP, ((ROW&amp;C1), (COL&amp;R1), @'UNIT'='TONS')-&gt;REC]{5} [] ]+
+ *   [VAL: 'EMISSION'-&gt;AVP, (ROW&amp;C1,COL&amp;R1,@'UNIT'='TONS')-&gt;REC]{5} [] ]+
  * </pre>
  */
 public class RtlTask117Test extends RtlTaskBase {
@@ -26,9 +26,9 @@ public class RtlTask117Test extends RtlTaskBase {
                 [ []+ ]
                 [ [] [ATTR] [VAL=SUBSTR(0,4): 'YEAR'->AVP]{5} [] ]
                 [ [] [VAL: 'POLLUTANT'->AVP]
-                  [VAL: 'EMISSION'->AVP, ((ROW&C1), (COL&R1), @'UNIT'='MLN M3')->REC]{5} [] ]
+                  [VAL: 'EMISSION'->AVP, (ROW&C1,COL&R1,@'UNIT'='MLN M3')->REC]{5} [] ]
                 [ [] [VAL: 'POLLUTANT'->AVP]
-                  [VAL: 'EMISSION'->AVP, ((ROW&C1), (COL&R1), @'UNIT'='TONS')->REC]{5} [] ]+
+                  [VAL: 'EMISSION'->AVP, (ROW&C1,COL&R1,@'UNIT'='TONS')->REC]{5} [] ]+
                 """;
     }
 }

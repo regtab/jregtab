@@ -7,7 +7,7 @@ package ru.icc.regtab.rtl;
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_113/}
  * <pre>
- * [ [ATTR]{8} []* ]
+ * [ []+ ]
  * [ [] [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]{7} []* ]
  * [ [VAL: 'POLLUTANT'-&gt;AVP] [VAL: 'EMISSION'-&gt;AVP, ROW-&gt;REC]{7} []* ]+
  * </pre>
@@ -20,7 +20,7 @@ public class RtlTask113Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
-                [ [ATTR]{8} []* ]
+                [ []+ ]
                 [ [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]{7} []* ]
                 [ [VAL: 'POLLUTANT'->AVP] [VAL: 'EMISSION'->AVP, ROW->REC]{7} []* ]+
                 """;
