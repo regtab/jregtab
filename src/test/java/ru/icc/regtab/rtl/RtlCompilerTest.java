@@ -182,7 +182,7 @@ class RtlCompilerTest {
 
     @Test
     void parse_conditionalContentSpec() {
-        compile("[ [(BLANK? SKIP | VAL : ('X')->AVP)] ]");
+        compile("[ [BLANK? SKIP | VAL : ('X')->AVP] ]");
     }
 
     @Test

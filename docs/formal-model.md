@@ -165,7 +165,7 @@ Available predicates: `CellPredicate.Blank`, `CellPredicate.NotBlank`, `CellPred
 
 In RTL, a cell match condition appears at several levels:
 - **Cell (guarded):** `[cond ? contSpec]` — the `?` is a required separator before the content spec, e.g. `[!BLANK ? VAL : …]`.
-- **Cell (bare conditional):** `[cond ? trueSpec | falseSpec]` — shorthand for `ConditionalContentSpec` without enclosing parentheses. Action specs may precede the condition: `[acts cond ? x | y]`. Parentheses are always optional.
+- **Cell (bare conditional):** `[cond ? trueSpec | falseSpec]` — `ConditionalContentSpec`; parentheses are not allowed. Action specs may precede the condition: `[acts cond ? x | y]`.
 - **Cell (condition-only):** `[cond]` — no `?`; the cell is consumed if the condition holds but produces no item, e.g. `[BLANK]*` or `[!BLANK]`.
 - **Subrow / row / subtable / table:** `{ cond ? … }` or `[ cond ? … ]` — `?` is always required at these levels since content always follows.
 

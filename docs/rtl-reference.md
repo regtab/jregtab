@@ -159,13 +159,11 @@ cond ? trueSpec | falseSpec
 
 Branches on a cell match condition; both branches must be `atomContSpec`, `delimContSpec`, or `compContSpec`.
 
-Parentheses are **optional** in all positions:
+Parentheses are **not allowed**; the bare form is the only valid syntax:
 
 ```
-[BLANK ? _ | VAL]                    — bare form
-[(BLANK ? _ | VAL)]                  — equivalent parenthesised form
-[RT*->REC BLANK ? _ | VAL]           — bare form with preceding actSpec
-[RT*->REC (BLANK ? _ | VAL)]         — parenthesised form with preceding actSpec
+[BLANK ? _ | VAL]                    — skip blank cells, derive VAL otherwise
+[RT*->REC BLANK ? _ | VAL]           — with preceding actSpec
 ```
 
 Example: `[BLANK ? _ | VAL]` — skip blank cells, derive a value from non-blank ones.

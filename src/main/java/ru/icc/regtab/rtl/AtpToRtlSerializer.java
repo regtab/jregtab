@@ -186,9 +186,9 @@ public final class AtpToRtlSerializer {
     }
 
     private static String serializeConditional(ConditionalContentSpec c) {
-        return "(" + serializeCellMatchConstr(c.condition()) + "? "
+        return serializeCellMatchConstr(c.condition()) + "? "
                 + serializeXContSpec(c.positive())
-                + " | " + serializeXContSpec(c.negative()) + ")";
+                + " | " + serializeXContSpec(c.negative());
     }
 
     private static String serializeXContSpec(ContentSpec cs) {

@@ -114,7 +114,7 @@ openDelim  : STRING ;  // Opening delimiter
 closeDelim : STRING ;  // Closing delimiter
 
 // Conditional content specification
-condContSpec : LPAREN? cellMatchCond QUESTION (xContSpec VBAR xContSpec) RPAREN?;
+condContSpec : cellMatchCond QUESTION (xContSpec VBAR xContSpec) ;
 xContSpec    : atomContSpec | delimContSpec | compContSpec ;
 
 // Cell match condition
