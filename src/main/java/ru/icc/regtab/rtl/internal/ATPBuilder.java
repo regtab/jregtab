@@ -159,6 +159,15 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
                     ? buildCellMatchCondition(body.cellMatchCond()) : null;
             return new CellPattern(cond, q, null);
         }
+        // Alt 1b: bare conditional — cellMatchCond QUESTION xContSpec VBAR xContSpec
+        if (!body.xContSpec().isEmpty()) {
+            CellMatchCondition innerCond = buildCellMatchCondition(body.cellMatchCond());
+            ContentSpec cs = new ConditionalContentSpec(
+                    innerCond,
+                    buildXContSpec(body.xContSpec().get(0)),
+                    buildXContSpec(body.xContSpec().get(1)));
+            return new CellPattern(null, q, cs);
+        }
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;
 

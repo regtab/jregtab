@@ -186,6 +186,11 @@ class RtlCompilerTest {
     }
 
     @Test
+    void parse_bareConditionalContentSpec() {
+        compile("[ [BLANK ? _ | VAL] ]");
+    }
+
+    @Test
     void parse_explicitSubrowPattern() {
         compile("[ { [SKIP]+ }* ]");
     }
