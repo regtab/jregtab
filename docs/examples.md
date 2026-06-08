@@ -238,6 +238,49 @@ mvn test -Dtest="RtlTask002Test"
 
 ---
 
+---
+
+## Named fragments (de-duplicating repeated sub-patterns)
+
+When the same sub-pattern appears in multiple non-adjacent positions, **named fragment
+definitions** eliminate the repetition. Fragments are declared in the RTL preamble
+(before the first `[` or `{`) and referenced by `[$N]` or `{$N}` at the appropriate level.
+
+**Task 116** — environmental monitoring table with repeating column groups.
+Without fragments, `[VAL: -AV->PREFIX(', ')]` appears five times and
+`[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]` appears eight times.
+
+```
+$V1=[VAL: -AV->PREFIX(', ')]
+$V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
+[ []+ ]
+[ [] [VAL: 'TERRITORY'->AVP]+ ]
+[ [AUX]+ ]
+[ 'LOCATION'->AVP [] [$V1]{4} [VAL] []
+                     [VAL] [$V1] [VAL]
+                     [$V1] [VAL] []
+                     { [VAL] [$V1] [VAL] [] }? ]
+{ [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
+  [ ['20\\d\\d' ? VAL: 'YEAR'->AVP]
+    { [$V2]{5} [] }{2}
+    { [$V2]{3} [] }?
+  ]+
+}+
+```
+
+- `$V1` = cell fragment; `[$V1]{4}` — four cells with PREFIX action, `[$V1]` — single cell.
+- `$V2` = cell fragment; `[$V2]{5}` — five VALUE cells with REC, `[$V2]{3}` — three.
+- Quantifiers on references are independent of the definition.
+
+See `RtlFragmentTest` for unit tests covering all four fragment levels (cell, row, subrow, subtable).
+
+```bash
+mvn test -Dtest="RtlTask116Test"
+mvn test -Dtest="RtlFragmentTest"
+```
+
+---
+
 ## Running all examples
 
 ```bash

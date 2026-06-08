@@ -12,19 +12,32 @@ import ru.icc.regtab.rtl.RtlCompileException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Walks an RTL parse tree and builds the ATP spec hierarchy. */
 public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     private final Deque<List<ActionSpec>> inheritedActionsStack = new ArrayDeque<>();
+    private final Map<String, RTLParser.CellPatternBodyContext>     cellFragmentTable     = new LinkedHashMap<>();
+    private final Map<String, RTLParser.RowPatternBodyContext>      rowFragmentTable      = new LinkedHashMap<>();
+    private final Map<String, RTLParser.SubrowPatternBodyContext>   subrowFragmentTable   = new LinkedHashMap<>();
+    private final Map<String, RTLParser.SubtablePatternBodyContext> subtableFragmentTable = new LinkedHashMap<>();
 
     // -------- table --------
 
     @Override
     public TablePattern visitTablePattern(RTLParser.TablePatternContext ctx) {
+        for (var def : ctx.fragmentDef()) {
+            String name = def.FRAGMENT_ID().getText().substring(1); // strip leading '$'
+            if      (def.rowPatternBody()      != null) rowFragmentTable.put(name, def.rowPatternBody());
+            else if (def.subtablePatternBody() != null) subtableFragmentTable.put(name, def.subtablePatternBody());
+            else if (def.subrowPatternBody()   != null) subrowFragmentTable.put(name, def.subrowPatternBody());
+            else                                         cellFragmentTable.put(name, def.cellPatternBody());
+        }
         CellMatchCondition cond = ctx.cellMatchCond() != null
                 ? buildCellMatchCondition(ctx.cellMatchCond()) : null;
         List<ActionSpec> local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs()) : List.of();
@@ -63,6 +76,13 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     @Override
     public SubtablePattern visitSubtablePattern(RTLParser.SubtablePatternContext ctx) {
+        if (ctx.FRAGMENT_ID() != null) {
+            String name = ctx.FRAGMENT_ID().getText().substring(1);
+            var bodyCtx = subtableFragmentTable.get(name);
+            if (bodyCtx == null) throw new RtlCompileException("Unknown subtable fragment: $" + name);
+            Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
+            return buildSubtablePattern(bodyCtx, q);
+        }
         if (ctx.implSubtablePattern() != null) return (SubtablePattern) visit(ctx.implSubtablePattern());
         return (SubtablePattern) visit(ctx.explSubtablePattern());
     }
@@ -78,7 +98,10 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     @Override
     public SubtablePattern visitExplSubtablePattern(RTLParser.ExplSubtablePatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
-        var body = ctx.subtablePatternBody();
+        return buildSubtablePattern(ctx.subtablePatternBody(), q);
+    }
+
+    private SubtablePattern buildSubtablePattern(RTLParser.SubtablePatternBodyContext body, Quantifier q) {
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;
         List<ActionSpec> local = body.actSpecs() != null ? buildActSpecs(body.actSpecs()) : List.of();
@@ -98,7 +121,16 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     @Override
     public RowPattern visitRowPattern(RTLParser.RowPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
-        var body = ctx.rowPatternBody();
+        if (ctx.FRAGMENT_ID() != null) {
+            String name = ctx.FRAGMENT_ID().getText().substring(1);
+            var bodyCtx = rowFragmentTable.get(name);
+            if (bodyCtx == null) throw new RtlCompileException("Unknown row fragment: $" + name);
+            return buildRowPattern(bodyCtx, q);
+        }
+        return buildRowPattern(ctx.rowPatternBody(), q);
+    }
+
+    private RowPattern buildRowPattern(RTLParser.RowPatternBodyContext body, Quantifier q) {
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;
         List<ActionSpec> local = body.actSpecs() != null ? buildActSpecs(body.actSpecs()) : List.of();
@@ -117,6 +149,13 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     @Override
     public SubrowPattern visitSubrowPattern(RTLParser.SubrowPatternContext ctx) {
+        if (ctx.FRAGMENT_ID() != null) {
+            String name = ctx.FRAGMENT_ID().getText().substring(1);
+            var bodyCtx = subrowFragmentTable.get(name);
+            if (bodyCtx == null) throw new RtlCompileException("Unknown subrow fragment: $" + name);
+            Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
+            return buildSubrowPattern(bodyCtx, q);
+        }
         if (ctx.implSubrowPattern() != null) return (SubrowPattern) visit(ctx.implSubrowPattern());
         return (SubrowPattern) visit(ctx.explSubrowPattern());
     }
@@ -132,7 +171,10 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     @Override
     public SubrowPattern visitExplSubrowPattern(RTLParser.ExplSubrowPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
-        var body = ctx.subrowPatternBody();
+        return buildSubrowPattern(ctx.subrowPatternBody(), q);
+    }
+
+    private SubrowPattern buildSubrowPattern(RTLParser.SubrowPatternBodyContext body, Quantifier q) {
         CellMatchCondition cond = body.cellMatchCond() != null
                 ? buildCellMatchCondition(body.cellMatchCond()) : null;
         List<ActionSpec> local = body.actSpecs() != null ? buildActSpecs(body.actSpecs()) : List.of();
@@ -152,7 +194,16 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     @Override
     public CellPattern visitCellPattern(RTLParser.CellPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
-        var body = ctx.cellPatternBody();
+        if (ctx.FRAGMENT_ID() != null) {
+            String name = ctx.FRAGMENT_ID().getText().substring(1); // strip leading '$'
+            var bodyCtx = cellFragmentTable.get(name);
+            if (bodyCtx == null) throw new RtlCompileException("Unknown cell fragment: $" + name);
+            return buildCellPattern(bodyCtx, q);
+        }
+        return buildCellPattern(ctx.cellPatternBody(), q);
+    }
+
+    private CellPattern buildCellPattern(RTLParser.CellPatternBodyContext body, Quantifier q) {
         // [] and [BLANK?] (no contSpec) are shorthand for [SKIP]
         if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
             CellMatchCondition cond = body != null && body.cellMatchCond() != null

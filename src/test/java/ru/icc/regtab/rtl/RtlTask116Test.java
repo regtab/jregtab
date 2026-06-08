@@ -23,17 +23,19 @@ package ru.icc.regtab.rtl;
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_116/}
  * <pre>
+ * $V1=[VAL: -AV-&gt;PREFIX(', ')]
+ * $V2=[VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]
  * [ []+ ]
  * [ [] [VAL: 'TERRITORY'-&gt;AVP]+ ]
  * [ [AUX]+ ]
- * [ 'LOCATION'-&gt;AVP []
- *     [VAL: -AV-&gt;PREFIX(', ')]{4} [VAL] []
- *     [VAL] [VAL: -AV-&gt;PREFIX(', ')] [VAL] [VAL: -AV-&gt;PREFIX(', ')] [VAL] []
- *     { [VAL] [VAL: -AV-&gt;PREFIX(', ')] [VAL] [] }? ]
+ * [ 'LOCATION'-&gt;AVP [] [$V1]{4} [VAL] []
+ *                      [VAL] [$V1] [VAL]
+ *                      [$V1] [VAL] []
+ *                      { [VAL] [$V1] [VAL] [] }? ]
  * { [ [VAL#'IND': 'INDICATOR'-&gt;AVP ',' VAL: 'UNIT'-&gt;AVP]+ ]
  *   [ ['20\\d\\d' ? VAL: 'YEAR'-&gt;AVP]
- *     { [VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]{5} [] }{2}
- *     { [VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]{3} [] }?
+ *     { [$V2]{5} [] }{2}
+ *     { [$V2]{3} [] }?
  *   ]+
  * }+
  * </pre>
@@ -46,17 +48,19 @@ public class RtlTask116Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return """
+                $V1=[VAL: -AV->PREFIX(', ')]
+                $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
                 [ []+ ]
                 [ [] [VAL: 'TERRITORY'->AVP]+ ]
                 [ [AUX]+ ]
-                [ 'LOCATION'->AVP [] [VAL: -AV->PREFIX(', ')]{4} [VAL] [] 
-                                     [VAL] [VAL: -AV->PREFIX(', ')] [VAL] 
-                                     [VAL: -AV->PREFIX(', ')] [VAL] [] 
-                                     { [VAL] [VAL: -AV->PREFIX(', ')] [VAL] [] }? ]
+                [ 'LOCATION'->AVP [] [$V1]{4} [VAL] []
+                                     [VAL] [$V1] [VAL]
+                                     [$V1] [VAL] []
+                                     { [VAL] [$V1] [VAL] [] }? ]
                 { [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
                   [ ['20\\d\\d' ? VAL: 'YEAR'->AVP]
-                    { [VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]{5} [] }{2}
-                    { [VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]{3} [] }? 
+                    { [$V2]{5} [] }{2}
+                    { [$V2]{3} [] }?
                   ]+
                 }+
                 """;
