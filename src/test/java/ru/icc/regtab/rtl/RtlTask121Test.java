@@ -1,7 +1,7 @@
 package ru.icc.regtab.rtl;
 
 /**
- * Task 121: monthly cross-tabulation with compound MIN-MAX&lt;br&gt;AVE cells.
+ * Task 121: monthly cross-tabulation with compound MIN-MAX\nAVE cells.
  * condContSpec guards empty/dash-only cells (skip); otherwise parses compound MIN, MAX, AVE.
  * REC collects same-cell attributes (CL*), INDICATOR at col 1 (ROW&amp;C1),
  * and MONTH at same column (COL).
@@ -11,7 +11,7 @@ package ru.icc.regtab.rtl;
  * [ []{2} [VAL: 'MONTH'-&gt;AVP]+ ]
  * [ [] [VAL: 'INDICATOR'-&gt;AVP]
  *   [('\s*-?\s*' ? _ |
- *   VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '&lt;br&gt;' VAL: 'AVE'-&gt;AVP, (CL*,ROW&amp;C1,COL)-&gt;REC)]+ ]+
+ *   VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '\n' VAL: 'AVE'-&gt;AVP, (CL*,ROW&amp;C1,COL)-&gt;REC)]+ ]+
  * </pre>
  */
 public class RtlTask121Test extends RtlTaskBase {
@@ -24,7 +24,7 @@ public class RtlTask121Test extends RtlTaskBase {
         return """
                 [ []{2} [VAL: 'MONTH'->AVP]+ ]
                 [ [] [VAL: 'INDICATOR'->AVP]
-                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>'
+                  ['\\s*-?\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '\\n'
                                       VAL: 'AVE'->AVP, (CL*,ROW&C1,COL)->REC]+ ]+
                 """;
     }

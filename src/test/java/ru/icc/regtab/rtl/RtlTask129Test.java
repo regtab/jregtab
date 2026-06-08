@@ -10,7 +10,7 @@ package ru.icc.regtab.rtl;
  * <pre>
  * [ [] [] [VAL=SUBSTR(0,4): 'YEAR'-&gt;AVP]+ ]
  * [ [] [VAL: 'HYDROBIONT_GROUP'-&gt;AVP ',' VAL=TRIM: 'UNIT'-&gt;AVP]
- *   [('\s*-\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '&lt;br&gt;' 
+ *   [('\s*-\s*' ? _ | VAL: 'MIN'-&gt;AVP '-' VAL: 'MAX'-&gt;AVP '\n' 
  *                    VAL: 'AVE'-&gt;AVP, (CL*,ROW&amp;C1*,COL)-&gt;REC)]+ ]+
  * </pre>
  */
@@ -24,7 +24,7 @@ public class RtlTask129Test extends RtlTaskBase {
         return """
                 [ [] [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]+ ]
                 [ [] [VAL: 'HYDROBIONT_GROUP'->AVP ',' VAL=TRIM: 'UNIT'->AVP]
-                  ['\\s*-\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '<br>' 
+                  ['\\s*-\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '\\n' 
                                      VAL: 'AVE'->AVP, (CL*,ROW&C1*,COL)->REC]+ ]+
                 """;
     }
