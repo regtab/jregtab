@@ -123,6 +123,10 @@ RTL string
 
 The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4`.
 
+Named fragment definitions (`$name=[body]`) in the RTL preamble are resolved during the
+`ATPBuilder` pass: each reference expands to a fresh pattern object (syntactic substitution).
+Fragments are supported at all four pattern levels: cell, row, subrow, and subtable.
+
 ---
 
 ## ATP→RTL serialization

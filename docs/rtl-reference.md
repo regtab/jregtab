@@ -27,6 +27,65 @@ cellPatternBody  : cond ? [acts] contSpec   // guarded: ? required when contSpec
                  | [acts] contSpec          // unguarded (condContSpec bare form included)
 ```
 
+---
+
+## Named fragment definitions
+
+Repeated sub-patterns can be extracted into **named fragments** declared in a preamble
+before the first `[` or `{` of the pattern body.
+
+### Syntax
+
+```
+$NAME = fragmentBody
+```
+
+`$NAME` is a `$`-prefixed alphanumeric identifier (case-insensitive).
+`fragmentBody` uses the same bracket style as the level it represents:
+
+| Level | Definition | Reference |
+|---|---|---|
+| cell | `$N=[cellBody]` | `[$N]` in cell position |
+| row | `$N=[ [sub]+ ]` | `[$N]` in row position |
+| subrow | `$N={ [cell]+ }` | `{$N}` in subrow position |
+| subtable | `$N={ [row]+ }` | `{$N}` in subtable position |
+
+The reference can carry its own quantifier independently of the definition:
+
+```
+$V=[VAL: 'X'->AVP]
+[ [$V]{4} [$V] ]   — four then one cell of the same form
+```
+
+### Semantics
+
+Each reference is a **syntactic substitution**: it expands to a fresh pattern object equivalent
+to the inline form. Fragment bodies inherit `actSpecs` from their call-site context, exactly as
+inline patterns would. Forward references within the same preamble are allowed.
+A reference to an undefined name throws `RtlCompileException` at compile time.
+
+### Example
+
+```
+$pref=[VAL: -AV->PREFIX(', ')]
+$val=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
+[ []+ ]
+[ [] [VAL: 'TERRITORY'->AVP]+ ]
+[ [AUX]+ ]
+[ 'LOCATION'->AVP [] [$pref]{4} [VAL] []
+                     [VAL] [$pref] [VAL]
+                     [$pref] [VAL] []
+                     { [VAL] [$pref] [VAL] [] }? ]
+{ [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
+  [ ['20\\d\\d' ? VAL: 'YEAR'->AVP]
+    { [$val]{5} [] }{2}
+    { [$val]{3} [] }?
+  ]+
+}+
+```
+
+---
+
 **Inherited action specs** — `[acts]` placed at the table, subtable, row, or subrow level are
 inherited by all descendant cells. Inherited actions are merged with any local actions on the
 cell's `contSpec`. Incompatible inherited actions (e.g. `COL->AVP` on an `ATTR` anchor) are
