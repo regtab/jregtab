@@ -11,8 +11,12 @@ zeroOrMore : MULT ;
 oneOrMore  : PLUS ;
 exactly    : LCURLY INT RCURLY ;
 
-// Named fragment definition: $name=[cellPatternBody]
-fragmentDef : FRAGMENT_ID ASSIGN LSQUARE cellPatternBody? RSQUARE ;
+// Named fragment definitions (preamble): $name=[body] or $name={body}
+fragmentDef : FRAGMENT_ID ASSIGN LSQUARE cellPatternBody? RSQUARE    // cell:     $N=[cellBody]
+            | FRAGMENT_ID ASSIGN LSQUARE rowPatternBody   RSQUARE    // row:      $N=[ [sub]+ ]
+            | FRAGMENT_ID ASSIGN LCURLY  subrowPatternBody  RCURLY   // subrow:   $N={ [cell]+ }
+            | FRAGMENT_ID ASSIGN LCURLY  subtablePatternBody RCURLY  // subtable: $N={ [row]+ }
+            ;
 
 // Table pattern
 tablePattern : fragmentDef* (cellMatchCond QUESTION)? settings? actSpecs? subtablePattern+ ;
@@ -24,8 +28,11 @@ normSetting  : 'NORM' ;
 anchSetting  : 'ANCH' LPAREN INT RPAREN ;
 splitSetting : 'SPLIT' LPAREN STRING RPAREN ;
 
-// Subtable pattern: implicit or explicit
-subtablePattern : implSubtablePattern | explSubtablePattern ;
+// Subtable pattern: implicit, explicit, or fragment reference
+subtablePattern : implSubtablePattern
+                | explSubtablePattern
+                | LCURLY FRAGMENT_ID RCURLY quantifier?   // subtable fragment ref {$N}
+                ;
 
 // Implicit subtable pattern
 implSubtablePattern : rowPattern+ ;
@@ -35,11 +42,16 @@ explSubtablePattern : LCURLY subtablePatternBody RCURLY quantifier? ;
 subtablePatternBody : (cellMatchCond QUESTION)? (actSpecs)? rowPattern+ ;
 
 // Row pattern
-rowPattern : LSQUARE rowPatternBody RSQUARE quantifier? ;
+rowPattern : LSQUARE rowPatternBody RSQUARE quantifier?   // regular
+           | LSQUARE FRAGMENT_ID    RSQUARE quantifier?   // row fragment ref [$N]
+           ;
 rowPatternBody : (cellMatchCond QUESTION)? (actSpecs)? subrowPattern+ ;
 
-// Subrow pattern: implicit or explicit
-subrowPattern : implSubrowPattern | explSubrowPattern ;
+// Subrow pattern: implicit, explicit, or fragment reference
+subrowPattern : implSubrowPattern
+              | explSubrowPattern
+              | LCURLY FRAGMENT_ID RCURLY quantifier?     // subrow fragment ref {$N}
+              ;
 
 // Implicit subrow pattern
 implSubrowPattern : cellPattern+ ;
