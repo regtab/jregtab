@@ -23,19 +23,19 @@ package ru.icc.regtab.rtl;
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_116/}
  * <pre>
- * $pref=[VAL: -AV-&gt;PREFIX(', ')]
- * $val=[VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]
+ * $V1=[VAL: -AV-&gt;PREFIX(', ')]
+ * $V2=[VAL: 'VALUE'-&gt;AVP, (ROW, COL&amp;R1..3*, -AV&amp;#'IND')-&gt;REC]
  * [ []+ ]
  * [ [] [VAL: 'TERRITORY'-&gt;AVP]+ ]
  * [ [AUX]+ ]
- * [ 'LOCATION'-&gt;AVP [] [$pref]{4} [VAL] []
- *                      [VAL] [$pref] [VAL]
- *                      [$pref] [VAL] []
- *                      { [VAL] [$pref] [VAL] [] }? ]
+ * [ 'LOCATION'-&gt;AVP [] [$V1]{4} [VAL] []
+ *                      [VAL] [$V1] [VAL]
+ *                      [$V1] [VAL] []
+ *                      { [VAL] [$V1] [VAL] [] }? ]
  * { [ [VAL#'IND': 'INDICATOR'-&gt;AVP ',' VAL: 'UNIT'-&gt;AVP]+ ]
  *   [ ['20\\d\\d' ? VAL: 'YEAR'-&gt;AVP]
- *     { [$val]{5} [] }{2}
- *     { [$val]{3} [] }?
+ *     { [$V2]{5} [] }{2}
+ *     { [$V2]{3} [] }?
  *   ]+
  * }+
  * </pre>
