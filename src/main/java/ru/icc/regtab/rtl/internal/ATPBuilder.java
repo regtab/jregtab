@@ -12,19 +12,26 @@ import ru.icc.regtab.rtl.RtlCompileException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /** Walks an RTL parse tree and builds the ATP spec hierarchy. */
 public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     private final Deque<List<ActionSpec>> inheritedActionsStack = new ArrayDeque<>();
+    private final Map<String, RTLParser.CellPatternBodyContext> fragmentTable = new LinkedHashMap<>();
 
     // -------- table --------
 
     @Override
     public TablePattern visitTablePattern(RTLParser.TablePatternContext ctx) {
+        for (var def : ctx.fragmentDef()) {
+            String name = def.FRAGMENT_ID().getText().substring(1); // strip leading '$'
+            fragmentTable.put(name, def.cellPatternBody());
+        }
         CellMatchCondition cond = ctx.cellMatchCond() != null
                 ? buildCellMatchCondition(ctx.cellMatchCond()) : null;
         List<ActionSpec> local = ctx.actSpecs() != null ? buildActSpecs(ctx.actSpecs()) : List.of();
@@ -152,7 +159,16 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
     @Override
     public CellPattern visitCellPattern(RTLParser.CellPatternContext ctx) {
         Quantifier q = ctx.quantifier() != null ? buildQuantifier(ctx.quantifier()) : Quantifier.one();
-        var body = ctx.cellPatternBody();
+        if (ctx.FRAGMENT_ID() != null) {
+            String name = ctx.FRAGMENT_ID().getText().substring(1); // strip leading '$'
+            var bodyCtx = fragmentTable.get(name);
+            if (bodyCtx == null) throw new RtlCompileException("Unknown fragment: $" + name);
+            return buildCellPattern(bodyCtx, q);
+        }
+        return buildCellPattern(ctx.cellPatternBody(), q);
+    }
+
+    private CellPattern buildCellPattern(RTLParser.CellPatternBodyContext body, Quantifier q) {
         // [] and [BLANK?] (no contSpec) are shorthand for [SKIP]
         if (body == null || body.contSpec() == null || isSkipAtom(body.contSpec())) {
             CellMatchCondition cond = body != null && body.cellMatchCond() != null
