@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" alt="jRegTab" width="100"/>
+</p>
+
 # jRegTab
 
 **jRegTab** is an open-source Java library implementing **RegTab** — a method for pattern-driven data extraction from editable document tables with regular structure.
