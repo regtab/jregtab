@@ -1,3 +1,0 @@
-[[attr]+]
-{[[val#loc : schema='location'][@blank ? skip]+]
-[schema=col [val: record=(row;(up{1}:c0#loc))][!@blank ? val]+]+}+
