@@ -150,13 +150,13 @@ Test data created as part of the jRegTab project to cover table patterns not pre
 
 ---
 
-## Collection 3: Baikal (tasks 111–132)
+## Collection 3: Baikal (tasks 111–150)
 
-Test data based on real environmental monitoring tables from the Lake Baikal region.
+Test data based on real tourism and environmental monitoring tables from the Lake Baikal region.
 
-**Source:** authored by the jRegTab team; derived from public ecological reports.
+**Source:** authored by the jRegTab team; derived from public ecological and tourism reports.
 
-**Structure:** 22 tasks × 5 variants = 110 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
+**Structure:** 40 tasks × 5 variants = 200 test cases. Each variant has an input table (CSV) and an expected recordset (CSV) with a header row.
 
 ### Task mapping: task_XX ↔ regtab_id (Baikal)
 
@@ -184,3 +184,21 @@ Test data based on real environmental monitoring tables from the Lake Baikal reg
 | 130 | real_baikal_0020 |
 | 131 | real_baikal_0021 |
 | 132 | real_baikal_0022 |
+| 133 | real_baikal_0023 |
+| 134 | real_baikal_0024 |
+| 135 | real_baikal_0025 |
+| 136 | real_baikal_0026 |
+| 137 | real_baikal_0027 |
+| 138 | real_baikal_0028 |
+| 139 | real_baikal_0029 |
+| 140 | real_baikal_0030 |
+| 141 | real_baikal_0031 |
+| 142 | real_baikal_0032 |
+| 143 | real_baikal_0033 |
+| 144 | real_baikal_0034 |
+| 145 | real_baikal_0035 |
+| 146 | real_baikal_0036 |
+| 147 | real_baikal_0037 |
+| 148 | real_baikal_0038 |
+| 149 | real_baikal_0039 |
+| 150 | real_baikal_0040 |

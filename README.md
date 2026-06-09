@@ -48,7 +48,7 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 mvn compile
 ```
 
-To compile and run the full test suite (110 tasks, 1100 variants (550 ATP + 550 RTL)):
+To compile and run the full test suite (150 tasks, 1300 variants (550 ATP + 750 RTL)):
 
 ```bash
 mvn test
@@ -301,7 +301,7 @@ mvn test -Dtest="AtpIllustrativeExampleTest,RtlIllustrativeExampleTest"
 
 ## Evaluation
 
-RegTab has been evaluated on two benchmarks.
+RegTab has been evaluated on four task collections.
 
 **Foofah benchmark (tasks 001–050)** — a well-established collection of 50 tabular data transformation tasks assembled by Jin et al. (2017) from real-world forums and related work (37 real-world cases, 13 synthetic). Each task provides five source tables from the same class and five corresponding target recordsets.
 
@@ -310,7 +310,11 @@ The benchmark data (input and expected CSV files) is available at:
 
 **RegTab benchmark (tasks 051–110)** — an original collection of 60 tasks designed to cover advanced RegTab features not present in the Foofah benchmark: multi-level headers, cross-tabulations, conditional and delimited content, grouped and tagged rows, and compound provider specifications.
 
-All 110 tasks are solved by ATP-based patterns implemented in jRegTab and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **1100 test variants (550 ATP + 550 RTL)** are transformed correctly (100 % accuracy).
+All 110 tasks (001–110) are solved by ATP-based patterns and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **1100 test variants (550 ATP + 550 RTL)** are transformed correctly (100 % accuracy).
+
+**Baikal collection (tasks 111–150)** — 40 tasks based on real tourism and environmental monitoring tables from the Lake Baikal region. RTL patterns only.
+
+Tasks 111–150 add **200 further RTL test variants**, bringing the total to **1300 variants (550 ATP + 750 RTL)** across all 150 tasks.
 
 ---
 
@@ -390,6 +394,12 @@ src/test/java/ru/icc/regtab/rtl/
     RtlTask051Test.java       # RegTab benchmark tasks 051–110
     ...
     RtlTask110Test.java
+    RtlTask111Test.java       # Baikal collection I tasks 111–132
+    ...
+    RtlTask132Test.java
+    RtlTask133Test.java       # Baikal collection II tasks 133–150
+    ...
+    RtlTask150Test.java
 ```
 
 Each test class overrides two methods:
@@ -427,6 +437,11 @@ src/test/resources/tasks/
         ...
     ...
     task_110/
+        ...
+    task_111/
+        ...
+    ...
+    task_150/
         ...
 ```
 
