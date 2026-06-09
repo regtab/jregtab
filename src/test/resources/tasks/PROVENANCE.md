@@ -150,7 +150,7 @@ Test data created as part of the jRegTab project to cover table patterns not pre
 
 ---
 
-## Collection 3: Baikal (tasks 111–150)
+## Collection 3: Baikal benchmark (tasks 111–150)
 
 Test data based on real tourism and environmental monitoring tables from the Lake Baikal region.
 
