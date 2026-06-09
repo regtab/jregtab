@@ -1,0 +1,2 @@
+[[attr]+]
+[schema=col [@blank ? val : factor=(up:!@blank) | val][val][@blank ? skip | val: record=row]]+
