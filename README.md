@@ -316,9 +316,12 @@ The benchmark data (input and expected CSV files) is available at:
 
 All 110 tasks (001–110) are solved by ATP-based patterns and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **1100 test variants (550 ATP + 550 RTL)** are transformed correctly (100 % accuracy).
 
-**Baikal benchmark (tasks 111–150)** — 40 tasks based on real tourism and environmental monitoring tables from the Lake Baikal region. RTL patterns only.
+**Baikal benchmark (tasks 111–150)** — 40 tasks based on tourism and environmental monitoring tables from the Lake Baikal region. The tables do not contain authentic data: they were derived from original source tables by preserving the full layout while replacing all numerical values with similar synthetic ones and applying automatic translation to English.
 
-Tasks 111–150 add **200 further RTL test variants**, bringing the total to **1300 variants (550 ATP + 750 RTL)** across all 150 tasks.
+- **Tasks 111–132** are derived from tables published in annual state reports on the ecological state of Lake Baikal and conservation measures (Russian Ministry of Natural Resources, 2018–2022).
+- **Tasks 133–150** are derived from tables provided by the Institute of Geography, Siberian Branch of the Russian Academy of Sciences.
+
+Tasks 111–150 add **400 further test variants (200 ATP + 200 RTL)**, bringing the total to **1500 variants (750 ATP + 750 RTL)** across all 150 tasks.
 
 ---
 
@@ -328,7 +331,7 @@ The test suite lives under `src/test/java/ru/icc/regtab/` and is split into two 
 
 ### ATP benchmark tests
 
-The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one task (Foofah benchmark: 001–050, RegTab benchmark: 051–110) as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
+The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one task as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
 
 ```
 src/test/java/ru/icc/regtab/atp/
@@ -340,6 +343,9 @@ src/test/java/ru/icc/regtab/atp/
     AtpTask051Test.java       # RegTab benchmark tasks 051–110
     ...
     AtpTask110Test.java
+    AtpTask111Test.java       # Baikal benchmark tasks 111–150
+    ...
+    AtpTask150Test.java
 ```
 
 Each test class overrides two methods:
