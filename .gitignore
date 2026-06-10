@@ -19,6 +19,9 @@ plans/
 # Manuscript (not distributed with the repo)
 .paper/
 
+# Publishing instructions (contain credentials guidance, synced via YandexDisk)
+docs/PUBLISHING.md
+
 # IntelliJ IDEA
 .idea/
 .antlr/

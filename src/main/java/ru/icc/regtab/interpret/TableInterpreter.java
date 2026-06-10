@@ -117,10 +117,12 @@ public final class TableInterpreter {
 
         for (InterpretationAction action : actions) {
             switch (action.operation()) {
-                case FillOperation _, PrefixOperation _, SuffixOperation _ -> strActions.add(action);
-                case AvpOperation _ -> avpActions.add(action);
-                case RecOperation _ -> recActions.add(action);
-                case JoinOperation _ -> joinActions.add(action);
+                case FillOperation ignored -> strActions.add(action);
+                case PrefixOperation ignored -> strActions.add(action);
+                case SuffixOperation ignored -> strActions.add(action);
+                case AvpOperation ignored -> avpActions.add(action);
+                case RecOperation ignored -> recActions.add(action);
+                case JoinOperation ignored -> joinActions.add(action);
             }
         }
 
@@ -148,8 +150,8 @@ public final class TableInterpreter {
             case PrefixOperation op -> ws.applyPrefix(anchor, items, op.delimiter());
             case SuffixOperation op -> ws.applySuffix(anchor, items, op.delimiter());
             // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
-            case AvpOperation _    -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
-            case RecOperation _    -> ws.applyRec((CellDerivedItem) anchor, items);
+            case AvpOperation ignored  -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
+            case RecOperation ignored  -> ws.applyRec((CellDerivedItem) anchor, items);
             case JoinOperation op  -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.keyPositions()); }
         }
     }

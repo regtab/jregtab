@@ -279,7 +279,7 @@ public final class SyntaxMatcher {
         return switch (spec) {
             case AtomicContentSpec atomic -> atomic.idd();
             case DelimitedContentSpec delimited -> delimited.atomicSpec().idd();
-            case CompoundContentSpec _ -> ItemDerivationDirective.VAL;
+            case CompoundContentSpec ignored -> ItemDerivationDirective.VAL;
             case ConditionalContentSpec conditional -> {
                 ContentSpec branch = conditional.condition().test(cell)
                         ? conditional.positive()
