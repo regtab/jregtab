@@ -39,10 +39,24 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 
 ---
 
+## Installation
+
+Add to your `pom.xml`:
+
+```xml
+<dependency>
+    <groupId>ru.icc.regtab</groupId>
+    <artifactId>regtab</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+---
+
 ## Requirements
 
-- Java 25 or later
-- Maven 3.8+
+- Java 21 or later
+- Maven 3.9+
 
 ---
 
@@ -52,7 +66,7 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 mvn compile
 ```
 
-To compile and run the full test suite (150 tasks, 1300 variants (550 ATP + 750 RTL)):
+To compile and run the full test suite (150 tasks, 1500 variants (750 ATP + 750 RTL)):
 
 ```bash
 mvn test
