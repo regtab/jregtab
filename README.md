@@ -10,11 +10,11 @@
 
 **jRegTab** is an open-source Java library implementing **RegTab** — a method for pattern-driven data extraction from editable document tables with regular structure.
 
-RegTab is described in the paper:
+<!-- RegTab is described in the paper:
 
 > Igor V. Bychkov, Alexey E. Hmelnov, and Alexey O. Shigarov.
 > *RegTab: Pattern-Driven Data Extraction from Document Tables with Regular Structure.*
-> Submitted to IEEE Transactions on Knowledge and Data Engineering.
+> Submitted to IEEE Transactions on Knowledge and Data Engineering. -->
 
 ---
 
@@ -505,7 +505,7 @@ mvn test -Dtest="AtpTask001Test"
 
 jRegTab builds on and supersedes **TabbyXL** (<https://github.com/tabbydoc/tabbyxl>), an earlier platform for tabular-data understanding based on the CRL domain-specific language.
 
----
+<!-- ---
 
 ## Citation
 
@@ -515,7 +515,7 @@ If you use jRegTab in your research, please cite:
 Igor V. Bychkov, Alexey E. Hmelnov, and Alexey O. Shigarov.
 RegTab: Pattern-Driven Data Extraction from Document Tables with Regular Structure.
 Submitted to IEEE Transactions on Knowledge and Data Engineering, 2025.
-```
+``` -->
 
 ---
 
