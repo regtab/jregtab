@@ -1,6 +1,10 @@
 # Maven build output
 target/
 
+# Maven Release Plugin temporary files
+release.properties
+pom.xml.releaseBackup
+
 # Compiled classes and archives
 *.class
 *.jar
