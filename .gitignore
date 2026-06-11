@@ -4,6 +4,7 @@ target/
 # Maven Release Plugin temporary files
 release.properties
 pom.xml.releaseBackup
+release.bat
 
 # Compiled classes and archives
 *.class

@@ -96,6 +96,10 @@
                     <goals>deploy</goals>
                     <!-- Формат тега: v0.1.0 -->
                     <tagNameFormat>v@{project.version}</tagNameFormat>
+                    <!-- Пушим вручную после release:prepare -->
+                    <pushChanges>false</pushChanges>
+                    <!-- Checkout из локального репо, не по SSH -->
+                    <localCheckout>true</localCheckout>
                 </configuration>
             </plugin>
             <plugin>
