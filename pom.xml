@@ -160,7 +160,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <keyname>1C47071A47AC77050B1C19621612083C36A68546</keyname>
+                            <keyname>83C71C986B956BA5270EAD162182B18A137EFD8E</keyname>
                             <gpgArguments>
                                 <arg>--pinentry-mode</arg>
                                 <arg>loopback</arg>
