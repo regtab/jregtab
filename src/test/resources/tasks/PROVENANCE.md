@@ -10,6 +10,8 @@ Test data sourced from the [Foofah](https://github.com/umich-dbgroup/foofah) ben
 
 **Source:** [https://github.com/umich-dbgroup/foofah/tree/master/tests/data](https://github.com/umich-dbgroup/foofah/tree/master/tests/data)
 
+**License:** [MIT](https://github.com/umich-dbgroup/foofah/blob/master/LICENSE)
+
 **Structure:** 50 tasks × 5 variants = 250 test cases. Each variant has an input table (CSV) and optionally an expected recordset (CSV).
 
 **Local conversion:** The original Foofah data (`.txt` in `tests/data`) was converted to CSV format with comma delimiter and stored in `foofah-csv-with-comma`. Each variant folder contains `TestingTable.csv`.
