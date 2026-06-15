@@ -230,3 +230,90 @@ The extracted recordset may be further post-processed by optional operations:
   string-modification operations.
 - **Whitespace normalisation** — trims leading and trailing whitespace and
   collapses internal whitespace to a single space across all values.
+
+---
+
+## End-to-end example
+
+This section traces the full lifecycle of a concrete table through ITM.
+The [Table patterns](patterns.md#end-to-end-example) page shows the ATP pattern and
+the syntactic matching step that precede interpretation.
+
+### Source table
+
+Consider a 3 × 3 table `t₀` listing the number of airline departures from airports
+in certain months.  Its first row contains an empty cell followed by two airline
+codes; each remaining row contains an airport code followed by two cells each
+containing a departure count and a month name separated by a space:
+
+| (empty) | CA   | HU    |
+|---------|------|-------|
+| IKT     | 0 Jan | 8 Feb |
+| SVO     | 31 Jan | 40 Feb |
+
+Target schema: `S = ⟨ND, AIRLINE, AIRPORT, MON⟩`.
+
+### Items derived from the table
+
+After syntactic matching, the following cell-derived items (all VAL) are created and
+added to `I_tbl^val` (subscripts denote row, column; superscripts denote index
+within the cell):
+
+| Cell | Items |
+|------|-------|
+| `c(0,1)` | `ι(0,1)` = `"CA"` |
+| `c(0,2)` | `ι(0,2)` = `"HU"` |
+| `c(1,0)` | `ι(1,0)` = `"IKT"` |
+| `c(1,1)` | `ι(1,1)⁰` = `"0"`,  `ι(1,1)¹` = `"Jan"` |
+| `c(1,2)` | `ι(1,2)⁰` = `"8"`,  `ι(1,2)¹` = `"Feb"` |
+| `c(2,0)` | `ι(2,0)` = `"SVO"` |
+| `c(2,1)` | `ι(2,1)⁰` = `"31"`, `ι(2,1)¹` = `"Jan"` |
+| `c(2,2)` | `ι(2,2)⁰` = `"40"`, `ι(2,2)¹` = `"Feb"` |
+
+The cell `c(0,0)` is matched by a skip cell pattern — no item is derived.
+
+Four context-derived ATTR items are also created from string constants embedded in
+the action specifications: `α(ND)`, `α(AIRLINE)`, `α(AIRPORT)`, `α(MON)`.
+
+### Working state completion
+
+**AVP-construction actions** (O_avp) assign an attribute to every VAL item:
+
+| Item | avp |
+|------|-----|
+| `ι(0,1)` | `(AIRLINE, "CA")` |
+| `ι(0,2)` | `(AIRLINE, "HU")` |
+| `ι(1,0)` | `(AIRPORT, "IKT")` |
+| `ι(2,0)` | `(AIRPORT, "SVO")` |
+| `ι(1,1)⁰` | `(ND, "0")` |
+| `ι(1,2)⁰` | `(ND, "8")` |
+| `ι(2,1)⁰` | `(ND, "31")` |
+| `ι(2,2)⁰` | `(ND, "40")` |
+| `ι(1,1)¹` | `(MON, "Jan")` |
+| `ι(1,2)¹` | `(MON, "Feb")` |
+| `ι(2,1)¹` | `(MON, "Jan")` |
+| `ι(2,2)¹` | `(MON, "Feb")` |
+
+**Record-construction actions** (O_rec) build four item-based records.  The anchor
+of each record is a departure-count item; the remaining fields are collected by
+three providers: *same column* (airline), *same row* (airport), *same cell* (month):
+
+| Anchor | rec(anchor) |
+|--------|-------------|
+| `ι(1,1)⁰` | `⟨ι(1,1)⁰, ι(0,1), ι(1,0), ι(1,1)¹⟩` → `⟨"0",  "CA", "IKT", "Jan"⟩` |
+| `ι(1,2)⁰` | `⟨ι(1,2)⁰, ι(0,2), ι(1,0), ι(1,2)¹⟩` → `⟨"8",  "HU", "IKT", "Feb"⟩` |
+| `ι(2,1)⁰` | `⟨ι(2,1)⁰, ι(0,1), ι(2,0), ι(2,1)¹⟩` → `⟨"31", "CA", "SVO", "Jan"⟩` |
+| `ι(2,2)⁰` | `⟨ι(2,2)⁰, ι(0,2), ι(2,0), ι(2,2)¹⟩` → `⟨"40", "HU", "SVO", "Feb"⟩` |
+
+### Extracted recordset
+
+Schema construction collects the attributes in the order they appear across records
+(record-first strategy), yielding `S = ⟨ND, AIRLINE, AIRPORT, MON⟩`.  Record
+generation produces:
+
+| ND | AIRLINE | AIRPORT | MON |
+|----|---------|---------|-----|
+| 0  | CA      | IKT     | Jan |
+| 8  | HU      | IKT     | Feb |
+| 31 | CA      | SVO     | Jan |
+| 40 | HU      | SVO     | Feb |

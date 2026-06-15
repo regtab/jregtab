@@ -282,3 +282,123 @@ Once all pairs in `M` are processed successfully, [table
 interpretation](interpretation.md#table-interpretation) is executed.  Matching is
 considered successful only if table interpretation produces a valid recordset; if it
 fails, the ITM instance is not modified.
+
+---
+
+## End-to-end example
+
+This section shows how to build an ATP instance for a concrete table class and how
+it is matched against a table.  The [Table interpretation](interpretation.md#end-to-end-example)
+page continues the trace through working state completion and recordset extraction.
+
+### Table class and goal
+
+Assume a class `C` of tables listing the numbers of departures operated by airlines
+from airports in certain months.  All tables share the same structure: the first row
+contains an empty first cell followed by one or more airline codes; each remaining
+row contains an airport code in the leftmost cell followed by one or more cells each
+containing a departure count and a month name separated by a space:
+
+| (empty) | SU     | … | YC    |
+|---------|--------|---|-------|
+| ARH     | 11 Jan | … | 0 Dec |
+| ⋮       | ⋮      | ⋱ | ⋮     |
+| YKS     | 27 Jan | … | 0 Dec |
+
+Goal: extract a recordset with schema `S = ⟨ND, AIRLINE, AIRPORT, MON⟩`.
+
+### ATP pattern
+
+The table pattern `P_tbl` consists of a single subtable pattern `P_st¹` with two
+row patterns.
+
+**Header row** (`P_row¹`, matched exactly once):
+
+- `P_cell¹` — one skipped cell (the empty top-left corner).
+- `P_cell²` — one or more cells (`+`), each matched by atomic spec `S_atom¹`:
+  derive a VAL item from the cell text, attach AVP action with context-derived ATTR
+  constant `"AIRLINE"`.
+
+**Data rows** (`P_row²`, matched one or more times):
+
+- `P_cell³` — one cell matched by `S_atom²`: derive a VAL item, attach AVP action
+  with `"AIRPORT"`.
+- `P_cell⁴` — one or more cells (`+`), each matched by compound spec
+  `S_comp = (S_atom³, " ", S_atom⁴)`:
+    - `S_atom³` (before the space) — derive VAL item for the departure count;
+      attach two actions:
+        1. REC action with three providers: same-column VAL (airline header),
+           same-row VAL (airport), same-cell VAL (month);
+        2. AVP action with `"ND"`.
+    - `S_atom⁴` (after the space) — derive VAL item for the month; attach AVP
+      action with `"MON"`.
+
+### Syntactic match on a concrete table
+
+For the 3 × 3 instance `t₀`:
+
+| (empty) | CA     | HU    |
+|---------|--------|-------|
+| IKT     | 0 Jan  | 8 Feb |
+| SVO     | 31 Jan | 40 Feb |
+
+The subtable pattern `P_st¹` consumes all three rows.  The cell-pattern assignment
+is:
+
+|           | col 0            | col 1     | col 2     |
+|-----------|------------------|-----------|-----------|
+| **row 0** | `P_cell¹` (skip) | `P_cell²` | `P_cell²` |
+| **row 1** | `P_cell³`        | `P_cell⁴` | `P_cell⁴` |
+| **row 2** | `P_cell³`        | `P_cell⁴` | `P_cell⁴` |
+
+Content spec resolution:
+
+|           | col 0     | col 1                         | col 2                         |
+|-----------|-----------|-------------------------------|-------------------------------|
+| **row 0** | —         | `S_atom¹`                     | `S_atom¹`                     |
+| **row 1** | `S_atom²` | `S_atom³` + `" "` + `S_atom⁴` | `S_atom³` + `" "` + `S_atom⁴` |
+| **row 2** | `S_atom²` | `S_atom³` + `" "` + `S_atom⁴` | `S_atom³` + `" "` + `S_atom⁴` |
+
+### Java implementation
+
+```java
+TablePattern.of(
+  SubtablePattern.of(
+    RowPattern.of(
+      CellPattern.skip(),
+      CellPattern.of(Quantifier.oneOrMore(),
+        AtomicContentSpec.val(
+          ActionSpec.avp("AIRLINE")
+        )
+      )
+    ),
+    RowPattern.of(Quantifier.oneOrMore(),
+      CellPattern.of(
+        AtomicContentSpec.val(
+          ActionSpec.avp("AIRPORT")
+        )
+      ),
+      CellPattern.of(Quantifier.oneOrMore(),
+        CompoundContentSpec.of(
+          AtomicContentSpec.val(
+            ActionSpec.rec(1,
+              (a, c) -> c.sameCol(a),
+              (a, c) -> c.sameRow(a),
+              (a, c) -> c.sameCell(a)
+            ),
+            ActionSpec.avp("ND")
+          ),
+          Segment.of(" ",
+            AtomicContentSpec.val(
+              ActionSpec.avp("MON")
+            )
+          )
+        )
+      )
+    )
+  )
+);
+```
+
+This pattern is implemented as `AtpIllustrativeExampleTest` in the jRegTab test
+suite.
