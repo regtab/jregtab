@@ -332,7 +332,7 @@ provSpecs -> op
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
 | `JOIN` | `prov->JOIN` | Join item-based records: all items included, then dedup by named attribute (K=∅) |
-| `JOIN(K)` | `prov->JOIN(0)` | Join with key positions K dropped from each joined record before dedup; `JOIN(0)` = old CONCAT |
+| `JOIN(K)` | `prov->JOIN(0)` | Join with key positions K dropped from each joined record before dedup (e.g. `JOIN(0)` drops the anchor position) |
 | `FILL('s')` | `prov->FILL('/')` | Fill anchor value forward from provider, separated by *s* |
 | `PREFIX('s')` | `prov->PREFIX(' ')` | Prepend provider value to anchor, separated by *s* |
 | `SUFFIX('s')` | `prov->SUFFIX(' ')` | Append provider value to anchor, separated by *s* |

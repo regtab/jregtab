@@ -310,7 +310,7 @@ satisfy the constraints of the chosen operation (Tab. I in the paper):
     | `REC` | `ActionSpec.rec(providers…)` | Anchor item → record; providers supply the remaining fields |
     | `AVP` | `ActionSpec.avp(provider)` | Associates a VAL item (anchor) with an ATTR item from the provider |
     | `JOIN` | `ActionSpec.join(providers…)` | Joins item-based records; dedup by named attribute (K=∅) |
-    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Joins with key positions K dropped; `JOIN(0)` = old CONCAT |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Joins with key positions K dropped (e.g. `JOIN(0)` drops the anchor position) |
     | `FILL` | `ActionSpec.fill(delimiter, providers…)` | Fills anchor value using provider values |
     | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | Prepends provider values to the anchor |
     | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | Appends provider values to the anchor |
