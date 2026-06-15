@@ -1,0 +1,75 @@
+# Configuration for the project documentation site: https://regtab.github.io/jregtab/
+site_name: jRegTab
+site_description: A formal model for table interpretation and its implementation
+site_url: https://regtab.github.io/jregtab/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+
+repo_url: https://github.com/regtab/jregtab
+repo_name: regtab/jregtab
+edit_uri: edit/main/docs/
+
+# Link back to the portal
+extra:
+  social:
+    - icon: fontawesome/solid/house
+      link: https://regtab.github.io/
+      name: All regtab projects
+
+# Explicit section tree — you have full control over the structure here
+nav:
+  - Overview: index.md
+  - Getting started: getting-started.md
+  - Model:
+      - Table interpretation: model/interpretation.md
+      - Table patterns: model/patterns.md
+  - API reference: api.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - footnotes
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
+  # LaTeX math support (uncomment if you need formulas)
+  # - pymdownx.arithmatex:
+  #     generic: true
+
+# extra_javascript:
+#   - javascripts/mathjax.js
+#   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
