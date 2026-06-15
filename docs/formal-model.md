@@ -4,6 +4,10 @@ This document maps the formal definitions from the paper
 (*RegTab: Pattern-Driven Data Extraction from Document Tables with Regular Structure*)
 to their Java counterparts in jRegTab.
 
+For a narrative explanation of each model see:
+[Table interpretation model (ITM)](model/interpretation.md) ·
+[Table patterns (ATP)](model/patterns.md)
+
 ---
 
 ## Interpretable Table Model (ITM)
@@ -43,6 +47,10 @@ The syntactic layer represents a table as a row-oriented hierarchy:
 
 ### Semantic layer
 
+**Definition (Semantic layer):** `L_sem = (I_tbl, I_ctx, A)` where `I_tbl` is the set of
+cell-derived items, `I_ctx` is the set of context-derived items, and `A` is the set of
+interpretation actions.
+
 **Cell-derived item:** a triple `(s, u⃗, i)` where `s ∈ Σ*` is the item string, `u⃗ ∈ U*` is a sequence of user-defined tags, and `i ∈ ℕ₀` is the item index within the cell.
 
 | Formal concept | Java class / method |
@@ -55,6 +63,39 @@ The syntactic layer represents a table as a row-oriented hierarchy:
 | Item type (VAL/ATTR/AUX) | `CellDerivedItem.type()` → `ItemType` |
 | Context-derived item | `ContextDerivedItem` |
 | Semantic layer container | `TableSemantics` |
+
+### Working state
+
+**Definition (Working state):** `ws = (V, A, val, attr, avp, rec)` — accumulated semantic
+information built up during table interpretation.
+
+| Formal component | Java |
+|---|---|
+| Value set `V ⊆ Σ*` | `WorkingState.allVal()` → `Map<Item, String>` |
+| Attribute set `A ⊆ Σ⁺` | `WorkingState.allAttr()` → `Map<Item, String>` |
+| `val(ι)` | `WorkingState.val(item)` |
+| `attr(ι)` | `WorkingState.attr(item)` |
+| `avp(ι)` | `WorkingState.avp(item)` → `AttributeValuePair(attribute, value)` |
+| `rec(ι)` | `WorkingState.rec(item)` → `List<Item>` |
+| Derived `assoc(ι)` | `WorkingState.assoc(item)` — attribute of `avp(ι)`, or `null` |
+
+Six **working-state update operations** are applied during working state completion:
+
+| Formal operation | Java method | Anchor type |
+|---|---|---|
+| `O_fill^δ` | `WorkingState.applyFill(anchor, items, delimiter)` | VAL or ATTR |
+| `O_prefix^δ` | `WorkingState.applyPrefix(anchor, items, delimiter)` | VAL or ATTR |
+| `O_suffix^δ` | `WorkingState.applySuffix(anchor, items, delimiter)` | VAL or ATTR |
+| `O_avp` | `WorkingState.applyAvp(anchor, items)` | VAL |
+| `O_rec` | `WorkingState.applyRec(anchor, items)` | cell-derived VAL |
+| `O_join^K` | `WorkingState.applyJoin(anchor, items, keyPositions)` | cell-derived VAL |
+
+Consistency predicates:
+
+| Predicate | Java method |
+|---|---|
+| Basic consistency: `rec(ι)[0] = ι` and `avp(ι) = (a,v) ⟹ val(ι) = v` | `WorkingState.isConsistent()` |
+| Recordset-consistency: uniform anchor attribute + distinct non-anchor attributes per record | `WorkingState.isRecordsetConsistent()` |
 
 ### Item providers and filter conditions
 
@@ -128,6 +169,48 @@ Compound conditions: `ItemFilterConditionSpec.and(terms…)` → `(c1 & c2 & …
 
 `ActionSpec.rec(int anchorPos, providers…)` adds an `AnchorAttributeAtPosition` post-processing step (RTL: `REC(n)`).
 `ActionSpec.rec(String splitDelimiter, providers…)` adds a `DelimitedFieldSplit` step (RTL: `REC('s')`).
+
+### Recordset and schema
+
+**Definition (Recordset):** given a schema `S = ⟨a₁, …, aₙ⟩`, a *record* is an
+n-tuple `⟨(a₁,v₁), …, (aₙ,vₙ)⟩`; a *recordset* is a finite sequence of records.
+
+| Formal concept | Java class / method |
+|---|---|
+| Schema `S = ⟨a₁, …, aₙ⟩` | `Schema` — `attributes()` → `List<String>` |
+| Record `⟨(a₁,v₁), …, (aₙ,vₙ)⟩` | `Record` — `get(attribute)`, `get(index)` |
+| Recordset | `Recordset` — `schema()`, `records()`, `size()`, `get(index)` |
+
+### Table interpretation
+
+`TableInterpreter.interpret(table)` executes the four phases defined in
+[Table interpretation](model/interpretation.md#table-interpretation):
+
+| Phase | Java entry point |
+|---|---|
+| 1 — Working state initialisation | `initWorkingState(sem)` (private) |
+| 2 — Working state completion | `completeWorkingState(ws, actions)` (private) |
+| 3 — Recordset extraction | `extractRecordset(ws)` → `constructSchema` + `generateRecords` |
+| 4 — Recordset transformation | `transformRecordset(recordset)` |
+
+**Strategies and options** (all configurable via `TableInterpreter.with*(…)`):
+
+| Option | Java type | Values |
+|---|---|---|
+| Action application strategy `Γ_row` / `Γ_col` | `ActionApplicationStrategy` | `ROW_FIRST` (default), `COLUMN_FIRST` |
+| Schema construction strategy `Γ_rec` / `Γ_pos` | `SchemaConstructionStrategy` | `RECORD_FIRST` (default), `POSITION_FIRST` |
+| Anonymous attribute template | `String` | Pattern with `%i` placeholder; default `"$a_%i"` |
+| Missing value handler `μ` | `MissingValueHandler` | Functional interface; default returns `null` |
+
+**Recordset transformations** (`RecordsetTransformation` sealed interface):
+
+| Transformation | Java class | RTL / API trigger |
+|---|---|---|
+| Schema reordering | `SchemaReordering` | explicit attribute list |
+| Delimited field split | `DelimitedFieldSplit` | `ActionSpec.rec(String delimiter, …)` — RTL `REC('s')` |
+| Field splitting | `FieldSplitting` | explicit split spec |
+| Whitespace normalisation | `WhitespaceNormalization` | added via `withTransformations(…)` |
+| Anchor attribute at position | `AnchorAttributeAtPosition` | `ActionSpec.rec(int pos, …)` — RTL `REC(n)` |
 
 ---
 
