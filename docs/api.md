@@ -1,6 +1,12 @@
 # API reference
 
-This page covers the public Java API. All classes live under `ru.icc.regtab`.
+This page is a curated overview of the public Java API, with the most common factories and
+methods grouped by purpose. All classes live under `ru.icc.regtab`.
+
+!!! tip "Full generated Javadoc"
+    For the exhaustive, always-up-to-date reference of every class and method, see the generated
+    Javadoc on **[javadoc.io](https://javadoc.io/doc/ru.icc.regtab/regtab)** (published
+    automatically for each Maven Central release).
 
 ---
 

@@ -79,7 +79,7 @@ The full documentation site is published at <https://regtab.github.io/jregtab/>.
 - [RTL reference](docs/rtl-reference.md) — complete RTL syntax with tables and examples
 - [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
 - [Architecture](docs/architecture.md) — package map, data flow, RTL compilation pipeline
-- [API reference](docs/api.md) — public classes, factories, and methods
+- [API reference](docs/api.md) — public classes, factories, and methods (full Javadoc on [javadoc.io](https://javadoc.io/doc/ru.icc.regtab/regtab))
 - [Benchmark](docs/benchmark.md) — Foofah, RegTab, and Baikal task collections
 - [Testing](docs/testing.md) — test suite layout, fixtures, and how to run tasks
 
