@@ -30,18 +30,58 @@ The method is built around two formal models:
 
 - **Abstract Table Pattern (ATP)** — specifies a class of tables and the rules for deriving structured records from them. An ATP instance mirrors the ITM hierarchy and contains *cell patterns* with *cell match conditions*, *content specifications*, and *interpretation action specifications*. Matching an ATP against an ITM instance populates the semantic layer automatically.
 
-Table interpretation then proceeds in four phases: working-state initialisation, working-state completion (applying interpretation actions), recordset extraction, and optional post-processing.
+Patterns can be written directly with the Java fluent API or, more compactly, in **RTL** (Regular Table Language) — a textual DSL that compiles to ATP.
+
+---
+
+## Quick start
+
+```java
+import ru.icc.regtab.atp.AtpMatcher;
+import ru.icc.regtab.atp.spec.TablePattern;
+import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.syntax.TableSyntax;
+import ru.icc.regtab.recordset.Recordset;
+import ru.icc.regtab.rtl.RtlCompiler;
+
+// Table:   Name  | Score
+//          Alice | 95
+//          Bob   | 87
+TableSyntax syntax = new TableSyntax(3, 2);
+syntax.getCell(0, 0).setText("Name");   syntax.getCell(0, 1).setText("Score");
+syntax.getCell(1, 0).setText("Alice");  syntax.getCell(1, 1).setText("95");
+syntax.getCell(2, 0).setText("Bob");    syntax.getCell(2, 1).setText("87");
+
+TablePattern pattern = RtlCompiler.compile("""
+        [ [ATTR]{2} ]
+        [ [VAL : (^COL)->AVP, (SR)->REC]{2} ]+
+        """);
+
+Recordset rs = AtpMatcher.match(pattern, syntax)
+        .map(itm -> new TableInterpreter().interpret(itm))
+        .orElseThrow();
+// rs.schema().attributes()  →  [Name, Score]
+// rs.records().get(0)       →  {Name=Alice, Score=95}
+```
+
+A step-by-step walkthrough of this example (including the equivalent Java fluent API and a
+low-level ITM construction) is in the [Getting started](docs/getting-started.md) guide.
 
 ---
 
 ## Documentation
 
-The documentation site is published at <https://regtab.github.io/jregtab/> and covers:
+The full documentation site is published at <https://regtab.github.io/jregtab/>.
 
-- [Architecture](docs/architecture.md) — package map, data flow, interpretation phases, RTL compilation pipeline
-- [Formal model](docs/formal-model.md) — ITM and ATP formal definitions mapped to Java classes
-- [RTL reference](docs/rtl-reference.md) — complete RTL syntax reference with tables and examples
+- [Getting started](docs/getting-started.md) — installation, first example, full pipeline walkthrough
+- [ITM](docs/model/itm.md) — syntactic and semantic layers, items, providers, working state, interpretation
+- [ATP](docs/model/atp.md) — pattern hierarchy, content specs, action specs, matching
+- [RTL reference](docs/rtl-reference.md) — complete RTL syntax with tables and examples
 - [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
+- [Architecture](docs/architecture.md) — package map, data flow, RTL compilation pipeline
+- [API reference](docs/api.md) — public classes, factories, and methods
+- [Benchmark](docs/benchmark.md) — Foofah, RegTab, and Baikal task collections
+- [Testing](docs/testing.md) — test suite layout, fixtures, and how to run tasks
 
 For local preview, run `serve.bat` (Windows) or on any OS:
 
@@ -66,449 +106,20 @@ Add to your `pom.xml`:
 </dependency>
 ```
 
----
-
-## Requirements
-
-- Java 21 or later
-- Maven 3.9+
+Requires **Java 21+** and **Maven 3.9+**.
 
 ---
 
 ## Build
 
 ```bash
-mvn compile
+mvn compile      # compile
+mvn test         # compile and run the full test suite
 ```
 
-To compile and run the full test suite (150 tasks, 1500 variants (750 ATP + 750 RTL)):
-
-```bash
-mvn test
-```
-
----
-
-## Usage
-
-The three sections below use a common running example — a simplified cross-tabulation with schema `⟨ND, AIRLINE, AIRPORT⟩`:
-
-```
-       | CA | HU
-IKT    |  5 |  3
-SVO    | 31 | 40
-```
-
-This is a stripped-down version of the illustrative example from Section VI of the paper (see [Illustrative example](#illustrative-example) below). The full paper example adds a `MON` field extracted from compound cells like `"0 Jan"`, which requires `CompoundContentSpec` and a third `sameCell()` provider in the `rec` action. The simplified version isolates the core pattern structure without the compound-cell machinery.
-
-### Low-level ITM construction
-
-An `InterpretableTable` can be constructed directly by assembling the syntactic and semantic layers programmatically. This approach gives full control over items and interpretation actions, and is suited to use cases where the ATP pattern language does not suffice. For most cases, the ATP and RTL paths are simpler.
-
-The example below builds this cross-tabulation from scratch:
-
-```java
-import ru.icc.regtab.itm.InterpretableTable;
-import ru.icc.regtab.interpret.TableInterpreter;
-import ru.icc.regtab.itm.semantics.TableSemantics;
-import ru.icc.regtab.itm.semantics.action.InterpretationAction;
-import ru.icc.regtab.itm.semantics.item.*;
-import ru.icc.regtab.itm.semantics.operation.*;
-import ru.icc.regtab.itm.semantics.provider.*;
-import ru.icc.regtab.itm.syntax.TableSyntax;
-import ru.icc.regtab.recordset.Recordset;
-
-import java.util.List;
-import java.util.Set;
-
-// 1. Build the syntactic layer
-TableSyntax syntax = new TableSyntax(3, 3);
-syntax.getCell(0, 0).setText("");
-syntax.getCell(0, 1).setText("CA");
-syntax.getCell(0, 2).setText("HU");
-syntax.getCell(1, 0).setText("IKT");
-syntax.getCell(1, 1).setText("5");
-syntax.getCell(1, 2).setText("3");
-syntax.getCell(2, 0).setText("SVO");
-syntax.getCell(2, 1).setText("31");
-syntax.getCell(2, 2).setText("40");
-
-// 2a. Cell-derived items (ι): one VALUE item per cell
-//     Index 0 = first (and only) item derived from that cell.
-CellDerivedItem iotaCA  = new CellDerivedItem("CA",  0, syntax.getCell(0, 1), ItemType.VALUE);
-CellDerivedItem iotaHU  = new CellDerivedItem("HU",  0, syntax.getCell(0, 2), ItemType.VALUE);
-CellDerivedItem iotaIKT = new CellDerivedItem("IKT", 0, syntax.getCell(1, 0), ItemType.VALUE);
-CellDerivedItem iotaSVO = new CellDerivedItem("SVO", 0, syntax.getCell(2, 0), ItemType.VALUE);
-CellDerivedItem iota11  = new CellDerivedItem("5",   0, syntax.getCell(1, 1), ItemType.VALUE);
-CellDerivedItem iota12  = new CellDerivedItem("3",   0, syntax.getCell(1, 2), ItemType.VALUE);
-CellDerivedItem iota21  = new CellDerivedItem("31",  0, syntax.getCell(2, 1), ItemType.VALUE);
-CellDerivedItem iota22  = new CellDerivedItem("40",  0, syntax.getCell(2, 2), ItemType.VALUE);
-
-Set<CellDerivedItem> allCdi = Set.of(
-        iotaCA, iotaHU, iotaIKT, iotaSVO, iota11, iota12, iota21, iota22);
-
-// 2b. Context-derived items (β): named ATTRIBUTE constants that define the schema fields
-ContextDerivedItem betaND      = new ContextDerivedItem("ND",      ItemType.ATTRIBUTE);
-ContextDerivedItem betaAIRLINE = new ContextDerivedItem("AIRLINE", ItemType.ATTRIBUTE);
-ContextDerivedItem betaAIRPORT = new ContextDerivedItem("AIRPORT", ItemType.ATTRIBUTE);
-Set<ContextDerivedItem> allCtx = Set.of(betaND, betaAIRLINE, betaAIRPORT);
-
-// 2c. Interpretation actions
-// AVP: pair each VALUE item with its named ATTRIBUTE (establishes the schema field name).
-// REC: anchor on each body cell; providers select the same-column airline and same-row airport.
-ItemFilterCondition sameCol = (a, c) -> c.sameCol(a) && !c.sameCell(a);
-ItemFilterCondition sameRow = (a, c) -> c.sameRow(a) && !c.sameCell(a);
-
-List<InterpretationAction> actions = List.of(
-        // AVP actions: bind header items to named attributes
-        new InterpretationAction(iotaCA,
-                List.of(new ContextDerivedItemProvider(List.of(betaAIRLINE))), new AvpOperation()),
-        new InterpretationAction(iotaHU,
-                List.of(new ContextDerivedItemProvider(List.of(betaAIRLINE))), new AvpOperation()),
-        new InterpretationAction(iotaIKT,
-                List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
-        new InterpretationAction(iotaSVO,
-                List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
-        new InterpretationAction(iota11,
-                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota12,
-                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota21,
-                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota22,
-                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        // REC actions: form one record per body cell
-        new InterpretationAction(iota11, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
-                new RecOperation()),
-        new InterpretationAction(iota12, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
-                new RecOperation()),
-        new InterpretationAction(iota21, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
-                new RecOperation()),
-        new InterpretationAction(iota22, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
-                new RecOperation())
-);
-
-// 3. Build the semantic layer and interpret
-TableSemantics semantics = new TableSemantics(allCdi, allCtx, actions);
-InterpretableTable itm = new InterpretableTable(syntax, semantics);
-Recordset result = new TableInterpreter().interpret(itm);
-// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
-// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
-```
-
-For cells that yield multiple items (e.g. `"0 Jan"` → `"0"` and `"Jan"`), create one `CellDerivedItem` per item with distinct index values. See `CrosstabMinMaxTest` for a worked example.
-
-### Using ATP patterns
-
-The `ru.icc.regtab.atp.spec` package provides the formal ATP types. A `TablePattern` is assembled hierarchically from `SubtablePattern`, `RowPattern`, `SubrowPattern`, and `CellPattern` instances. Each `CellPattern` carries a `ContentSpec` that says how items are derived from the matched cell and which interpretation actions to apply. `AtpMatcher.match()` then performs structural matching against a `TableSyntax`, populates the semantic layer automatically, and returns an `InterpretableTable` ready for interpretation.
-
-**Example** — the same cross-tabulation expressed as an ATP pattern:
-
-```java
-import ru.icc.regtab.atp.AtpMatcher;
-import ru.icc.regtab.atp.spec.*;
-import ru.icc.regtab.interpret.TableInterpreter;
-import ru.icc.regtab.itm.syntax.TableSyntax;
-import ru.icc.regtab.recordset.Recordset;
-
-TableSyntax syntax = new TableSyntax(3, 3);
-syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
-syntax.getCell(0, 2).setText("HU");
-syntax.getCell(1, 0).setText("IKT"); syntax.getCell(1, 1).setText("5");
-syntax.getCell(1, 2).setText("3");
-syntax.getCell(2, 0).setText("SVO"); syntax.getCell(2, 1).setText("31");
-syntax.getCell(2, 2).setText("40");
-
-TablePattern pattern = TablePattern.of(
-        SubtablePattern.of(
-                // header row: skip first cell, then one-or-more airline-code cells
-                RowPattern.of(
-                        CellPattern.skip(),
-                        CellPattern.of(Quantifier.oneOrMore(),
-                                AtomicContentSpec.val(ActionSpec.avp("AIRLINE")))
-                ),
-                // data rows: airport cell + one-or-more ND cells
-                RowPattern.of(Quantifier.oneOrMore(),
-                        CellPattern.of(AtomicContentSpec.val(ActionSpec.avp("AIRPORT"))),
-                        CellPattern.of(Quantifier.oneOrMore(),
-                                AtomicContentSpec.val(
-                                        ActionSpec.avp("ND"),
-                                        ActionSpec.rec(1,
-                                                ItemFilterConditionSpec.sameCol(), // airline, same column
-                                                ItemFilterConditionSpec.sameRow()  // airport, same row
-                                        )
-                                )
-                        )
-                )
-        )
-);
-
-Recordset result = AtpMatcher.match(pattern, syntax)
-        .map(itm -> new TableInterpreter().interpret(itm))
-        .orElseThrow(() -> new IllegalStateException("Pattern did not match"));
-// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
-// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
-```
-
-Key building blocks:
-
-| Type | Role |
-|------|------|
-| `TablePattern` / `SubtablePattern` / `RowPattern` / `CellPattern` | Structural hierarchy mirroring the ITM |
-| `Quantifier` | How many times a pattern element repeats (`one()`, `oneOrMore()`, `zeroOrMore()`, `exactly(n)`) |
-| `AtomicContentSpec` | How one item is derived from a cell (`val`, `attr`, `aux`, `skip`) |
-| `ActionSpec` | Interpretation action: `avp("NAME")` names a field, `rec(k, …)` creates a record |
-| `ItemFilterConditionSpec` | Predicate selecting provider items: `sameCol()`, `sameRow()`, `sameSubtable()`, … |
-| `ProviderSpec` | Bundles a filter condition with cardinality and traversal order |
-| `AtpMatcher.match()` | Structural matching + automatic semantic-layer construction |
-
-### Using RTL patterns
-
-RTL (Regular Table Language) is a compact textual DSL that compiles to ATP.
-Use `RtlCompiler.compile(rtl)` to obtain a `TablePattern`, then proceed identically to the ATP path.
-
-**Example** — the same cross-tabulation expressed as an RTL string:
-
-```java
-import ru.icc.regtab.atp.AtpMatcher;
-import ru.icc.regtab.atp.spec.TablePattern;
-import ru.icc.regtab.interpret.TableInterpreter;
-import ru.icc.regtab.itm.syntax.TableSyntax;
-import ru.icc.regtab.recordset.Recordset;
-import ru.icc.regtab.rtl.RtlCompiler;
-
-TableSyntax syntax = new TableSyntax(3, 3);
-syntax.getCell(0, 0).setText("");   syntax.getCell(0, 1).setText("CA");
-syntax.getCell(0, 2).setText("HU");
-syntax.getCell(1, 0).setText("IKT"); syntax.getCell(1, 1).setText("5");
-syntax.getCell(1, 2).setText("3");
-syntax.getCell(2, 0).setText("SVO"); syntax.getCell(2, 1).setText("31");
-syntax.getCell(2, 2).setText("40");
-
-TablePattern pattern = RtlCompiler.compile("""
-        [ [] [VAL: 'AIRLINE'->AVP]+ ]
-        [ [VAL: 'AIRPORT'->AVP] [VAL: 'ND'->AVP, (COL,ROW)->REC]+ ]+
-        """);
-
-Recordset result = AtpMatcher.match(pattern, syntax)
-        .map(itm -> new TableInterpreter().interpret(itm))
-        .orElseThrow(() -> new IllegalStateException("Pattern did not match"));
-// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
-// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
-```
-
-The RTL string is a compact encoding of the ATP pattern shown in the previous section:
-
-| RTL token | ATP equivalent |
-|-----------|---------------|
-| `[]` | `CellPattern.skip()` |
-| `[VAL: 'AIRLINE'->AVP]+` | `CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val(ActionSpec.avp("AIRLINE")))` |
-| `(COL,ROW)->REC` | `ActionSpec.rec(1, ItemFilterConditionSpec.sameCol(), ItemFilterConditionSpec.sameRow())` |
-| `[ ... ]+` | `RowPattern.of(Quantifier.oneOrMore(), ...)` |
-
-### Illustrative example
-
-`AtpIllustrativeExampleTest` and `RtlIllustrativeExampleTest` implement the worked example from Section VI of the paper — a table class listing the numbers of airline departures from airports by month. The target schema is `⟨ND, AIRLINE, AIRPORT, MON⟩`. The ATP and RTL tests are exact counterparts: same tables, same assertions, different pattern representation.
-
-Each test covers three cases:
-
-- `paperExample_3x3_table_t0` — matches the 3 × 3 table from Figure 7 and verifies all four extracted records
-- `extendedTable_4airlines_3airports` — matches a 4 × 5 table (4 airlines, 3 airports) and verifies 12 records
-- `malformedTable_bodyCell_missingDelimiter_fails` — verifies that a table with malformed body cells does not match
-
-To run both:
-
-```bash
-mvn test -Dtest="AtpIllustrativeExampleTest,RtlIllustrativeExampleTest"
-```
-
----
-
-## Evaluation
-
-RegTab has been evaluated on four task collections.
-
-**Foofah benchmark (tasks 001–050)** — a well-established collection of 50 tabular data transformation tasks assembled by Jin et al. (2017) from real-world forums and related work (37 real-world cases, 13 synthetic). Each task provides five source tables from the same class and five corresponding target recordsets.
-
-The benchmark data (input and expected CSV files) is available at:
-<https://github.com/umich-dbgroup/foofah>
-
-**RegTab benchmark (tasks 051–110)** — an original collection of 60 tasks designed to cover advanced RegTab features not present in the Foofah benchmark: multi-level headers, cross-tabulations, conditional and delimited content, grouped and tagged rows, and compound provider specifications.
-
-All 110 tasks (001–110) are solved by ATP-based patterns and verified by a JUnit 5 test suite (see [Testing](#testing) below). Automated comparison with ground-truth confirms that all **1100 test variants (550 ATP + 550 RTL)** are transformed correctly (100 % accuracy).
-
-**Baikal benchmark (tasks 111–150)** — 40 tasks based on tourism and environmental monitoring tables from the Lake Baikal region. The tables do not contain authentic data: they were derived from original source tables by preserving the full layout while replacing all numerical values with similar synthetic ones and applying automatic translation to English.
-
-- **Tasks 111–132** are derived from tables published in annual state reports on the ecological state of Lake Baikal and conservation measures (Russian Ministry of Natural Resources, 2018–2022).
-- **Tasks 133–150** are derived from tables provided by the Institute of Geography, Siberian Branch of the Russian Academy of Sciences.
-
-Tasks 111–150 add **400 further test variants (200 ATP + 200 RTL)**, bringing the total to **1500 variants (750 ATP + 750 RTL)** across all 150 tasks.
-
----
-
-## Testing
-
-The test suite lives under `src/test/java/ru/icc/regtab/` and is split into two complementary parts.
-
-### ATP benchmark tests
-
-The primary benchmark tests are in the `atp` package. Each class `AtpTask{NN}Test` implements one task as an ATP pattern using the formal `ru.icc.regtab.atp.spec` API:
-
-```
-src/test/java/ru/icc/regtab/atp/
-    AtpTaskBase.java          # parameterised base: loads CSV, runs matcher, asserts output
-    AtpTask001Test.java       # Foofah benchmark tasks 001–050
-    AtpTask002Test.java
-    ...
-    AtpTask050Test.java
-    AtpTask051Test.java       # RegTab benchmark tasks 051–110
-    ...
-    AtpTask110Test.java
-    AtpTask111Test.java       # Baikal benchmark tasks 111–150
-    ...
-    AtpTask150Test.java
-```
-
-Each test class overrides two methods:
-
-- `taskId()` — returns the three-digit task number (e.g. `"001"`)
-- `buildPattern()` — constructs and returns the `TablePattern` for that task
-
-`AtpTaskBase` runs five JUnit parameterized test variants (`@ValueSource(ints = {1,2,3,4,5})`), one per source table. For each variant it:
-
-1. Loads `src/test/resources/tasks/task_{NN}/input_{V}.csv` into a `TableSyntax`
-2. Calls `AtpMatcher.match(pattern, syntax)` to populate the semantic layer
-3. Interprets the enriched `InterpretableTable` with `TableInterpreter`
-4. Applies optional post-processing (e.g. `WhitespaceNormalization`)
-5. Asserts the result against `src/test/resources/tasks/task_{NN}/expected_{V}.csv`
-
-All 110 tasks have dedicated `AtpTask{NN}Test` classes.
-
-**Example — Task 001** (subtables with a `rec` action using the `sameSubtable` predicate):
-
-```java
-import ru.icc.regtab.atp.spec.*;
-
-@Override
-protected TablePattern buildPattern() {
-    var sameSubtable = ItemFilterConditionSpec.sameSubtable();
-    return TablePattern.of(
-        SubtablePattern.of(Quantifier.oneOrMore(),
-            RowPattern.of(
-                CellPattern.of(AtomicContentSpec.val(
-                    ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, sameSubtable))
-                )),
-                CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.val()),
-                CellPattern.skip(Quantifier.oneOrMore())
-            ),
-            RowPattern.of(
-                CellPattern.skip(),
-                CellPattern.of(Quantifier.exactly(4), AtomicContentSpec.val()),
-                CellPattern.skip(Quantifier.oneOrMore())
-            )
-        )
-    );
-}
-```
-
-### RTL benchmark tests
-
-The `rtl` package mirrors the ATP benchmark: each `RtlTask{NN}Test` implements the same task as a compact RTL string. These tests verify that the RTL compiler produces an ATP pattern equivalent to the hand-crafted ATP counterpart.
-
-```
-src/test/java/ru/icc/regtab/rtl/
-    RtlTaskBase.java          # loads CSV, compiles RTL → ATP, runs matcher, asserts output
-    RtlTask001Test.java       # Foofah benchmark tasks 001–050
-    RtlTask002Test.java
-    ...
-    RtlTask050Test.java
-    RtlTask051Test.java       # RegTab benchmark tasks 051–110
-    ...
-    RtlTask110Test.java
-    RtlTask111Test.java       # Baikal benchmark I tasks 111–132
-    ...
-    RtlTask132Test.java
-    RtlTask133Test.java       # Baikal benchmark II tasks 133–150
-    ...
-    RtlTask150Test.java
-```
-
-Each test class overrides two methods:
-
-- `taskId()` — returns the three-digit task number (e.g. `"001"`)
-- `buildRtl()` — returns the RTL string for that task
-
-**Example — Task 01:**
-
-```java
-@Override
-protected String buildRtl() {
-    return """
-            { [ [VAL : ST*->REC] [VAL]{2} []+ ]
-              [ []               [VAL]{4} []+ ] }+
-            """;
-}
-```
-
-### Fixture data
-
-Source and expected tables are stored as CSV files:
-
-```
-src/test/resources/tasks/
-    task_001/
-        input_1.csv  …  input_5.csv
-        expected_1.csv  …  expected_5.csv
-    task_002/
-        ...
-    ...
-    task_050/
-        ...
-    task_051/
-        ...
-    ...
-    task_110/
-        ...
-    task_111/
-        ...
-    ...
-    task_150/
-        ...
-```
-
-### Running the tests
-
-Run the entire test suite with Maven:
-
-```bash
-mvn test
-```
-
-To run only the ATP benchmark tests:
-
-```bash
-mvn test -Dtest="AtpTask*Test"
-```
-
-To run only the RTL benchmark tests:
-
-```bash
-mvn test -Dtest="RtlTask*Test"
-```
-
-To run a single task:
-
-```bash
-mvn test -Dtest="AtpTask001Test"
-```
+The library is evaluated on **150 benchmark tasks** (Foofah, RegTab, and Baikal collections),
+covering **1 500 test variants (750 ATP + 750 RTL)** with 100 % accuracy. See
+[Benchmark](docs/benchmark.md) and [Testing](docs/testing.md) for details.
 
 ---
 

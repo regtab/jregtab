@@ -93,6 +93,8 @@ Requires **Java 21+**.
 | [Examples](examples.md) | Three worked examples: repeating subtables, cross-row providers, compound cells |
 | [Architecture](architecture.md) | Package map, data flow, compilation pipeline |
 | [API reference](api.md) | All public classes, factories, and methods |
+| [Benchmark](benchmark.md) | Foofah, RegTab, and Baikal task collections |
+| [Testing](testing.md) | Test suite layout, fixtures, and how to run tasks |
 
 ---
 

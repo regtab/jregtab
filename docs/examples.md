@@ -281,6 +281,129 @@ mvn test -Dtest="RtlFragmentTest"
 
 ---
 
+## Low-level ITM construction (without a pattern)
+
+The ATP and RTL paths populate the semantic layer automatically by matching a pattern. For full
+control — or for use cases the pattern language does not cover — an `InterpretableTable` can also
+be assembled **by hand**: you create the cell-derived items, the context-derived items, and the
+interpretation actions yourself, then interpret the result directly. No `AtpMatcher` is involved.
+
+This example builds the simplified cross-tabulation (schema `⟨ND, AIRLINE, AIRPORT⟩`) from scratch:
+
+```
+       | CA | HU
+IKT    |  5 |  3
+SVO    | 31 | 40
+```
+
+```java
+import ru.icc.regtab.itm.InterpretableTable;
+import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.semantics.TableSemantics;
+import ru.icc.regtab.itm.semantics.action.InterpretationAction;
+import ru.icc.regtab.itm.semantics.item.*;
+import ru.icc.regtab.itm.semantics.operation.*;
+import ru.icc.regtab.itm.semantics.provider.*;
+import ru.icc.regtab.itm.syntax.TableSyntax;
+import ru.icc.regtab.recordset.Recordset;
+
+import java.util.List;
+import java.util.Set;
+
+// 1. Build the syntactic layer
+TableSyntax syntax = new TableSyntax(3, 3);
+syntax.getCell(0, 0).setText("");
+syntax.getCell(0, 1).setText("CA");
+syntax.getCell(0, 2).setText("HU");
+syntax.getCell(1, 0).setText("IKT");
+syntax.getCell(1, 1).setText("5");
+syntax.getCell(1, 2).setText("3");
+syntax.getCell(2, 0).setText("SVO");
+syntax.getCell(2, 1).setText("31");
+syntax.getCell(2, 2).setText("40");
+
+// 2a. Cell-derived items (ι): one VALUE item per cell.
+//     Index 0 = first (and only) item derived from that cell.
+CellDerivedItem iotaCA  = new CellDerivedItem("CA",  0, syntax.getCell(0, 1), ItemType.VALUE);
+CellDerivedItem iotaHU  = new CellDerivedItem("HU",  0, syntax.getCell(0, 2), ItemType.VALUE);
+CellDerivedItem iotaIKT = new CellDerivedItem("IKT", 0, syntax.getCell(1, 0), ItemType.VALUE);
+CellDerivedItem iotaSVO = new CellDerivedItem("SVO", 0, syntax.getCell(2, 0), ItemType.VALUE);
+CellDerivedItem iota11  = new CellDerivedItem("5",   0, syntax.getCell(1, 1), ItemType.VALUE);
+CellDerivedItem iota12  = new CellDerivedItem("3",   0, syntax.getCell(1, 2), ItemType.VALUE);
+CellDerivedItem iota21  = new CellDerivedItem("31",  0, syntax.getCell(2, 1), ItemType.VALUE);
+CellDerivedItem iota22  = new CellDerivedItem("40",  0, syntax.getCell(2, 2), ItemType.VALUE);
+
+Set<CellDerivedItem> allCdi = Set.of(
+        iotaCA, iotaHU, iotaIKT, iotaSVO, iota11, iota12, iota21, iota22);
+
+// 2b. Context-derived items (β): named ATTRIBUTE constants that define the schema fields
+ContextDerivedItem betaND      = new ContextDerivedItem("ND",      ItemType.ATTRIBUTE);
+ContextDerivedItem betaAIRLINE = new ContextDerivedItem("AIRLINE", ItemType.ATTRIBUTE);
+ContextDerivedItem betaAIRPORT = new ContextDerivedItem("AIRPORT", ItemType.ATTRIBUTE);
+Set<ContextDerivedItem> allCtx = Set.of(betaND, betaAIRLINE, betaAIRPORT);
+
+// 2c. Interpretation actions
+// AVP: pair each VALUE item with its named ATTRIBUTE (establishes the schema field name).
+// REC: anchor on each body cell; providers select the same-column airline and same-row airport.
+ItemFilterCondition sameCol = (a, c) -> c.sameCol(a) && !c.sameCell(a);
+ItemFilterCondition sameRow = (a, c) -> c.sameRow(a) && !c.sameCell(a);
+
+List<InterpretationAction> actions = List.of(
+        // AVP actions: bind header items to named attributes
+        new InterpretationAction(iotaCA,
+                List.of(new ContextDerivedItemProvider(List.of(betaAIRLINE))), new AvpOperation()),
+        new InterpretationAction(iotaHU,
+                List.of(new ContextDerivedItemProvider(List.of(betaAIRLINE))), new AvpOperation()),
+        new InterpretationAction(iotaIKT,
+                List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
+        new InterpretationAction(iotaSVO,
+                List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
+        new InterpretationAction(iota11,
+                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
+        new InterpretationAction(iota12,
+                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
+        new InterpretationAction(iota21,
+                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
+        new InterpretationAction(iota22,
+                List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
+        // REC actions: form one record per body cell
+        new InterpretationAction(iota11, List.of(
+                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
+                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
+                new RecOperation()),
+        new InterpretationAction(iota12, List.of(
+                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
+                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
+                new RecOperation()),
+        new InterpretationAction(iota21, List.of(
+                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
+                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
+                new RecOperation()),
+        new InterpretationAction(iota22, List.of(
+                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
+                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
+                new RecOperation())
+);
+
+// 3. Build the semantic layer and interpret
+TableSemantics semantics = new TableSemantics(allCdi, allCtx, actions);
+InterpretableTable itm = new InterpretableTable(syntax, semantics);
+Recordset result = new TableInterpreter().interpret(itm);
+// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
+// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
+```
+
+For cells that yield multiple items (e.g. `"0 Jan"` → `"0"` and `"Jan"`), create one
+`CellDerivedItem` per item with distinct index values. See `CrosstabMinMaxTest` for a worked
+example.
+
+> This is the lowest-level entry point. In practice the [ATP](model/atp.md) and
+> [RTL](rtl-reference.md) paths express the same result far more compactly — the entire block
+> above collapses to the two-line RTL pattern shown in the
+> [Getting started](getting-started.md) guide.
+
+---
+
 ## Running all examples
 
 ```bash

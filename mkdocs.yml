@@ -56,6 +56,8 @@ nav:
   - Examples: examples.md
   - Architecture: architecture.md
   - API reference: api.md
+  - Benchmark: benchmark.md
+  - Testing: testing.md
 
 markdown_extensions:
   - admonition
