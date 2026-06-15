@@ -1,4 +1,4 @@
-# Table interpretation model (ITM)
+# Interpretable Table Model (ITM)
 
 The **Interpretable Table Model (ITM)** is the formal model that jRegTab uses to represent a
 document table at two complementary levels: a *syntactic layer* that captures the raw
@@ -35,6 +35,28 @@ formatting and content of the original merged cell replicated in every copy.  Th
 original bounding box is preserved in the `bbox(c)` property so that the merge
 geometry is not lost.
 
+??? note "Java mapping — syntactic layer"
+    **Definition (Syntactic layer):** `L_syn = (C, P)` where `C` is the finite set of
+    cells and `P = P_layout ∪ P_format ∪ P_content`.
+
+    | Formal concept | Java class / field |
+    |---|---|
+    | Cell set `C` | `TableSyntax` — cells accessed via `getCell(row, col)` |
+    | Primary position `pos(c) = (row, col)` | `Cell.row()`, `Cell.col()` |
+    | Merged-cell bounding box `bbox(c)` | `Cell.bbox()` → `BoundingBox` |
+    | Merge flag `merg(c)` | `Cell.isMerged()` |
+    | Subtable membership `subtable(c)` | `Cell.subtable()` → `Subtable` |
+    | Subrow membership `subrow(c)` | `Cell.subrow()` → `Subrow` |
+
+    Substructure hierarchy traversal:
+
+    | Formal concept | Java |
+    |---|---|
+    | Subtable set `ST` | `TableSyntax.subtables()` → `List<Subtable>` |
+    | Row set (within subtable) | `Subtable.rows()` → `List<Row>` |
+    | Subrow set `SR` | `Row.subrows()` → `List<Subrow>` |
+    | Cell set (within subrow) | `Subrow.cells()` → `List<Cell>` |
+
 ### Formatting properties
 
 Each cell carries a set of formatting properties:
@@ -58,13 +80,25 @@ Each cell carries a set of formatting properties:
 | `txtMultiline` | `true` when the text spans multiple lines |
 | `txtIndent` | Number of leading spaces |
 
+??? note "Java mapping — formatting and content"
+    | Formal property | Java method |
+    |---|---|
+    | `fntFamily` | `Cell.fontFamily()` → `FontFamily` (SERIF / SANS_SERIF / MONOSPACED) |
+    | `fntBold`, `fntItalic`, `fntStrikeout`, `fntUnderline` | `Cell.isBold()`, `Cell.isItalic()`, … |
+    | `horzAlign` | `Cell.horzAlign()` → `HorizontalAlignment` |
+    | `vertAlign` | `Cell.vertAlign()` → `VerticalAlignment` |
+    | `ltBorder`, `tpBorder`, `rtBorder`, `bmBorder` | `Cell.hasLeftBorder()`, `Cell.hasTopBorder()`, … |
+    | `bgColor`, `fgColor` | `Cell.bgColor()`, `Cell.fgColor()` → `CellColor` |
+    | `txt` | `Cell.text()` |
+    | `txtBlank` | `Cell.isBlank()` |
+
 ---
 
 ## Semantic layer
 
 The semantic layer `L_sem = (I_tbl, I_ctx, A)` adds interpretive meaning to the
 syntactic structure.  It is absent in a freshly loaded table and is populated by
-the matching process (see [Table patterns](patterns.md)).
+the matching process (see [Table patterns (ATP)](atp.md)).
 
 ### Items
 
@@ -87,6 +121,22 @@ Each item belongs to exactly one of three **item types**:
 | Value-associated | `VAL` | Atomic data value (number, date, string, …) |
 | Attribute-associated | `ATTR` | Symbolic name for a semantic role |
 | Auxiliary | `AUX` | Supporting information used during interpretation |
+
+??? note "Java mapping — items"
+    **Definition (Semantic layer):** `L_sem = (I_tbl, I_ctx, A)` where `I_tbl` is the set
+    of cell-derived items, `I_ctx` is the set of context-derived items, and `A` is the
+    set of interpretation actions.
+
+    | Formal concept | Java class / method |
+    |---|---|
+    | Cell-derived item `(s, u⃗, i)` | `CellDerivedItem` |
+    | String `str(ι)` | `CellDerivedItem.str()` |
+    | Tags `tags(ι)` | `CellDerivedItem.tags()` |
+    | Index `pos(ι)` | `CellDerivedItem.index()` |
+    | Source cell `cell(ι)` | `CellDerivedItem.cell()` |
+    | Item type (VAL / ATTR / AUX) | `CellDerivedItem.type()` → `ItemType` |
+    | Context-derived item `s` | `ContextDerivedItem` |
+    | Semantic layer container `L_sem` | `TableSemantics` |
 
 ### Item providers
 
@@ -117,6 +167,63 @@ Three standard instances are recognised:
 context-derived items regardless of the anchor, effectively injecting a constant
 into the computation.
 
+??? note "Java API — ProviderSpec"
+    **Item filter condition:** a predicate `κ : I_tbl × I_tbl → {false, true}` taking
+    an anchor item and a candidate item.
+
+    | Concept | Java |
+    |---|---|
+    | Filter condition `κ` | `ItemFilterCondition` (functional interface), `ItemFilterConditionSpec` (structured) |
+    | Filter `Φ_κ(ι_anch, J)` | `ItemFilter.filter(anchor, items)` |
+    | Cell-derived provider spec `S_prov = (ipt, k, τ, κ)` | `ProviderSpec` (record: `cardinality`, `traversalOrder`, `filterCondition`, `targetItemKind`) |
+    | Cardinality `k` | `ProviderSpec.cardinality()` — use `ProviderSpec.UNBOUNDED` for ∞ |
+    | Traversal order `τ` | `ProviderSpec.traversalOrder()` → `TraversalOrder` (ROW_MAJOR / REVERSE_ROW_MAJOR / COLUMN_MAJOR / REVERSE_COLUMN_MAJOR) |
+    | Typed VAL provider `Υ_tbl^val` | `ProviderSpec.val(…)` |
+    | Typed ATTR provider `Υ_tbl^attr` | `ProviderSpec.attr(…)` — always cardinality 1 |
+    | Typed AUX provider `Υ_tbl^aux` | `ProviderSpec.aux(…)` |
+    | Unrestricted provider | `ProviderSpec.any(…)` |
+    | Context-derived provider | `ProviderSpec.ctxAttr(text)`, `ProviderSpec.ctxVal(text)`, `ProviderSpec.ctxAux(text)` |
+    | Runtime provider | `ItemProvider` (functional: `provide(anchor)`) |
+
+    Compound conditions: `ItemFilterConditionSpec.and(terms…)` → `(c1 & c2 & …)`;
+    `ItemFilterConditionSpec.or(groups…)` → `(g1 | g2 | …)`.
+
+??? note "Java API — Filter terms (FilterTerm sealed interface)"
+    These implement the atomic constraints of filter condition `κ` and mirror the
+    RTL `spatConstr` / `contConstr` tokens.
+
+    | FilterTerm | RTL token | Condition |
+    |---|---|---|
+    | `SameSubtable` | `ST` | `sameSubtable(a) && !sameCell(a)` |
+    | `SameSubrow` | `SR` | `sameSubrow(a) && !sameCell(a)` |
+    | `SameSubcol` | `SC` | `sameSubcol(a) && !sameCell(a)` |
+    | `SameCell` | `CL` | `sameCell(a)` |
+    | `NotSameCell` | `NCL` | `!sameCell(a)` |
+    | `SameRow` | `ROW` | `sameRow(a) && !sameCell(a)` |
+    | `SameCol` | `COL` | `sameCol(a) && !sameCell(a)` |
+    | `RightOf` | `RT` | `sameSubrow(a) && col > col(a)` |
+    | `LeftOf` | `LT` | `sameSubrow(a) && col < col(a)` |
+    | `Below` | `BW` | `sameSubcol(a) && row > row(a)` |
+    | `Above` | `AV` | `sameSubcol(a) && row < row(a)` |
+    | `ColExact(n)` | `Cn` | `col == n` |
+    | `ColOffset(d)` | `C+n` / `C-n` | `col == col(a) + d` |
+    | `ColRange(f,t)` | `C+n..m` | `col(a)+f ≤ col ≤ col(a)+t` |
+    | `ColAbsoluteRange(lo,hi)` | `Clo..hi` | `lo ≤ col ≤ hi` |
+    | `RowExact(n)` | `Rn` | `row == n` |
+    | `RowOffset(d)` | `R+n` / `R-n` | `row == row(a) + d` |
+    | `PosExact(n)` | `Pn` | `index == n` |
+    | `PosOffset(d)` | `P+n` / `P-n` | `index == index(a) + d` |
+    | `PosRange(lo,hi)` | `Plo..hi` | `lo ≤ index ≤ hi` |
+    | `RegexMatched(pat)` | `"pat"` | `str.matches(pat)` |
+    | `NotRegexMatched(pat)` | `!"pat"` | `!str.matches(pat)` |
+    | `Contains(sub)` | `~"sub"` | `str.contains(sub)` |
+    | `NotContains(sub)` | `!~"sub"` | `!str.contains(sub)` |
+    | `Blank` | `BLANK` | `blankStr()` |
+    | `NotBlank` | `!BLANK` | `!blankStr()` |
+    | `Tagged(tags)` | `TAG #t1 #t2` | any tag matches (OR) |
+    | `NotTagged(tags)` | `!TAG #t1 #t2` | no tag matches |
+    | `SameStr` | `STR` | `sameStr(a)` |
+
 ### Working state and update operations
 
 During interpretation, semantic information is accumulated in a **working state**
@@ -141,6 +248,37 @@ Six **working-state update operations** populate or modify the working state:
 | Record construction | `O_rec` | Creates an item-based record with the anchor VAL item as its first element and the provided VAL items as the remaining elements |
 | Record join | `O_join^K` | Merges previously created records; key positions `K` are dropped from joined records, duplicate named attributes are removed, and the merged result is stored under the anchor |
 
+??? note "Java mapping — WorkingState"
+    **Definition (Working state):** `ws = (V, A, val, attr, avp, rec)`.
+
+    | Formal component | Java |
+    |---|---|
+    | Value set `V ⊆ Σ*` | `WorkingState.allVal()` → `Map<Item, String>` |
+    | Attribute set `A ⊆ Σ⁺` | `WorkingState.allAttr()` → `Map<Item, String>` |
+    | `val(ι)` | `WorkingState.val(item)` |
+    | `attr(ι)` | `WorkingState.attr(item)` |
+    | `avp(ι)` | `WorkingState.avp(item)` → `AttributeValuePair(attribute, value)` |
+    | `rec(ι)` | `WorkingState.rec(item)` → `List<Item>` |
+    | Derived `assoc(ι)` | `WorkingState.assoc(item)` — attribute of `avp(ι)`, or `null` |
+
+    Six working-state update operations:
+
+    | Formal operation | Java method | Anchor type |
+    |---|---|---|
+    | `O_fill^δ` | `WorkingState.applyFill(anchor, items, delimiter)` | VAL or ATTR |
+    | `O_prefix^δ` | `WorkingState.applyPrefix(anchor, items, delimiter)` | VAL or ATTR |
+    | `O_suffix^δ` | `WorkingState.applySuffix(anchor, items, delimiter)` | VAL or ATTR |
+    | `O_avp` | `WorkingState.applyAvp(anchor, items)` | VAL |
+    | `O_rec` | `WorkingState.applyRec(anchor, items)` | cell-derived VAL |
+    | `O_join^K` | `WorkingState.applyJoin(anchor, items, keyPositions)` | cell-derived VAL |
+
+    Consistency predicates:
+
+    | Predicate | Java method |
+    |---|---|
+    | Basic consistency: `rec(ι)[0] = ι` and `avp(ι) = (a,v) ⟹ val(ι) = v` | `WorkingState.isConsistent()` |
+    | Recordset-consistency: uniform anchor attribute + distinct per-record attributes | `WorkingState.isRecordsetConsistent()` |
+
 ### Interpretation actions
 
 An **interpretation action** `(ι_anch, π⃗, o)` combines:
@@ -149,11 +287,12 @@ An **interpretation action** `(ι_anch, π⃗, o)` combines:
 - a sequence of item providers `π⃗ = ⟨π₁, …, πₙ⟩` that supply the operand items;
 - a working-state update operation `o`.
 
-When executed, the action first collects a concatenated item sequence `ι⃗ = π₁(ι_anch) · … · πₙ(ι_anch)`, then applies `o` to the working state with `ι_anch` as the anchor and `ι⃗` as the operand sequence.
+When executed, the action first collects a concatenated item sequence
+`ι⃗ = π₁(ι_anch) · … · πₙ(ι_anch)`, then applies `o` to the working state with
+`ι_anch` as the anchor and `ι⃗` as the operand sequence.
 
 Actions must be *consistent*: the provider types and resulting item counts must
-satisfy the constraints of the chosen operation (see the table below, which also
-appears in the paper as Tab. I).
+satisfy the constraints of the chosen operation (Tab. I in the paper):
 
 | Action subset | Anchor type | Provider type | `|ι⃗|` |
 |---|---|---|---|
@@ -161,6 +300,40 @@ appears in the paper as Tab. I).
 | AVP construction | VAL (cell- or context-derived) | ATTR provider | = 1 |
 | Record construction | VAL (cell-derived) | VAL providers | ≥ 0 |
 | Record join | VAL (cell-derived) | VAL providers (cell-derived) | ≥ 0 |
+
+??? note "Java API — ActionSpec"
+    **Action spec:** `S_act = (op, ⟨S_prov¹, …, S_provⁿ⟩)` where `op` is a
+    working-state update operation.
+
+    | Operation | Java factory | Effect |
+    |---|---|---|
+    | `REC` | `ActionSpec.rec(providers…)` | Anchor item → record; providers supply the remaining fields |
+    | `AVP` | `ActionSpec.avp(provider)` | Associates a VAL item (anchor) with an ATTR item from the provider |
+    | `JOIN` | `ActionSpec.join(providers…)` | Joins item-based records; dedup by named attribute (K=∅) |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Joins with key positions K dropped; `JOIN(0)` = old CONCAT |
+    | `FILL` | `ActionSpec.fill(delimiter, providers…)` | Fills anchor value using provider values |
+    | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | Prepends provider values to the anchor |
+    | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | Appends provider values to the anchor |
+    | AVP with literal | `ActionSpec.avp("ATTR_NAME")` | Context-derived ATTR constant |
+
+    `ActionSpec.rec(int anchorPos, providers…)` adds an `AnchorAttributeAtPosition`
+    post-processing step (RTL: `REC(n)`).
+    `ActionSpec.rec(String splitDelimiter, providers…)` adds a `DelimitedFieldSplit`
+    step (RTL: `REC('s')`).
+
+---
+
+## Recordset and schema
+
+**Definition (Recordset):** given a schema `S = ⟨a₁, …, aₙ⟩`, a *record* is an
+n-tuple `⟨(a₁,v₁), …, (aₙ,vₙ)⟩`; a *recordset* is a finite sequence of records.
+
+??? note "Java mapping — Schema, Record, Recordset"
+    | Formal concept | Java class / method |
+    |---|---|
+    | Schema `S = ⟨a₁, …, aₙ⟩` | `Schema` — `attributes()` → `List<String>` |
+    | Record `⟨(a₁,v₁), …, (aₙ,vₙ)⟩` | `Record` — `get(attribute)`, `get(index)` |
+    | Recordset | `Recordset` — `schema()`, `records()`, `size()`, `get(index)` |
 
 ---
 
@@ -231,12 +404,41 @@ The extracted recordset may be further post-processed by optional operations:
 - **Whitespace normalisation** — trims leading and trailing whitespace and
   collapses internal whitespace to a single space across all values.
 
+??? note "Java mapping — TableInterpreter"
+    `TableInterpreter.interpret(table)` executes all four phases.
+
+    | Phase | Java entry point |
+    |---|---|
+    | 1 — Working state initialisation | `initWorkingState(sem)` (private) |
+    | 2 — Working state completion | `completeWorkingState(ws, actions)` (private) |
+    | 3 — Recordset extraction | `extractRecordset(ws)` → `constructSchema` + `generateRecords` |
+    | 4 — Recordset transformation | `transformRecordset(recordset)` |
+
+    **Strategies and options** (all configurable via `TableInterpreter.with*(…)`):
+
+    | Option | Java type | Values |
+    |---|---|---|
+    | Action application strategy `Γ_row` / `Γ_col` | `ActionApplicationStrategy` | `ROW_FIRST` (default), `COLUMN_FIRST` |
+    | Schema construction strategy `Γ_rec` / `Γ_pos` | `SchemaConstructionStrategy` | `RECORD_FIRST` (default), `POSITION_FIRST` |
+    | Anonymous attribute template | `String` | Pattern with `%i` placeholder; default `"$a_%i"` |
+    | Missing value handler `μ` | `MissingValueHandler` | Functional interface; default returns `null` |
+
+    **Recordset transformations** (`RecordsetTransformation` sealed interface):
+
+    | Transformation | Java class | RTL / API trigger |
+    |---|---|---|
+    | Schema reordering | `SchemaReordering` | explicit attribute list |
+    | Delimited field split | `DelimitedFieldSplit` | `ActionSpec.rec(String delimiter, …)` — RTL `REC('s')` |
+    | Field splitting | `FieldSplitting` | explicit split spec |
+    | Whitespace normalisation | `WhitespaceNormalization` | `withTransformations(…)` |
+    | Anchor attribute at position | `AnchorAttributeAtPosition` | `ActionSpec.rec(int pos, …)` — RTL `REC(n)` |
+
 ---
 
 ## End-to-end example
 
 This section traces the full lifecycle of a concrete table through ITM.
-The [Table patterns](patterns.md#end-to-end-example) page shows the ATP pattern and
+The [Table patterns (ATP)](atp.md#end-to-end-example) page shows the ATP pattern and
 the syntactic matching step that precede interpretation.
 
 ### Source table

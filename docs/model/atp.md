@@ -8,13 +8,12 @@ tables.  An ATP instance describes, in abstract and syntax-independent terms:
 - what they mean — through interpretation action specifications embedded at the
   cell level.
 
-The relationship between ATP and [ITM](interpretation.md) is dual and
-complementary.  An ITM instance is a single concrete table; an ATP instance is a
-description of all possible realisations of a table class.  *Matching* bridges the
-two: given an ATP instance and an ITM instance whose syntactic layer is populated
-but whose semantic layer is absent, matching checks whether the table belongs to the
-class and, if so, uses the ATP's action specifications to automatically populate the
-semantic layer.
+The relationship between ATP and [ITM](itm.md) is dual and complementary.  An ITM
+instance is a single concrete table; an ATP instance is a description of all possible
+realisations of a table class.  *Matching* bridges the two: given an ATP instance and
+an ITM instance whose syntactic layer is populated but whose semantic layer is absent,
+matching checks whether the table belongs to the class and, if so, uses the ATP's
+action specifications to automatically populate the semantic layer.
 
 ---
 
@@ -54,6 +53,31 @@ row pattern, its subtable pattern, and the top-level table pattern.
 
 Quantifiers have identical semantics at every level of the hierarchy.
 
+??? note "Java mapping — pattern hierarchy and quantifiers"
+    **Definition (ATP instance):** `P_tbl = (q, λ, ⟨P_st¹, …⟩)`.
+
+    | Formal concept | Java class | Constructor |
+    |---|---|---|
+    | Table pattern `P_tbl` | `TablePattern` | `TablePattern.of(subtablePatterns…)` |
+    | Subtable pattern `P_st` | `SubtablePattern` | `SubtablePattern.of(rowPatterns…)` |
+    | Row pattern `P_row` | `RowPattern` | `RowPattern.of(subrowOrCellPatterns…)` |
+    | Subrow pattern `P_sr` | `SubrowPattern` | `SubrowPattern.of(cellPatterns…)` |
+    | Cell pattern `P_cell` | `CellPattern` | `CellPattern.of(contentSpec)`, `CellPattern.skip()` |
+
+    Quantifier factories (`Quantifier` record):
+
+    | Notation | Factory |
+    |---|---|
+    | `?` | `Quantifier.zeroOrOne()` |
+    | default / `1` | `Quantifier.one()` (implied if omitted) |
+    | `{n}` | `Quantifier.exactly(n)` |
+    | `+` | `Quantifier.oneOrMore()` |
+    | `*` | `Quantifier.zeroOrMore()` |
+
+    Pass the quantifier as the first argument:
+    `CellPattern.of(Quantifier.oneOrMore(), contentSpec)`,
+    `RowPattern.of(Quantifier.zeroOrMore(), cellPatterns…)`.
+
 ---
 
 ## Cell match conditions
@@ -67,9 +91,8 @@ When used in a table, subtable, row, or subrow pattern, `λ` must hold for *ever
 cell belonging to the matched (sub)structure.  When used in a cell pattern, it must
 hold for that individual cell only.
 
-Commonly used atomic constraints (see the
-[formal model reference](../formal-model.md#substructure-hierarchy) for a complete
-list):
+Commonly used atomic constraints (see
+[ITM — Layout hierarchy](itm.md#layout-hierarchy) for the full property list):
 
 | Constraint | Meaning |
 |---|---|
@@ -81,6 +104,18 @@ list):
 In RTL notation, a condition appears inside `[ ]` at the cell level and inside
 `{ }` (or `[ ]`) at higher levels, separated from the content specification by
 `?`.
+
+??? note "Java mapping — CellMatchCondition and CellPredicate"
+    | Concept | Java |
+    |---|---|
+    | Cell match condition `λ` | `CellMatchCondition` wraps a `CellPredicate` |
+    | `txtBlank = true` | `CellPredicate.Blank` |
+    | `txtBlank = false` | `CellPredicate.NotBlank` |
+    | `txt matches "pat"` | `CellPredicate.Regex(pattern)` |
+    | `txt not matches "pat"` | `CellPredicate.NotRegex(pattern)` |
+
+    Conditions are composed using `CellMatchCondition.and(…)` and
+    `CellMatchCondition.or(…)`.
 
 ---
 
@@ -101,7 +136,7 @@ S_atom = (idd, ξ, u⃗, ⟨S_act¹, …, S_actᵐ⟩)
 | Component | Description |
 |---|---|
 | `idd` | Item derivation directive: `VAL`, `ATTR`, `AUX`, or `SKIP` |
-| `ξ` | Optional string extractor applied to the raw cell text before creating the item string (e.g. `NORM`, `UC`, `SUBSTR(n,m)`, `REPL("a","b")`) |
+| `ξ` | Optional string extractor applied to the raw cell text before creating the item string |
 | `u⃗` | Optional sequence of user-defined tags attached to the derived item |
 | `S_act¹ … S_actᵐ` | Sequence of interpretation action specifications (may be empty) |
 
@@ -110,6 +145,43 @@ consumed but ignored.
 
 The derived item becomes the *anchor item* for all action specifications in the
 list.
+
+**String extractors** (`ξ`) transform the raw cell text before item creation.
+Extractors are applied in order and may be chained:
+
+| Extractor | RTL notation | Effect |
+|---|---|---|
+| Whitespace normalisation | `=NORM` | Trim + collapse internal whitespace |
+| Upper case | `=UC` | Convert to upper case |
+| Lower case | `=LC` | Convert to lower case |
+| Trimmed | `=TRIM` | Strip leading/trailing whitespace only |
+| Substring | `=SUBSTR(n,m)` | Extract characters at positions `n` to `m` |
+| Replaced | `=REPL("a","b")` | Replace all occurrences of `"a"` with `"b"` |
+
+Chained example: `=REPL("x","").NORM` — first removes `"x"`, then normalises whitespace.
+
+??? note "Java mapping — AtomicContentSpec and StringExtractor"
+    | Concept | Java |
+    |---|---|
+    | `idd = VAL` | `AtomicContentSpec.val(actionSpecs…)` |
+    | `idd = ATTR` | `AtomicContentSpec.attr(actionSpecs…)` |
+    | `idd = AUX` | `AtomicContentSpec.aux(actionSpecs…)` |
+    | `idd = SKIP` | `AtomicContentSpec.skip()` or `CellPattern.skip()` |
+
+    StringExtractor constants and factories:
+
+    | RTL notation | Java |
+    |---|---|
+    | `=NORM` | `StringExtractor.WhitespaceNormalized.INSTANCE` |
+    | `=UC` | `StringExtractor.UpperCase.INSTANCE` |
+    | `=LC` | `StringExtractor.LowerCase.INSTANCE` |
+    | `=TRIM` | `StringExtractor.Trimmed.INSTANCE` |
+    | `=SUBSTR(n,m)` | `new StringExtractor.Substring(n, m)` |
+    | `=REPL("a","b")` | `new StringExtractor.Replaced(Pattern.compile("a"), "b")` |
+    | chained `=X.Y` | `StringExtractor.chain(X, Y)` |
+
+    Pass the extractor to the spec factory:
+    `AtomicContentSpec.val(StringExtractor.WhitespaceNormalized.INSTANCE, actionSpecs…)`.
 
 ### Delimited content specification
 
@@ -123,6 +195,19 @@ S_delim = (δ, S_atom)
 If the cell text decomposes as `s₁ · δ · s₂ · δ · … · δ · sₙ`, then `S_atom` is
 applied independently to each `sₖ`, deriving one item per substring.  This is
 used, for example, when a single cell contains a comma-separated list of values.
+
+??? note "Java mapping — DelimitedContentSpec"
+    ```java
+    DelimitedContentSpec.of(atomSpec, delimiter)
+    ```
+
+    Example — comma-separated list of VAL items, each tagged AVP to `"CODES"`:
+    ```java
+    DelimitedContentSpec.of(
+        AtomicContentSpec.val(ActionSpec.avp("CODES")),
+        ","
+    )
+    ```
 
 ### Compound content specification
 
@@ -141,6 +226,19 @@ passed to the corresponding `S_xⁱ` as its input text.
 This is used, for example, when a cell contains a value and a unit separated by a
 space: `"42 km"` → `S_atom³` receives `"42"`, `S_atom⁴` receives `"km"`.
 
+??? note "Java mapping — CompoundContentSpec"
+    ```java
+    CompoundContentSpec.of(
+        headerAtomSpec,
+        Segment.of(delimiter1, atomSpec2),
+        Segment.of(delimiter2, atomSpec3),
+        …
+    )
+    ```
+
+    The `headerAtomSpec` corresponds to `S_x¹`; each `Segment(δ, S_x)` corresponds to
+    one `(δᵢ, S_xⁱ⁺¹)` pair.  Empty leading delimiter `δ₀` is implied.
+
 ### Conditional content specification
 
 A **conditional content specification** selects between two alternative
@@ -152,6 +250,14 @@ S_cond = (λ, S_x⁺, S_x⁻)
 
 If `c ⊨ λ` then `S_x⁺` governs the cell; otherwise `S_x⁻` governs it.  Each
 branch may be atomic, delimited, or compound.
+
+??? note "Java mapping — ConditionalContentSpec"
+    ```java
+    ConditionalContentSpec.of(condition, thenSpec, elseSpec)
+    ```
+
+    where `condition` is a `CellMatchCondition` and `thenSpec` / `elseSpec` are any
+    content specification instances.
 
 ---
 
@@ -187,6 +293,9 @@ of string constants.  The constructed provider always returns a fixed sequence o
 context-derived items regardless of the anchor — effectively injecting constants
 into the interpretation.
 
+See [ITM — Item providers](itm.md#item-providers) for the complete `ProviderSpec`
+API and the table of 27 atomic filter terms (`FilterTerm`).
+
 ---
 
 ## Interpretation action specifications
@@ -210,7 +319,24 @@ S_act = (op, s, ⟨S_prov¹, …, S_provⁿ⟩)
 In both forms, `op` is one of the six working-state update operations (`FILL`,
 `PREFIX`, `SUFFIX`, `AVP`, `REC`, `JOIN`) and `S_prov¹ … S_provⁿ` are item
 provider specifications whose types must satisfy the consistency constraints for the
-chosen operation (see [interpretation actions](interpretation.md#interpretation-actions)).
+chosen operation (see [ITM — Interpretation actions](itm.md#interpretation-actions)).
+
+??? note "Java mapping — ActionSpec"
+    | Operation | Java factory | Notes |
+    |---|---|---|
+    | `REC` | `ActionSpec.rec(providers…)` | anchor → first field; providers supply remaining fields |
+    | `REC(n)` | `ActionSpec.rec(int n, providers…)` | adds `AnchorAttributeAtPosition` post-step |
+    | `REC('s')` | `ActionSpec.rec(String delim, providers…)` | adds `DelimitedFieldSplit` post-step |
+    | `AVP` | `ActionSpec.avp(provider)` | associates VAL anchor with ATTR item |
+    | `AVP "name"` | `ActionSpec.avp("ATTR_NAME")` | context-derived ATTR constant |
+    | `JOIN` | `ActionSpec.join(providers…)` | joins records, dedup by named attribute |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(k…), providers…)` | joins with key positions K dropped |
+    | `FILL` | `ActionSpec.fill(delimiter, providers…)` | fills anchor value from providers |
+    | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | prepends provider values |
+    | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | appends provider values |
+
+    Lambda form: providers may be written as `(anchor, candidate) -> candidate.sameCol(anchor)`
+    when passed directly to `ActionSpec.rec(…)` (shorthand matching `ProviderSpec.val(…)`).
 
 ---
 
@@ -279,7 +405,7 @@ provider specifications are also created at this point and added to the ITM
 instance.  The resulting actions are added to the ITM instance's action set `A`.
 
 Once all pairs in `M` are processed successfully, [table
-interpretation](interpretation.md#table-interpretation) is executed.  Matching is
+interpretation](itm.md#table-interpretation) is executed.  Matching is
 considered successful only if table interpretation produces a valid recordset; if it
 fails, the ITM instance is not modified.
 
@@ -288,7 +414,7 @@ fails, the ITM instance is not modified.
 ## End-to-end example
 
 This section shows how to build an ATP instance for a concrete table class and how
-it is matched against a table.  The [Table interpretation](interpretation.md#end-to-end-example)
+it is matched against a table.  The [Table interpretation](itm.md#end-to-end-example)
 page continues the trace through working state completion and recordset extraction.
 
 ### Table class and goal

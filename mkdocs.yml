@@ -50,9 +50,8 @@ nav:
   - Overview: index.md
   - Getting started: getting-started.md
   - Model:
-      - Formal model: formal-model.md
-      - Table interpretation: model/interpretation.md
-      - Table patterns: model/patterns.md
+      - ITM (Interpretable Table Model): model/itm.md
+      - ATP (Abstract Table Pattern): model/atp.md
   - RTL reference: rtl-reference.md
   - Examples: examples.md
   - Architecture: architecture.md

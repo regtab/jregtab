@@ -140,5 +140,6 @@ for (var record : rs.records()) {
 
 - [Examples](examples.md) — three worked examples, including cross-row providers and compound cells.
 - [RTL reference](rtl-reference.md) — complete syntax for the RTL DSL.
-- [Formal model](formal-model.md) — mapping from the paper's definitions to Java types.
+- [ITM](model/itm.md) — syntactic and semantic layers, working state, table interpretation.
+- [ATP](model/atp.md) — pattern hierarchy, content specs, matching algorithm.
 - [API reference](api.md) — public classes and methods.

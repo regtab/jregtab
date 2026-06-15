@@ -87,9 +87,8 @@ Requires **Java 21+**.
 | Section | Contents |
 |---|---|
 | [Getting started](getting-started.md) | Installation, first example, full pipeline walkthrough |
-| [Formal model](formal-model.md) | ITM and ATP formal definitions mapped to Java types |
-| [Table interpretation](model/interpretation.md) | Interpretation phases, working state, recordset extraction |
-| [Table patterns](model/patterns.md) | ATP hierarchy, quantifiers, content and action specs |
+| [ITM](model/itm.md) | Syntactic and semantic layers, items, providers, working state, table interpretation |
+| [ATP](model/atp.md) | Pattern hierarchy, quantifiers, content specs, action specs, matching |
 | [RTL reference](rtl-reference.md) | Complete RTL syntax with tables and examples |
 | [Examples](examples.md) | Three worked examples: repeating subtables, cross-row providers, compound cells |
 | [Architecture](architecture.md) | Package map, data flow, compilation pipeline |
