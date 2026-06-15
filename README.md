@@ -36,10 +36,21 @@ Table interpretation then proceeds in four phases: working-state initialisation,
 
 ## Documentation
 
+The documentation site is published at <https://regtab.github.io/jregtab/> and covers:
+
 - [Architecture](docs/architecture.md) — package map, data flow, interpretation phases, RTL compilation pipeline
 - [Formal model](docs/formal-model.md) — ITM and ATP formal definitions mapped to Java classes
 - [RTL reference](docs/rtl-reference.md) — complete RTL syntax reference with tables and examples
 - [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
+
+For local preview, run `serve.bat` (Windows) or on any OS:
+
+```bash
+pip install -r requirements.txt
+mkdocs serve
+```
+
+Then open <http://127.0.0.1:8000>. Publishing is automated by the `Deploy docs` GitHub Actions workflow on every push to `main`.
 
 ---
 
