@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-06-21
+
+### Added
+- MkDocs documentation site with GitHub Pages deployment
+- README badges (license, Maven Central, Java), links to docs site and Javadoc
+- License reference for Foofah benchmark data in PROVENANCE
+
+### Changed
+- Consolidated and expanded model docs (itm.md, atp.md, RTL reference, API reference)
+- Trimmed README to a showcase, moved low-level/benchmark content into docs
+
+### Removed
+- Stale CONCAT/ConcatOperation references from docs
+
 ## [0.1.0] - 2026-06-11
 
 ### Added
