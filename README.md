@@ -40,6 +40,9 @@ IKT    | 0 Jan  | 8 Feb
 SVO    | 31 Jan | 40 Feb
 ```
 
+The program below builds this table, compiles an RTL pattern, matches it, and interprets the match
+into a flat recordset over the schema `⟨ND, AIRLINE, AIRPORT, MON⟩`:
+
 ```java
 import ru.icc.regtab.atp.AtpMatcher;
 import ru.icc.regtab.atp.spec.TablePattern;
