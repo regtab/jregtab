@@ -518,27 +518,8 @@ A reference to an undefined name throws `RtlCompileException` at compile time.
 
 ### Example
 
-Task 116 declares two cell fragments and reuses them across a complex header row and the data
-rows. `$V1` is a prefix-from-above cell; `$V2` is a value cell that builds a record:
-
-```
-$V1=[VAL: -AV->PREFIX(', ')]
-$V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
-[ []+ ]
-[ [] [VAL: 'TERRITORY'->AVP]+ ]
-[ [AUX]+ ]
-[ 'LOCATION'->AVP [] [$V1]{4} [VAL] []
-                     [VAL] [$V1] [VAL]
-                     [$V1] [VAL] []
-                     { [VAL] [$V1] [VAL] [] }? ]
-{ [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
-  [ ['20\d\d' ? VAL: 'YEAR'->AVP]
-    { [$V2]{5} [] }{2}
-    { [$V2]{3} [] }?
-  ]+
-}+
-```
-
-Here `[$V1]{4}` expands `$V1` four times, and `{ [$V2]{5} [] }{2}` repeats a subrow of five `$V2`
-value cells (plus a skipped separator) exactly twice — the same effect as writing the cell body
-out by hand at each position.
+For a complete worked example, see
+[Example 4 — Task 116](examples.md#example-4-task-116-named-fragments-de-duplicating-repeated-sub-patterns)
+on the Examples page: it declares two cell fragments (`$V1`, `$V2`) and reuses them across a complex
+header row and the data rows, e.g. `[$V1]{4}` expands `$V1` four times and `{ [$V2]{5} [] }{2}`
+repeats a subrow of five value cells twice.
