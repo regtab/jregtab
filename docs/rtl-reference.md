@@ -516,10 +516,5 @@ to the inline form. Fragment bodies inherit `actSpecs` from their call-site cont
 inline patterns would. Forward references within the same preamble are allowed.
 A reference to an undefined name throws `RtlCompileException` at compile time.
 
-### Example
-
-For a complete worked example, see
-[Example 4 — Task 116](examples.md#example-4-task-116-named-fragments-de-duplicating-repeated-sub-patterns)
-on the Examples page: it declares two cell fragments (`$V1`, `$V2`) and reuses them across a complex
-header row and the data rows, e.g. `[$V1]{4}` expands `$V1` four times and `{ [$V2]{5} [] }{2}`
-repeats a subrow of five value cells twice.
+See [Example 4 — Task 116](examples.md#example-4-task-116-named-fragments-de-duplicating-repeated-sub-patterns)
+on the Examples page for a complete worked example with two reused cell fragments.
