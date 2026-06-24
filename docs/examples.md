@@ -505,6 +505,9 @@ mvn test -Dtest="RtlTask051Test"
 
 ## Running all examples
 
+All five examples above are tasks from the benchmark suite (052, 053, 046, 116, 051), so they
+are covered by the `AtpTask*Test` / `RtlTask*Test` globs:
+
 ```bash
 # All ATP benchmark tests
 mvn test -Dtest="AtpTask*Test"
@@ -512,6 +515,6 @@ mvn test -Dtest="AtpTask*Test"
 # All RTL benchmark tests
 mvn test -Dtest="RtlTask*Test"
 
-# Illustrative example
-mvn test -Dtest="AtpIllustrativeExampleTest"
+# Named-fragment unit tests (Example 4)
+mvn test -Dtest="RtlFragmentTest"
 ```
