@@ -302,7 +302,7 @@ mvn test -Dtest="RtlTask046Test"
 
 ---
 
-## Named fragments (de-duplicating repeated sub-patterns)
+## Example 4 — Task 116: named fragments (de-duplicating repeated sub-patterns)
 
 When the same sub-pattern appears in multiple non-adjacent positions, **named fragment
 definitions** eliminate the repetition. Fragments are declared in the RTL preamble
@@ -343,19 +343,22 @@ mvn test -Dtest="RtlFragmentTest"
 
 ---
 
-## Low-level ITM construction (without a pattern)
+## Example 5 — Task 051: low-level ITM construction (without a pattern)
 
 The ATP and RTL paths populate the semantic layer automatically by matching a pattern. For full
 control — or for use cases the pattern language does not cover — an `InterpretableTable` can also
 be assembled **by hand**: you create the cell-derived items, the context-derived items, and the
 interpretation actions yourself, then interpret the result directly. No `AtpMatcher` is involved.
 
-This example builds the simplified cross-tabulation (schema `⟨ND, AIRLINE, AIRPORT⟩`) from scratch:
+This example reproduces **task 051** — the cross-table unpivot from the
+[Getting started](getting-started.md) guide — entirely by hand (schema `⟨ND, AIRLINE, AIRPORT, MON⟩`).
+Each compound body cell yields **two** cell-derived items, which is the key difference from a
+one-item-per-cell table:
 
 ```
-       | CA | HU
-IKT    |  5 |  3
-SVO    | 31 | 40
+       | CA     | HU
+IKT    | 0 Jan  | 8 Feb
+SVO    | 31 Jan | 40 Feb
 ```
 
 ```java
@@ -372,46 +375,55 @@ import ru.icc.regtab.recordset.Recordset;
 import java.util.List;
 import java.util.Set;
 
-// 1. Build the syntactic layer
+// 1. Build the syntactic layer (the empty corner cell defaults to "")
 TableSyntax syntax = new TableSyntax(3, 3);
-syntax.getCell(0, 0).setText("");
 syntax.getCell(0, 1).setText("CA");
 syntax.getCell(0, 2).setText("HU");
 syntax.getCell(1, 0).setText("IKT");
-syntax.getCell(1, 1).setText("5");
-syntax.getCell(1, 2).setText("3");
+syntax.getCell(1, 1).setText("0 Jan");
+syntax.getCell(1, 2).setText("8 Feb");
 syntax.getCell(2, 0).setText("SVO");
-syntax.getCell(2, 1).setText("31");
-syntax.getCell(2, 2).setText("40");
+syntax.getCell(2, 1).setText("31 Jan");
+syntax.getCell(2, 2).setText("40 Feb");
 
-// 2a. Cell-derived items (ι): one VALUE item per cell.
-//     Index 0 = first (and only) item derived from that cell.
+// 2a. Cell-derived items (ι).
+//     Header and row-header cells yield one VALUE item each (index 0).
 CellDerivedItem iotaCA  = new CellDerivedItem("CA",  0, syntax.getCell(0, 1), ItemType.VALUE);
 CellDerivedItem iotaHU  = new CellDerivedItem("HU",  0, syntax.getCell(0, 2), ItemType.VALUE);
 CellDerivedItem iotaIKT = new CellDerivedItem("IKT", 0, syntax.getCell(1, 0), ItemType.VALUE);
 CellDerivedItem iotaSVO = new CellDerivedItem("SVO", 0, syntax.getCell(2, 0), ItemType.VALUE);
-CellDerivedItem iota11  = new CellDerivedItem("5",   0, syntax.getCell(1, 1), ItemType.VALUE);
-CellDerivedItem iota12  = new CellDerivedItem("3",   0, syntax.getCell(1, 2), ItemType.VALUE);
-CellDerivedItem iota21  = new CellDerivedItem("31",  0, syntax.getCell(2, 1), ItemType.VALUE);
-CellDerivedItem iota22  = new CellDerivedItem("40",  0, syntax.getCell(2, 2), ItemType.VALUE);
+//     Each compound body cell "ND MON" yields TWO items: ND at index 0, MON at index 1.
+CellDerivedItem nd11 = new CellDerivedItem("0",   0, syntax.getCell(1, 1), ItemType.VALUE);
+CellDerivedItem mo11 = new CellDerivedItem("Jan", 1, syntax.getCell(1, 1), ItemType.VALUE);
+CellDerivedItem nd12 = new CellDerivedItem("8",   0, syntax.getCell(1, 2), ItemType.VALUE);
+CellDerivedItem mo12 = new CellDerivedItem("Feb", 1, syntax.getCell(1, 2), ItemType.VALUE);
+CellDerivedItem nd21 = new CellDerivedItem("31",  0, syntax.getCell(2, 1), ItemType.VALUE);
+CellDerivedItem mo21 = new CellDerivedItem("Jan", 1, syntax.getCell(2, 1), ItemType.VALUE);
+CellDerivedItem nd22 = new CellDerivedItem("40",  0, syntax.getCell(2, 2), ItemType.VALUE);
+CellDerivedItem mo22 = new CellDerivedItem("Feb", 1, syntax.getCell(2, 2), ItemType.VALUE);
 
 Set<CellDerivedItem> allCdi = Set.of(
-        iotaCA, iotaHU, iotaIKT, iotaSVO, iota11, iota12, iota21, iota22);
+        iotaCA, iotaHU, iotaIKT, iotaSVO,
+        nd11, mo11, nd12, mo12, nd21, mo21, nd22, mo22);
 
 // 2b. Context-derived items (β): named ATTRIBUTE constants that define the schema fields
 ContextDerivedItem betaND      = new ContextDerivedItem("ND",      ItemType.ATTRIBUTE);
 ContextDerivedItem betaAIRLINE = new ContextDerivedItem("AIRLINE", ItemType.ATTRIBUTE);
 ContextDerivedItem betaAIRPORT = new ContextDerivedItem("AIRPORT", ItemType.ATTRIBUTE);
-Set<ContextDerivedItem> allCtx = Set.of(betaND, betaAIRLINE, betaAIRPORT);
+ContextDerivedItem betaMON     = new ContextDerivedItem("MON",     ItemType.ATTRIBUTE);
+Set<ContextDerivedItem> allCtx = Set.of(betaND, betaAIRLINE, betaAIRPORT, betaMON);
 
 // 2c. Interpretation actions
 // AVP: pair each VALUE item with its named ATTRIBUTE (establishes the schema field name).
-// REC: anchor on each body cell; providers select the same-column airline and same-row airport.
-ItemFilterCondition sameCol = (a, c) -> c.sameCol(a) && !c.sameCell(a);
-ItemFilterCondition sameRow = (a, c) -> c.sameRow(a) && !c.sameCell(a);
+// REC: anchor on each ND item; providers select the same-column airline, same-row airport,
+//      and the same-cell MON sibling. The provider excludes the anchor itself, and !sameCell
+//      keeps sameCol/sameRow from picking the ND item's own MON sibling.
+ItemFilterCondition sameCol  = (a, c) -> c.sameCol(a) && !c.sameCell(a);
+ItemFilterCondition sameRow  = (a, c) -> c.sameRow(a) && !c.sameCell(a);
+ItemFilterCondition sameCell = (a, c) -> c.sameCell(a);
 
 List<InterpretationAction> actions = List.of(
-        // AVP actions: bind header items to named attributes
+        // AVP actions: bind header / row-header items to named attributes
         new InterpretationAction(iotaCA,
                 List.of(new ContextDerivedItemProvider(List.of(betaAIRLINE))), new AvpOperation()),
         new InterpretationAction(iotaHU,
@@ -420,30 +432,43 @@ List<InterpretationAction> actions = List.of(
                 List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
         new InterpretationAction(iotaSVO,
                 List.of(new ContextDerivedItemProvider(List.of(betaAIRPORT))), new AvpOperation()),
-        new InterpretationAction(iota11,
+        // AVP actions: bind each ND segment to ND and each MON segment to MON
+        new InterpretationAction(nd11,
                 List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota12,
+        new InterpretationAction(nd12,
                 List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota21,
+        new InterpretationAction(nd21,
                 List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        new InterpretationAction(iota22,
+        new InterpretationAction(nd22,
                 List.of(new ContextDerivedItemProvider(List.of(betaND))), new AvpOperation()),
-        // REC actions: form one record per body cell
-        new InterpretationAction(iota11, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
+        new InterpretationAction(mo11,
+                List.of(new ContextDerivedItemProvider(List.of(betaMON))), new AvpOperation()),
+        new InterpretationAction(mo12,
+                List.of(new ContextDerivedItemProvider(List.of(betaMON))), new AvpOperation()),
+        new InterpretationAction(mo21,
+                List.of(new ContextDerivedItemProvider(List.of(betaMON))), new AvpOperation()),
+        new InterpretationAction(mo22,
+                List.of(new ContextDerivedItemProvider(List.of(betaMON))), new AvpOperation()),
+        // REC actions: anchor on each ND item → ⟨ND, AIRLINE, AIRPORT, MON⟩
+        new InterpretationAction(nd11, List.of(
+                new CellDerivedItemProvider(sameCol,  allCdi, 1),   // → iotaCA  (AIRLINE)
+                new CellDerivedItemProvider(sameRow,  allCdi, 1),   // → iotaIKT (AIRPORT)
+                new CellDerivedItemProvider(sameCell, allCdi, 1)),  // → mo11    (MON)
                 new RecOperation()),
-        new InterpretationAction(iota12, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaIKT
+        new InterpretationAction(nd12, List.of(
+                new CellDerivedItemProvider(sameCol,  allCdi, 1),   // → iotaHU
+                new CellDerivedItemProvider(sameRow,  allCdi, 1),   // → iotaIKT
+                new CellDerivedItemProvider(sameCell, allCdi, 1)),  // → mo12
                 new RecOperation()),
-        new InterpretationAction(iota21, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaCA
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
+        new InterpretationAction(nd21, List.of(
+                new CellDerivedItemProvider(sameCol,  allCdi, 1),   // → iotaCA
+                new CellDerivedItemProvider(sameRow,  allCdi, 1),   // → iotaSVO
+                new CellDerivedItemProvider(sameCell, allCdi, 1)),  // → mo21
                 new RecOperation()),
-        new InterpretationAction(iota22, List.of(
-                new CellDerivedItemProvider(sameCol, allCdi, 1),   // → iotaHU
-                new CellDerivedItemProvider(sameRow, allCdi, 1)),  // → iotaSVO
+        new InterpretationAction(nd22, List.of(
+                new CellDerivedItemProvider(sameCol,  allCdi, 1),   // → iotaHU
+                new CellDerivedItemProvider(sameRow,  allCdi, 1),   // → iotaSVO
+                new CellDerivedItemProvider(sameCell, allCdi, 1)),  // → mo22
                 new RecOperation())
 );
 
@@ -451,13 +476,14 @@ List<InterpretationAction> actions = List.of(
 TableSemantics semantics = new TableSemantics(allCdi, allCtx, actions);
 InterpretableTable itm = new InterpretableTable(syntax, semantics);
 Recordset result = new TableInterpreter().interpret(itm);
-// schema ⟨ND, AIRLINE, AIRPORT⟩; four records:
-// ⟨5, CA, IKT⟩  ⟨3, HU, IKT⟩  ⟨31, CA, SVO⟩  ⟨40, HU, SVO⟩
+// schema ⟨ND, AIRLINE, AIRPORT, MON⟩; four records:
+// ⟨0, CA, IKT, Jan⟩  ⟨8, HU, IKT, Feb⟩  ⟨31, CA, SVO, Jan⟩  ⟨40, HU, SVO, Feb⟩
 ```
 
-For cells that yield multiple items (e.g. `"0 Jan"` → `"0"` and `"Jan"`), create one
-`CellDerivedItem` per item with distinct index values. See `CrosstabMinMaxTest` for a worked
-example.
+This is exactly the recordset that task 051 produces from the two-line RTL pattern — here every
+cell-derived item, attribute, provider, and action is spelled out by hand. The compound cells show
+the general rule: a cell that yields multiple items gets one `CellDerivedItem` per item with a
+distinct index. See `CrosstabMinMaxTest` for another worked example.
 
 > This is the lowest-level entry point. In practice the [ATP](model/atp.md) and
 > [RTL](rtl-reference.md) paths express the same result far more compactly — the entire block
