@@ -334,11 +334,12 @@ $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
 - `$V2` = cell fragment; `[$V2]{5}` — five VALUE cells with REC, `[$V2]{3}` — three.
 - Quantifiers on references are independent of the definition.
 
-See `RtlFragmentTest` for unit tests covering all four fragment levels (cell, row, subrow, subtable).
-
-### Running the test
+This example reproduces **task 116** — the full environmental-monitoring pattern, here written
+with named fragments to avoid repeating the two recurring cell sub-patterns; the same recordset
+is produced by the benchmark tests:
 
 ```bash
+mvn test -Dtest="AtpTask116Test"
 mvn test -Dtest="RtlTask116Test"
 ```
 
@@ -490,8 +491,6 @@ distinct index. See `CrosstabMinMaxTest` for another worked example.
 > [RTL](rtl-reference.md) paths express the same result far more compactly — the entire block
 > above collapses to the two-line RTL pattern shown in the
 > [Getting started](getting-started.md) guide.
-
-### Running the test
 
 This example reproduces task 051 by hand; the same recordset is produced by the pattern-based tests:
 
