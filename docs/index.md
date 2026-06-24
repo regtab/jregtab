@@ -50,6 +50,16 @@ Recordset rs = AtpMatcher.match(pattern, syntax)
 // rs.records().get(0)       →  {ND=0, AIRLINE=CA, AIRPORT=IKT, MON=Jan}
 ```
 
+The resulting recordset `rs`:
+
+```
+ND | AIRLINE | AIRPORT | MON
+0  | CA      | IKT     | Jan
+8  | HU      | IKT     | Feb
+31 | CA      | SVO     | Jan
+40 | HU      | SVO     | Feb
+```
+
 ---
 
 ## Installation
