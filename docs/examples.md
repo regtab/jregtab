@@ -340,7 +340,6 @@ See `RtlFragmentTest` for unit tests covering all four fragment levels (cell, ro
 
 ```bash
 mvn test -Dtest="RtlTask116Test"
-mvn test -Dtest="RtlFragmentTest"
 ```
 
 ---
@@ -514,7 +513,4 @@ mvn test -Dtest="AtpTask*Test"
 
 # All RTL benchmark tests
 mvn test -Dtest="RtlTask*Test"
-
-# Named-fragment unit tests (Example 4)
-mvn test -Dtest="RtlFragmentTest"
 ```
