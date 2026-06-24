@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="assets/icon.svg" alt="jRegTab" width="100"/>
-</p>
-
 # jRegTab
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
