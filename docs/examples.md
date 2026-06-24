@@ -31,6 +31,16 @@ ND | AIRLINE | AIRPORT | MON | YEAR
 40 | HU      | SVO     | Feb | 2025
 ```
 
+### Item roles
+
+Which item each cell yields (`YEAR` is injected as a constant, not read from a cell):
+
+|           | col 0                | col 1                          | col 2                          |
+|-----------|----------------------|--------------------------------|--------------------------------|
+| **row 0** | — *(skip)*           | VAL `CA` → AIRLINE             | VAL `HU` → AIRLINE             |
+| **row 1** | VAL `IKT` → AIRPORT  | VAL `0`→ND, VAL `Jan`→MON      | VAL `8`→ND, VAL `Feb`→MON      |
+| **row 2** | VAL `SVO` → AIRPORT  | VAL `31`→ND, VAL `Jan`→MON     | VAL `40`→ND, VAL `Feb`→MON     |
+
 ### ATP pattern
 
 ```java
@@ -97,6 +107,17 @@ TablePattern pattern = TablePattern.of(
   - `CL` (`sameCell`) — the `MON` value inside the same compound cell.
   - `@'YEAR'='2025'` — a **context provider** that injects the constant pair `YEAR=2025` into every record.
 
+### Derivation
+
+1. **AVP** (headers): `AIRLINE=CA`, `AIRLINE=HU`; `AIRPORT=IKT`, `AIRPORT=SVO`.
+2. **AVP** (compound split): each body cell yields `ND=…` and `MON=…` — e.g. `ND=0`, `MON=Jan`.
+3. **Context AVP**: `YEAR=2025` (the injected constant).
+4. **REC** anchored on each `ND`, pulling `AIRLINE` (COL), `AIRPORT` (ROW), `MON` (CL), `YEAR` (ctx):
+   - `⟨0, CA, IKT, Jan, 2025⟩`
+   - `⟨8, HU, IKT, Feb, 2025⟩`
+   - `⟨31, CA, SVO, Jan, 2025⟩`
+   - `⟨40, HU, SVO, Feb, 2025⟩`
+
 ### Running the test
 
 ```bash
@@ -131,6 +152,19 @@ ID  | REF_TP | SPECS_HV | REF_SN | SPECS_LV
 T-1 | D16    | 750      | 001    | 110
 T-2 | D24    | 110      | 002    | 10
 ```
+
+### Item roles
+
+|           | col 0            | col 1       | col 2      | col 3       | col 4      |
+|-----------|------------------|-------------|------------|-------------|------------|
+| **row 0** | —                | AUX `REF`   | —          | AUX `SPECS` | —          |
+| **row 1** | VAL `T-1` → ID   | ATTR `TP`   | VAL `D16`  | ATTR `HV`   | VAL `750`  |
+| **row 2** | VAL `T-1` → ID   | ATTR `SN`   | VAL `001`  | ATTR `LV`   | VAL `110`  |
+| **row 3** | VAL `T-2` → ID   | ATTR `TP`   | VAL `D24`  | ATTR `HV`   | VAL `110`  |
+| **row 4** | VAL `T-2` → ID   | ATTR `SN`   | VAL `002`  | ATTR `LV`   | VAL `10`   |
+
+The `AUX` group headers feed the `PREFIX` action; each `ATTR` qualifier gets the header above it
+prepended to form a compound attribute name.
 
 ### ATP pattern
 
@@ -199,6 +233,18 @@ TablePattern pattern = TablePattern.of(
   - `[VAL : SR->AVP]` — the value cell (`D16`, `750`) takes its attribute name from the `ATTR`
     in the same subrow.
 
+### Derivation
+
+1. **PREFIX** builds the compound attribute names: `REF`+`TP`→`REF_TP`, `SPECS`+`HV`→`SPECS_HV`,
+   `REF`+`SN`→`REF_SN`, `SPECS`+`LV`→`SPECS_LV`.
+2. **AVP**: `ID=T-1` (rows 1–2), `ID=T-2` (rows 3–4); then `REF_TP=D16`, `SPECS_HV=750` (row 1);
+   `REF_SN=001`, `SPECS_LV=110` (row 2); `REF_TP=D24`, `SPECS_HV=110` (row 3);
+   `REF_SN=002`, `SPECS_LV=10` (row 4).
+3. **REC** (one per row): `⟨T-1, D16, 750⟩`, `⟨T-1, 001, 110⟩`, `⟨T-2, D24, 110⟩`, `⟨T-2, 002, 10⟩`.
+4. **JOIN(0)** merges the row below sharing the same `ID`:
+   - `⟨T-1, D16, 750, 001, 110⟩`
+   - `⟨T-2, D24, 110, 002, 10⟩`
+
 ### Running the test
 
 ```bash
@@ -241,6 +287,20 @@ Joan |      |        | 79
 Tom  | 90   | 85     |
 Rob  |      | 92     | 87
 ```
+
+### Item roles
+
+Every row plays the same three roles (shown for the first rows):
+
+|           | col 0             | col 1          | col 2     |
+|-----------|-------------------|----------------|-----------|
+| **row 1** | VAL `Anna` → `""` | ATTR `Math`    | VAL `43`  |
+| **row 2** | VAL `Anna` → `""` | ATTR `French`  | VAL `78`  |
+| **row 3** | VAL `Bob` → `""`  | ATTR `English` | VAL `96`  |
+| …         | …                 | …              | …         |
+
+The blank-named `""` attribute holds the student name (the anchor); each `ATTR` subject names its
+adjacent score `VAL`.
 
 ### ATP pattern
 
@@ -292,6 +352,21 @@ TablePattern pattern = TablePattern.of(
   same subrow → `Math=43`.
 - The result is one record per student with a column per distinct subject; subject/student
   combinations that never appear stay blank.
+
+### Derivation
+
+1. **AVP** (score ← same-subrow subject): `Math=43`, `French=78` (Anna); `English=96`, `French=54`
+   (Bob); `English=79` (Joan); `Math=90`, `French=85` (Tom); `English=87`, `French=92` (Rob).
+2. **REC** (one per row, anchored on the name): `⟨Anna,43⟩`, `⟨Anna,78⟩`, `⟨Bob,96⟩`, `⟨Bob,54⟩`,
+   `⟨Joan,79⟩`, `⟨Tom,90⟩`, `⟨Tom,85⟩`, `⟨Rob,87⟩`, `⟨Rob,92⟩`.
+3. **JOIN(0)** merges every row whose name repeats directly below, collapsing each student to one
+   record: `⟨Anna, 43, 78⟩`, `⟨Bob, 96, 54⟩`, `⟨Joan, 79⟩`, `⟨Tom, 90, 85⟩`, `⟨Rob, 87, 92⟩`.
+
+**Schema-flexible result.** Different students list different subjects, so the records are *ragged*:
+the schema is the union `⟨"", Math, French, English⟩`, but a subject/student combination that never
+occurs has **no value item at all**. For example Joan's record is just `⟨Joan, 79⟩` (English), so its
+`Math` and `French` values are `⊥` (the manuscript's term for a missing value). In the API
+`record.get("Math")` returns `null` for Joan, and the CSV renders it as an empty field.
 
 ### Running the test
 
