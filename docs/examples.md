@@ -504,13 +504,12 @@ mvn test -Dtest="RtlTask051Test"
 
 ## Running all examples
 
-All five examples above are tasks from the benchmark suite (052, 053, 046, 116, 051), so they
-are covered by the `AtpTask*Test` / `RtlTask*Test` globs:
+All five examples above are benchmark tasks (052, 053, 046, 116, 051). The `*Task<NN>Test`
+wildcard runs both the ATP and the RTL test for each:
 
 ```bash
-# All ATP benchmark tests
-mvn test -Dtest="AtpTask*Test"
-
-# All RTL benchmark tests
-mvn test -Dtest="RtlTask*Test"
+# ATP + RTL tests for the five examples on this page
+mvn test -Dtest="*Task052Test,*Task053Test,*Task046Test,*Task116Test,*Task051Test"
 ```
+
+To run the whole benchmark suite instead, use the `AtpTask*Test` / `RtlTask*Test` globs.
