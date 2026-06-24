@@ -22,26 +22,28 @@ TableSyntax  ──►  AtpMatcher.match(pattern, syntax)  ──►  TableInter
 ## Quick example
 
 ```java
-// Table:   Name  | Score
-//          Alice | 95
-//          Bob   | 87
+// Cross-tabulation:        | CA     | HU
+//                  IKT     | 0 Jan  | 8 Feb
+//                  SVO     | 31 Jan | 40 Feb
 
-TableSyntax syntax = new TableSyntax(3, 2);
-syntax.getCell(0, 0).setText("Name");   syntax.getCell(0, 1).setText("Score");
-syntax.getCell(1, 0).setText("Alice");  syntax.getCell(1, 1).setText("95");
-syntax.getCell(2, 0).setText("Bob");    syntax.getCell(2, 1).setText("87");
+TableSyntax syntax = new TableSyntax(3, 3);
+syntax.getCell(0, 1).setText("CA");    syntax.getCell(0, 2).setText("HU");
+syntax.getCell(1, 0).setText("IKT");   syntax.getCell(1, 1).setText("0 Jan");   syntax.getCell(1, 2).setText("8 Feb");
+syntax.getCell(2, 0).setText("SVO");   syntax.getCell(2, 1).setText("31 Jan");  syntax.getCell(2, 2).setText("40 Feb");
 
+// Unpivot into ⟨ND, AIRLINE, AIRPORT, MON⟩; each compound "ND MON" cell is split by space.
 TablePattern pattern = RtlCompiler.compile("""
-    [ [ATTR]{2} ]
-    [ [VAL : (^COL)->AVP, (SR)->REC]{2} ]+
+    [ [] [VAL : 'AIRLINE'->AVP]+ ]
+    [ [VAL : 'AIRPORT'->AVP]
+      [VAL : (COL, ROW, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
     """);
 
 Recordset rs = AtpMatcher.match(pattern, syntax)
     .map(itm -> new TableInterpreter().interpret(itm))
     .orElseThrow();
 
-// rs.schema().attributes()  →  [Name, Score]
-// rs.records().get(0)       →  {Name=Alice, Score=95}
+// rs.schema().attributes()  →  [ND, AIRLINE, AIRPORT, MON]
+// rs.records().get(0)       →  {ND=0, AIRLINE=CA, AIRPORT=IKT, MON=Jan}
 ```
 
 ---

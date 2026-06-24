@@ -37,25 +37,36 @@ A pattern is an **Abstract Table Pattern (ATP)**. You can construct one in Java 
 
 ## First example
 
-Consider a simple two-column table:
+Consider a cross-tabulation of airline departures by airport:
 
 ```
-Name   | Score
-Alice  | 95
-Bob    | 87
+        | CA     | HU
+IKT     | 0 Jan  | 8 Feb
+SVO     | 31 Jan | 40 Feb
 ```
 
-The first row contains attribute names; the remaining rows contain values.
+The column headers are airlines (`CA`, `HU`), the row headers are airports (`IKT`, `SVO`), and each
+body cell holds a compound `"ND MON"` value — a number of departures plus a month. The goal is to
+*unpivot* this matrix into a flat recordset `⟨ND, AIRLINE, AIRPORT, MON⟩`:
+
+```
+ND | AIRLINE | AIRPORT | MON
+0  | CA      | IKT     | Jan
+8  | HU      | IKT     | Feb
+31 | CA      | SVO     | Jan
+40 | HU      | SVO     | Feb
+```
 
 ### Step 1 — build the table
 
 ```java
 import ru.icc.regtab.itm.syntax.TableSyntax;
 
-TableSyntax syntax = new TableSyntax(3, 2);
-syntax.getCell(0, 0).setText("Name");  syntax.getCell(0, 1).setText("Score");
-syntax.getCell(1, 0).setText("Alice"); syntax.getCell(1, 1).setText("95");
-syntax.getCell(2, 0).setText("Bob");   syntax.getCell(2, 1).setText("87");
+TableSyntax syntax = new TableSyntax(3, 3);
+syntax.getCell(0, 1).setText("CA");    syntax.getCell(0, 2).setText("HU");
+syntax.getCell(1, 0).setText("IKT");   syntax.getCell(1, 1).setText("0 Jan");   syntax.getCell(1, 2).setText("8 Feb");
+syntax.getCell(2, 0).setText("SVO");   syntax.getCell(2, 1).setText("31 Jan");  syntax.getCell(2, 2).setText("40 Feb");
+// The empty corner cell (0, 0) defaults to "".
 ```
 
 ### Step 2 — write the pattern
@@ -67,41 +78,58 @@ import ru.icc.regtab.rtl.RtlCompiler;
 import ru.icc.regtab.atp.spec.TablePattern;
 
 TablePattern pattern = RtlCompiler.compile("""
-    [ [ATTR]{2} ]
-    [ [VAL : (^COL)->AVP, (SR)->REC]{2} ]+
+    [ [] [VAL : 'AIRLINE'->AVP]+ ]
+    [ [VAL : 'AIRPORT'->AVP]
+      [VAL : (COL, ROW, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
     """);
 ```
 
-- `[ [ATTR]{2} ]` — one header row with exactly two attribute cells.
-- `[ … ]+` — one or more data rows.
-- `(^COL)->AVP` — link each value to the attribute in the same column (header row above).
-- `(SR)->REC` — collect all values in the same row into one record.
+- `[ [] [VAL : 'AIRLINE'->AVP]+ ]` — header subtable: skip the empty corner `[]`, then one-or-more
+  column headers, each bound to the attribute `AIRLINE`.
+- `[ [VAL : 'AIRPORT'->AVP] … ]+` — data subtable: one-or-more rows whose first cell is bound to `AIRPORT`.
+- `[VAL : … " " VAL : 'MON'->AVP]` — the compound body cell is split at the space into two values:
+  `ND` (the first segment) and `MON` (the second).
+- `(COL, ROW, CL)->REC` — the `ND` value forms one record from the same-column `AIRLINE`,
+  the same-row `AIRPORT`, and the same-cell `MON`.
 
 **Option B — Java builder API** (full control):
 
 ```java
 import ru.icc.regtab.atp.spec.*;
 
-var avpProvider = ProviderSpec.attr(ItemFilterConditionSpec.sameCol());
-var recProvider = ProviderSpec.val(ItemFilterConditionSpec.sameRow());
+var sameCol  = ItemFilterConditionSpec.sameCol();
+var sameRow  = ItemFilterConditionSpec.sameRow();
+var sameCell = ItemFilterConditionSpec.sameCell();
+
+// Compound body cell: "0 Jan" → ND ("0") + MON ("Jan")
+var dataCell = CompoundContentSpec.of(
+    AtomicContentSpec.val(
+        ActionSpec.rec(
+            ProviderSpec.val(1, sameCol),    // AIRLINE (column header)
+            ProviderSpec.val(1, sameRow),    // AIRPORT (leftmost cell)
+            ProviderSpec.val(1, sameCell)    // MON (same compound cell)
+        ),
+        ActionSpec.avp("ND")
+    ),
+    CompoundContentSpec.Segment.of(" ",
+        AtomicContentSpec.val(ActionSpec.avp("MON"))
+    )
+);
 
 TablePattern pattern = TablePattern.of(
-    // Header subtable: two attribute cells
+    // Header subtable: skip the empty corner + one-or-more airline cells
     SubtablePattern.of(
         RowPattern.of(
-            CellPattern.of(Quantifier.exactly(2), AtomicContentSpec.attr())
+            CellPattern.skip(),
+            CellPattern.of(Quantifier.oneOrMore(),
+                AtomicContentSpec.val(ActionSpec.avp("AIRLINE")))
         )
     ),
-    // Data subtable: one or more rows with two value cells each
+    // Data subtable: one-or-more rows of airport cell + one-or-more body cells
     SubtablePattern.of(
         RowPattern.of(Quantifier.oneOrMore(),
-            CellPattern.of(AtomicContentSpec.val(
-                ActionSpec.avp(avpProvider),
-                ActionSpec.rec(recProvider)
-            )),
-            CellPattern.of(AtomicContentSpec.val(
-                ActionSpec.avp(avpProvider)
-            ))
+            CellPattern.of(AtomicContentSpec.val(ActionSpec.avp("AIRPORT"))),
+            CellPattern.of(Quantifier.oneOrMore(), dataCell)
         )
     )
 );
@@ -128,12 +156,15 @@ Recordset rs = new TableInterpreter()
     .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
     .interpret(match.get());
 
-System.out.println(rs.schema().attributes()); // [Name, Score]
+System.out.println(rs.schema().attributes()); // [ND, AIRLINE, AIRPORT, MON]
 for (var record : rs.records()) {
-    System.out.println(record.get("Name") + " → " + record.get("Score"));
+    System.out.println(record.get("AIRPORT") + "/" + record.get("AIRLINE")
+            + ": " + record.get("ND") + " (" + record.get("MON") + ")");
 }
-// Alice → 95
-// Bob  → 87
+// IKT/CA: 0 (Jan)
+// IKT/HU: 8 (Feb)
+// SVO/CA: 31 (Jan)
+// SVO/HU: 40 (Feb)
 ```
 
 ## What's next
