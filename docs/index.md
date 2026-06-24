@@ -8,9 +8,13 @@ Tables in spreadsheets, text documents, and web pages are designed for human rea
 
 ## How it works
 
-```
-TableSyntax  ──►  AtpMatcher.match(pattern, syntax)  ──►  TableInterpreter.interpret(itm)  ──►  Recordset
-(grid of cells)       (structural matching)                 (semantic interpretation)           (records)
+```mermaid
+flowchart TB
+    A["TableSyntax<br/>(grid of cells)"]
+    B["InterpretableTable<br/>(structural matching)"]
+    C["Recordset<br/>(records)"]
+    A -->|"AtpMatcher.match(pattern, syntax)"| B
+    B -->|"TableInterpreter.interpret(itm)"| C
 ```
 
 1. **Describe** the table structure as an **ATP** pattern — either in Java (`atp.spec.*`) or as a compact **RTL** string compiled with `RtlCompiler.compile()`.

@@ -65,25 +65,15 @@ ru.icc.regtab
 
 ## Data flow
 
-```
-   [Source data]           [ATP pattern]
-        │                  (ATP API or
-        ▼                   RtlCompiler.compile(rtl))
-  TableSyntax                    │
-        │                        │
-        └──────────┬─────────────┘
-                   ▼
-       AtpMatcher.match(pattern, syntax)
-                   │
-                   ▼
-      Optional<InterpretableTable>
-        (syntax + populated semantic layer)
-                   │
-                   ▼
-       TableInterpreter.interpret(itm)
-                   │
-                   ▼
-               Recordset
+```mermaid
+flowchart TB
+    S["Source data"] --> TS["TableSyntax"]
+    P["ATP pattern<br/>(ATP API or RtlCompiler.compile(rtl))"]
+    TS --> M["AtpMatcher.match(pattern, syntax)"]
+    P --> M
+    M --> ITM["Optional&lt;InterpretableTable&gt;<br/>(syntax + populated semantic layer)"]
+    ITM --> I["TableInterpreter.interpret(itm)"]
+    I --> R["Recordset"]
 ```
 
 If the pattern does not match, `AtpMatcher.match` returns `Optional.empty()`.
@@ -105,20 +95,12 @@ If the pattern does not match, `AtpMatcher.match` returns `Optional.empty()`.
 
 ## RTL compilation pipeline
 
-```
-RTL string
-    │
-    ▼  ANTLR4 lexer+parser (RTLLexer / RTLParser)
- Parse tree
-    │
-    ▼  ATPBuilder (RTLBaseVisitor)
-  ATP objects (TablePattern, …, CellPattern)
-    │
-    ▼  ProviderTemplateResolver
-  Resolved ProviderSpec instances
-    │
-    ▼  RtlCompiler (wraps transformations)
- TablePattern  [+ List<RecordsetTransformation>]
+```mermaid
+flowchart TB
+    A["RTL string"] -->|"ANTLR4 lexer+parser<br/>(RTLLexer / RTLParser)"| B["Parse tree"]
+    B -->|"ATPBuilder (RTLBaseVisitor)"| C["ATP objects<br/>(TablePattern, …, CellPattern)"]
+    C -->|"ProviderTemplateResolver"| D["Resolved ProviderSpec instances"]
+    D -->|"RtlCompiler (wraps transformations)"| E["TablePattern<br/>[+ List&lt;RecordsetTransformation&gt;]"]
 ```
 
 The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4`.
@@ -133,10 +115,12 @@ Fragments are supported at all four pattern levels: cell, row, subrow, and subta
 
 `AtpToRtlSerializer.serialize(TablePattern)` is the inverse of `RtlCompiler.compile()`: it traverses a `TablePattern` object graph and produces the corresponding RTL string.
 
-```
-TablePattern  ──►  AtpToRtlSerializer.serialize()  ──►  RTL string
-     ▲                                                       │
-     └────────────  RtlCompiler.compile()  ◄─────────────────┘
+```mermaid
+flowchart LR
+    A["TablePattern"]
+    B["RTL string"]
+    A -->|"AtpToRtlSerializer.serialize()"| B
+    B -->|"RtlCompiler.compile()"| A
 ```
 
 The round-trip property — serialize then compile gives back the original pattern — is verified in `AtpRtlRoundTripTest` for all 50 Foofah benchmark tasks (001–050).

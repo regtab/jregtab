@@ -18,8 +18,13 @@ RTL is **not** a separate model — it is a concrete surface syntax for [ATP](mo
 Every RTL string denotes an ATP `TablePattern`, and the two are connected by a compiler and a
 serializer:
 
-```
-RTL string  ──RtlCompiler.compile──▶  TablePattern (ATP)  ──AtpToRtlSerializer.serialize──▶  RTL string
+```mermaid
+flowchart LR
+    A["RTL string"]
+    B["TablePattern (ATP)"]
+    C["RTL string"]
+    A -->|"RtlCompiler.compile()"| B
+    B -->|"AtpToRtlSerializer.serialize()"| C
 ```
 
 **Compilation** (`ru.icc.regtab.rtl.RtlCompiler`) runs the ANTLR4-generated lexer/parser over
