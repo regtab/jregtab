@@ -25,11 +25,16 @@ flowchart TB
 
 ## Quick example
 
-```java
-// Cross-tabulation:        | CA     | HU
-//                  IKT     | 0 Jan  | 8 Feb
-//                  SVO     | 31 Jan | 40 Feb
+Source table — a cross-tabulation of airline departures by airport, with compound `"ND MON"` cells:
 
+```
+       | CA     | HU
+IKT    | 0 Jan  | 8 Feb
+SVO    | 31 Jan | 40 Feb
+```
+
+```java
+// Build the table shown above
 TableSyntax syntax = new TableSyntax(3, 3);
 syntax.getCell(0, 1).setText("CA");    syntax.getCell(0, 2).setText("HU");
 syntax.getCell(1, 0).setText("IKT");   syntax.getCell(1, 1).setText("0 Jan");   syntax.getCell(1, 2).setText("8 Feb");
