@@ -336,6 +336,8 @@ $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
 
 See `RtlFragmentTest` for unit tests covering all four fragment levels (cell, row, subrow, subtable).
 
+### Running the test
+
 ```bash
 mvn test -Dtest="RtlTask116Test"
 mvn test -Dtest="RtlFragmentTest"
@@ -489,6 +491,15 @@ distinct index. See `CrosstabMinMaxTest` for another worked example.
 > [RTL](rtl-reference.md) paths express the same result far more compactly — the entire block
 > above collapses to the two-line RTL pattern shown in the
 > [Getting started](getting-started.md) guide.
+
+### Running the test
+
+This example reproduces task 051 by hand; the same recordset is produced by the pattern-based tests:
+
+```bash
+mvn test -Dtest="AtpTask051Test"
+mvn test -Dtest="RtlTask051Test"
+```
 
 ---
 
