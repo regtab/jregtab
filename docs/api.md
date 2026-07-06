@@ -52,6 +52,22 @@ Bindings.of()
 
 ---
 
+## Embedded RTL (`dsl`)
+
+A Java DSL mirroring RTL syntax with escape hatches into Java — see the dedicated
+[Embedded RTL](embedded-rtl.md) page.
+
+```java
+import static ru.icc.regtab.dsl.Rtl.*;
+
+TablePattern p = table(
+    sub( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
+         row( skip(),                         cell(VAL).exactly(4), skip().oneOrMore() )
+    ).oneOrMore());
+```
+
+---
+
 ## Pattern specification (`atp.spec`)
 
 These classes mirror the formal ATP hierarchy: table → subtables → rows → subrows → cells.

@@ -53,6 +53,7 @@ nav:
       - ITM (Interpretable Table Model): model/itm.md
       - ATP (Abstract Table Pattern): model/atp.md
   - RTL reference: rtl-reference.md
+  - Embedded RTL: embedded-rtl.md
   - Examples: examples.md
   - Architecture: architecture.md
   - API reference: api.md
