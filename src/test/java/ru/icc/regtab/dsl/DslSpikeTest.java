@@ -7,36 +7,7 @@ import ru.icc.regtab.rtl.AtpToRtlSerializer;
 import ru.icc.regtab.rtl.RtlCompiler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static ru.icc.regtab.dsl.Rtl.ATTR;
-import static ru.icc.regtab.dsl.Rtl.AUX;
-import static ru.icc.regtab.dsl.Rtl.BW;
-import static ru.icc.regtab.dsl.Rtl.C;
-import static ru.icc.regtab.dsl.Rtl.CL;
-import static ru.icc.regtab.dsl.Rtl.COL;
-import static ru.icc.regtab.dsl.Rtl.NORM;
-import static ru.icc.regtab.dsl.Rtl.ROW;
-import static ru.icc.regtab.dsl.Rtl.RT;
-import static ru.icc.regtab.dsl.Rtl.SC;
-import static ru.icc.regtab.dsl.Rtl.SKIP;
-import static ru.icc.regtab.dsl.Rtl.SR;
-import static ru.icc.regtab.dsl.Rtl.ST;
-import static ru.icc.regtab.dsl.Rtl.STR;
-import static ru.icc.regtab.dsl.Rtl.VAL;
-import static ru.icc.regtab.dsl.Rtl.avp;
-import static ru.icc.regtab.dsl.Rtl.blank;
-import static ru.icc.regtab.dsl.Rtl.cell;
-import static ru.icc.regtab.dsl.Rtl.ctxAvp;
-import static ru.icc.regtab.dsl.Rtl.join;
-import static ru.icc.regtab.dsl.Rtl.notBlank;
-import static ru.icc.regtab.dsl.Rtl.rec;
-import static ru.icc.regtab.dsl.Rtl.row;
-import static ru.icc.regtab.dsl.Rtl.skip;
-import static ru.icc.regtab.dsl.Rtl.sub;
-import static ru.icc.regtab.dsl.Rtl.suffix;
-import static ru.icc.regtab.dsl.Rtl.table;
-import static ru.icc.regtab.dsl.Rtl.tag;
-import static ru.icc.regtab.dsl.Rtl.val;
-import static ru.icc.regtab.dsl.Rtl.when;
+import static ru.icc.regtab.dsl.Rtl.*;
 
 /**
  * Design spike B1 (plans/RTL_EMBEDDED_DSL.md): embedded RTL must build byte-identical
@@ -191,6 +162,240 @@ class DslSpikeTest {
                         row(cell(notBlank(), VAL),
                                 cell(VAL, rec(COL.and(tag("HEAD")).unbounded(), ROW)).oneOrMore())
                                 .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("009: REPL extractor, explicit subrow, conditional with actions in a branch")
+    void task009() {
+        assertMirrors("""
+                [ [] [VAL = REPL('\\s+', '')]{5} ]
+                [ { [VAL] [BLANK? _ | VAL : (SR, SC)->REC(2)]+ } ]+
+                """,
+                table(sub(
+                        row(skip(), cell(val().extract(repl("\\s+", ""))).exactly(5)),
+                        row(subrow(cell(VAL),
+                                cell(when(blank(), SKIP, val(rec(2, SR, SC)))).oneOrMore()))
+                                .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("013: AVP per column plus REC with explicitly ordered SR&Cn providers")
+    void task013() {
+        assertMirrors("""
+                [ [ATTR]{5} []+ ]
+                [ [VAL : SC->AVP, (SR&C2, SR&C4, SR&C1, SR&C3)->REC] [VAL : SC->AVP]{4} []+ ]+
+                """,
+                table(sub(
+                        row(cell(ATTR).exactly(5), skip().oneOrMore()),
+                        row(cell(VAL, avp(SC), rec(SR.and(C(2)), SR.and(C(4)), SR.and(C(1)), SR.and(C(3)))),
+                                cell(VAL, avp(SC)).exactly(4), skip().oneOrMore())
+                                .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("025: SUFFIX('/'), REC('/') split, relative open column range C+2..*")
+    void task025() {
+        assertMirrors("""
+                [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
+                """,
+                table(sub(row(
+                        cell(VAL, suffix("/", RT),
+                                recSplit("/", RT.and(CrelFrom(2)).unbounded()),
+                                join(0, BW.and(STR).unbounded())),
+                        cell(VAL).oneOrMore()).oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("029: implicit + explicit subrows mixed in one row, ROW{6} provider")
+    void task029() {
+        assertMirrors("""
+                [ [VAL]{6} { [VAL : (ROW{6}, RT*)->REC(6)] [VAL]{3} }+ ]+
+                """,
+                table(sub(row(
+                        subrow(cell(VAL).exactly(6)),
+                        subrow(cell(VAL, rec(6, ROW.card(6), RT.unbounded())),
+                                cell(VAL).exactly(3)).oneOrMore())
+                        .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("069: row-level inherited REC merged down into subrow atoms")
+    void task069() {
+        assertMirrors("""
+                [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->JOIN][VAL#'2': ROW&#'2'*->JOIN] }* ]
+                """,
+                table(sub(row(acts(rec(BW.unbounded())),
+                        subrow(cell(ATTR),
+                                cell(val(join(ROW.and(tag("1")).unbounded())).tagged("1")),
+                                cell(val(join(ROW.and(tag("2")).unbounded())).tagged("2")))
+                                .zeroOrMore()))));
+    }
+
+    @Test
+    @DisplayName("070: regex guards with tags on atoms and in constraints")
+    void task070() {
+        assertMirrors("""
+                [ [BLANK]+           [VAL#'H']+ ]+
+                [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: (COL&#'H'*, ROW&#'S'*)->REC]+ ]+
+                """,
+                table(sub(
+                        row(cell(blank()).oneOrMore(), cell(val().tagged("H")).oneOrMore()).oneOrMore(),
+                        row(cell(notRe("\\d+"), val().tagged("S")).oneOrMore(),
+                                cell(re("\\d+"), VAL,
+                                        rec(COL.and(tag("H")).unbounded(), ROW.and(tag("S")).unbounded()))
+                                        .oneOrMore())
+                                .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("071: SUFFIX('/') on tagged atoms in both header and stub rows")
+    void task071() {
+        assertMirrors("""
+                [ [BLANK]+       [VAL#'H': BW&#'H'*->SUFFIX('/')]+ ]+
+                [ [!'\\d+'? VAL#'S': RT&#'S'*->SUFFIX('/')]+ ['\\d+'? VAL: (COL, ROW)->REC]+ ]+
+                """,
+                table(sub(
+                        row(cell(blank()).oneOrMore(),
+                                cell(val(suffix("/", BW.and(tag("H")).unbounded())).tagged("H")).oneOrMore())
+                                .oneOrMore(),
+                        row(cell(notRe("\\d+"),
+                                        val(suffix("/", RT.and(tag("S")).unbounded())).tagged("S")).oneOrMore(),
+                                cell(re("\\d+"), VAL, rec(COL, ROW)).oneOrMore())
+                                .oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("074: row-level inherited COL->AVP plus @'D'='d' context pair")
+    void task074() {
+        assertMirrors("""
+                [ COL->AVP [VAL: (RT*, @'D'='d')->REC][VAL]{2} ]+
+                """,
+                table(sub(row(acts(avp(COL)),
+                        cell(VAL, rec(RT.unbounded(), ctxAvp("D", "d"))),
+                        cell(VAL).exactly(2)).oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("107: fragments as variables, FILL with reversed traversal, conditional branch actions")
+    void task107() {
+        var v = cell(re("\\d+"), VAL,
+                rec(COL.and(tag("H")).unbounded(), ROW.and(tag("S")).unbounded()));
+        assertMirrors("""
+                $V=['\\d+' ? VAL: (COL&#'H'*,ROW&#'S'*)->REC]
+                [ [BLANK]+ [!BLANK ? VAL#'H'] [BLANK ? VAL#'H': -LT&!BLANK->FILL | VAL#'H']+ ]+
+                {
+                [ ['\\D.*' ? VAL#'S']+ [$V]+ ]
+                [ [BLANK ? VAL#'S': SC->FILL]+ ['\\D.*' ? VAL#'S']+ [$V]+ ]*
+                }+
+                """,
+                table(
+                        sub(row(cell(blank()).oneOrMore(),
+                                cell(notBlank(), val().tagged("H")),
+                                cell(when(blank(),
+                                        val(fill(LT.and(itemNotBlank()).reversed())).tagged("H"),
+                                        val().tagged("H"))).oneOrMore())
+                                .oneOrMore()),
+                        sub(
+                                row(cell(re("\\D.*"), val().tagged("S")).oneOrMore(), v.oneOrMore()),
+                                row(cell(blank(), val(fill(SC)).tagged("S")).oneOrMore(),
+                                        cell(re("\\D.*"), val().tagged("S")).oneOrMore(),
+                                        v.oneOrMore()).zeroOrMore()
+                        ).oneOrMore()));
+    }
+
+    @Test
+    @DisplayName("116: fragments, reversed PREFIX, row-level AVP, nested explicit subrows")
+    void task116() {
+        var v1 = cell(VAL, prefix(", ", AV.reversed()));
+        var v2 = cell(VAL, avp("VALUE"),
+                rec(ROW, COL.and(R(1, 3)).unbounded(), AV.and(tag("IND")).reversed()));
+        assertMirrors("""
+                $V1=[VAL: -AV->PREFIX(', ')]
+                $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
+                [ []+ ]
+                [ [] [VAL: 'TERRITORY'->AVP]+ ]
+                [ [AUX]+ ]
+                [ 'LOCATION'->AVP [] [$V1]{4} [VAL] []
+                                     [VAL] [$V1] [VAL]
+                                     [$V1] [VAL] []
+                                     { [VAL] [$V1] [VAL] [] }? ]
+                { [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
+                  [ ['20\\d\\d' ? VAL: 'YEAR'->AVP]
+                    { [$V2]{5} [] }{2}
+                    { [$V2]{3} [] }?
+                  ]+
+                }+
+                """,
+                table(
+                        sub(row(skip().oneOrMore()),
+                                row(skip(), cell(VAL, avp("TERRITORY")).oneOrMore()),
+                                row(cell(AUX).oneOrMore()),
+                                row(acts(avp("LOCATION")),
+                                        subrow(skip(), v1.exactly(4), cell(VAL), skip(),
+                                                cell(VAL), v1, cell(VAL),
+                                                v1, cell(VAL), skip()),
+                                        subrow(cell(VAL), v1, cell(VAL), skip()).zeroOrOne())),
+                        sub(
+                                row(cell(val(avp("INDICATOR")).tagged("IND")
+                                        .then(",", val(avp("UNIT")))).oneOrMore()),
+                                row(subrow(cell(re("20\\d\\d"), VAL, avp("YEAR"))),
+                                        subrow(v2.exactly(5), skip()).exactly(2),
+                                        subrow(v2.exactly(3), skip()).zeroOrOne())
+                                        .oneOrMore()
+                        ).oneOrMore()));
+    }
+
+    @Test
+    @DisplayName("Ad-hoc: OR disjunction with & precedence (SR&#'t1'|#'t2')")
+    void adhocOrDisjunction() {
+        assertMirrors("""
+                [ [VAL : (SR&#'t1'|#'t2')*->REC] [VAL] ]+
+                """,
+                table(sub(row(
+                        cell(VAL, rec(SR.and(tag("t1")).or(tag("t2")).unbounded())),
+                        cell(VAL)).oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("Ad-hoc: distributed OR — A&(B|C) → (A&B)|(A&C)")
+    void adhocDistributedOr() {
+        assertMirrors("""
+                [ [VAL : (SR&(#'a'|#'b'))*->REC] [VAL] ]+
+                """,
+                table(sub(row(
+                        cell(VAL, rec(SR.and(tag("a").or(tag("b"))).unbounded())),
+                        cell(VAL)).oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("Ad-hoc: settings prefix <NORM> maps to withTransformations(norm())")
+    void adhocSettings() {
+        assertMirrors("""
+                <NORM> [ [VAL : SR->REC] [VAL] ]+
+                """,
+                table(sub(row(cell(VAL, rec(SR)), cell(VAL)).oneOrMore()))
+                        .withTransformations(norm()));
+    }
+
+    @Test
+    @DisplayName("Ad-hoc: cell-level actions before a bare conditional spec")
+    void adhocCellLevelActs() {
+        assertMirrors("""
+                [ [RT*->REC BLANK ? _ | VAL] [VAL] ]+
+                """,
+                table(sub(row(
+                        cell(acts(rec(RT.unbounded())), when(blank(), SKIP, VAL)),
+                        cell(VAL)).oneOrMore())));
+    }
+
+    @Test
+    @DisplayName("Ad-hoc: table-level condition and table-level inherited actions")
+    void adhocTableLevel() {
+        assertMirrors("""
+                !BLANK ? BW*->REC [ [VAL] ]+
+                """,
+                table(notBlank(), acts(rec(BW.unbounded())),
+                        sub(row(cell(VAL)).oneOrMore())));
     }
 
     @Test

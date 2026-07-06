@@ -66,6 +66,57 @@ public final class Rtl {
     public static final StringExtractor UC   = StringExtractor.UpperCase.INSTANCE;
     public static final StringExtractor LC   = StringExtractor.LowerCase.INSTANCE;
 
+    /** RTL {@code REPL("regex","replacement")}. */
+    public static StringExtractor repl(String regex, String replacement) {
+        return new StringExtractor.Replaced(regex, replacement);
+    }
+
+    /** RTL {@code SUBSTR(begin,length)} — here as begin/end offsets. */
+    public static StringExtractor substr(int begin, int end) {
+        return new StringExtractor.Substring(begin, end);
+    }
+
+    /** RTL extractor chain {@code =REPL(…).TRIM}. */
+    public static StringExtractor chain(StringExtractor... steps) {
+        return new StringExtractor.Chain(List.of(steps));
+    }
+
+    // ==== recordset transformations (RTL settings prefix <NORM,ANCH(n),SPLIT("s")>) ====
+
+    /** RTL setting {@code NORM} — use with {@code table(…).withTransformations(norm(), …)}. */
+    public static ru.icc.regtab.interpret.RecordsetTransformation norm() {
+        return new ru.icc.regtab.interpret.WhitespaceNormalization();
+    }
+
+    /** RTL setting {@code ANCH(n)}. */
+    public static ru.icc.regtab.interpret.RecordsetTransformation anch(int position) {
+        return new ru.icc.regtab.interpret.AnchorAttributeAtPosition(position);
+    }
+
+    /** RTL setting {@code SPLIT("s")}. */
+    public static ru.icc.regtab.interpret.RecordsetTransformation split(String delimiter) {
+        return new ru.icc.regtab.interpret.DelimitedFieldSplit(delimiter);
+    }
+
+    // ==== inherited action specs (RTL: actSpecs at table/subtable/row/subrow/cell level) ====
+
+    /**
+     * Level-scoped action specs (RTL {@code acts} written before the nested patterns).
+     * They are merged down into every atom of the enclosed patterns with
+     * {@code inherited=true}, exactly as the RTL compiler does:
+     * {@code row(acts(rec(BW.unbounded())), subrow(…))} ≙ RTL {@code [ BW*->REC { … } ]}.
+     */
+    public static Acts acts(ActionSpec... actions) {
+        return new Acts(List.of(actions));
+    }
+
+    /** Wrapper for level-scoped action specs — see {@link #acts(ActionSpec...)}. */
+    public record Acts(List<ActionSpec> actions) {
+        List<ActionSpec> marked() {
+            return actions.stream().map(ActionSpec::asInherited).toList();
+        }
+    }
+
     // ==== pattern levels ====
 
     /** Table pattern; inline REC(n)/REC('s') params become transformations automatically. */
@@ -73,9 +124,45 @@ public final class Rtl {
         return TablePattern.of(subtables);
     }
 
+    /** Table pattern with table-level inherited actions (RTL {@code acts subtables}). */
+    public static TablePattern table(Acts acts, SubtablePattern... subtables) {
+        return TablePattern.of(mergeDown(List.of(subtables), acts.marked())
+                .toArray(SubtablePattern[]::new));
+    }
+
+    /** Table pattern with a table-level condition (RTL {@code cond ? subtables}). */
+    public static TablePattern table(CellPredicate condition, SubtablePattern... subtables) {
+        TablePattern base = TablePattern.of(subtables);
+        return new TablePattern(new CellMatchCondition(condition),
+                base.subtablePatterns(), base.transformations());
+    }
+
+    /** Table pattern with a table-level condition and inherited actions. */
+    public static TablePattern table(CellPredicate condition, Acts acts, SubtablePattern... subtables) {
+        TablePattern base = table(acts, subtables);
+        return new TablePattern(new CellMatchCondition(condition),
+                base.subtablePatterns(), base.transformations());
+    }
+
     /** Subtable pattern (RTL {@code { rows }}); quantify with postfix methods. */
     public static SubtablePattern sub(RowPattern... rows) {
         return new SubtablePattern(null, Quantifier.one(), List.of(rows));
+    }
+
+    /** Subtable pattern with subtable-level inherited actions. */
+    public static SubtablePattern sub(Acts acts, RowPattern... rows) {
+        return new SubtablePattern(null, Quantifier.one(), mergeDownRows(List.of(rows), acts.marked()));
+    }
+
+    /** Subtable pattern with a subtable-level condition (RTL {@code { cond ? rows }}). */
+    public static SubtablePattern sub(CellPredicate condition, RowPattern... rows) {
+        return new SubtablePattern(new CellMatchCondition(condition), Quantifier.one(), List.of(rows));
+    }
+
+    /** Subtable pattern with a subtable-level condition and inherited actions. */
+    public static SubtablePattern sub(CellPredicate condition, Acts acts, RowPattern... rows) {
+        return new SubtablePattern(new CellMatchCondition(condition), Quantifier.one(),
+                mergeDownRows(List.of(rows), acts.marked()));
     }
 
     /** Row pattern with one implicit subrow (RTL {@code [ cells ]}). */
@@ -89,9 +176,96 @@ public final class Rtl {
         return new RowPattern(null, Quantifier.one(), List.of(subrows));
     }
 
+    /** Row pattern with row-level inherited actions (RTL {@code [ acts cells ]}). */
+    public static RowPattern row(Acts acts, CellPattern... cells) {
+        return new RowPattern(null, Quantifier.one(),
+                List.of(new SubrowPattern(null, Quantifier.one(),
+                        mergeDownCells(List.of(cells), acts.marked()))));
+    }
+
+    /** Row pattern with row-level inherited actions and explicit subrows. */
+    public static RowPattern row(Acts acts, SubrowPattern... subrows) {
+        return new RowPattern(null, Quantifier.one(), mergeDownSubrows(List.of(subrows), acts.marked()));
+    }
+
+    /** Row pattern with a row-level condition (RTL {@code [ cond ? cells ]}). */
+    public static RowPattern row(CellPredicate condition, CellPattern... cells) {
+        return new RowPattern(new CellMatchCondition(condition), Quantifier.one(),
+                List.of(new SubrowPattern(null, Quantifier.one(), List.of(cells))));
+    }
+
+    /** Row pattern with a row-level condition and inherited actions. */
+    public static RowPattern row(CellPredicate condition, Acts acts, CellPattern... cells) {
+        return new RowPattern(new CellMatchCondition(condition), Quantifier.one(),
+                List.of(new SubrowPattern(null, Quantifier.one(),
+                        mergeDownCells(List.of(cells), acts.marked()))));
+    }
+
     /** Explicit subrow pattern (RTL {@code { cells }} inside a row). */
     public static SubrowPattern subrow(CellPattern... cells) {
         return new SubrowPattern(null, Quantifier.one(), List.of(cells));
+    }
+
+    /** Explicit subrow pattern with subrow-level inherited actions. */
+    public static SubrowPattern subrow(Acts acts, CellPattern... cells) {
+        return new SubrowPattern(null, Quantifier.one(), mergeDownCells(List.of(cells), acts.marked()));
+    }
+
+    /** Explicit subrow pattern with a subrow-level condition (RTL {@code { cond ? cells }}). */
+    public static SubrowPattern subrow(CellPredicate condition, CellPattern... cells) {
+        return new SubrowPattern(new CellMatchCondition(condition), Quantifier.one(), List.of(cells));
+    }
+
+    // ==== merge-down of inherited actions (mirrors ATPBuilder's inheritance stack) ====
+
+    private static List<SubtablePattern> mergeDown(List<SubtablePattern> subs, List<ActionSpec> inh) {
+        return subs.stream()
+                .map(s -> new SubtablePattern(s.condition(), s.quantifier(),
+                        mergeDownRows(s.rowPatterns(), inh)))
+                .toList();
+    }
+
+    private static List<RowPattern> mergeDownRows(List<RowPattern> rows, List<ActionSpec> inh) {
+        return rows.stream()
+                .map(r -> new RowPattern(r.condition(), r.quantifier(),
+                        mergeDownSubrows(r.subrowPatterns(), inh)))
+                .toList();
+    }
+
+    private static List<SubrowPattern> mergeDownSubrows(List<SubrowPattern> subrows, List<ActionSpec> inh) {
+        return subrows.stream()
+                .map(sr -> new SubrowPattern(sr.condition(), sr.quantifier(),
+                        mergeDownCells(sr.cellPatterns(), inh)))
+                .toList();
+    }
+
+    private static List<CellPattern> mergeDownCells(List<CellPattern> cells, List<ActionSpec> inh) {
+        return cells.stream()
+                .map(c -> c.contentSpec() == null ? c
+                        : new CellPattern(c.condition(), c.quantifier(), mergeDown(c.contentSpec(), inh)))
+                .toList();
+    }
+
+    private static ContentSpec mergeDown(ContentSpec cs, List<ActionSpec> inh) {
+        return switch (cs) {
+            case AtomicContentSpec a -> {
+                var merged = new ArrayList<>(inh);
+                merged.addAll(a.actions());
+                yield new AtomicContentSpec(a.idd(), a.extractor(), a.tags(), merged);
+            }
+            case ru.icc.regtab.atp.spec.DelimitedContentSpec d ->
+                    new ru.icc.regtab.atp.spec.DelimitedContentSpec(d.delimiter(),
+                            (AtomicContentSpec) mergeDown(d.atomicSpec(), inh));
+            case ru.icc.regtab.atp.spec.CompoundContentSpec c ->
+                    new ru.icc.regtab.atp.spec.CompoundContentSpec(
+                            c.segments().stream()
+                                    .map(s -> new ru.icc.regtab.atp.spec.CompoundSegment(
+                                            s.leadingDelimiter(), mergeDown(s.spec(), inh)))
+                                    .toList(),
+                            c.trailingDelimiter());
+            case ConditionalContentSpec x -> new ConditionalContentSpec(x.condition(),
+                    mergeDown(x.positive(), inh), mergeDown(x.negative(), inh));
+        };
     }
 
     // ==== cells ====
@@ -124,6 +298,17 @@ public final class Rtl {
     /** Guarded cell with an arbitrary content spec (RTL {@code [cond ? S_cont]}). */
     public static CellPattern cell(CellPredicate condition, ContentSpec cs) {
         return new CellPattern(new CellMatchCondition(condition), Quantifier.one(), cs);
+    }
+
+    /** Cell with cell-level inherited actions before the content spec (RTL {@code [acts S_cont]}). */
+    public static CellPattern cell(Acts acts, ContentSpec cs) {
+        return new CellPattern(null, Quantifier.one(), mergeDown(cs, acts.marked()));
+    }
+
+    /** Guarded cell with cell-level inherited actions (RTL {@code [cond ? acts S_cont]}). */
+    public static CellPattern cell(CellPredicate condition, Acts acts, ContentSpec cs) {
+        return new CellPattern(new CellMatchCondition(condition), Quantifier.one(),
+                mergeDown(cs, acts.marked()));
     }
 
     // ==== atomic content specs (for compound/delimited/conditional/tagged forms) ====
@@ -161,6 +346,20 @@ public final class Rtl {
         return when(condition, atom(positive), atom(negative));
     }
 
+    /** Conditional spec, directive-positive form (RTL {@code BLANK ? _ | VAL : acts}). */
+    public static ConditionalContentSpec when(CellPredicate condition,
+                                              ItemDerivationDirective positive,
+                                              ContentSpec negative) {
+        return when(condition, atom(positive), negative);
+    }
+
+    /** Conditional spec, directive-negative form (RTL {@code BLANK ? VAL : acts | _}). */
+    public static ConditionalContentSpec when(CellPredicate condition,
+                                              ContentSpec positive,
+                                              ItemDerivationDirective negative) {
+        return when(condition, positive, atom(negative));
+    }
+
     // ==== cell match predicates (RTL: BLANK, "regex", ~"sub" + negations) ====
 
     /** RTL {@code BLANK}. */
@@ -176,10 +375,10 @@ public final class Rtl {
     public static CellPredicate notRe(String regex) { return new CellPredicate.NotRegexMatched(regex); }
 
     /** RTL {@code ~"sub"}. */
-    public static CellPredicate has(String substring) { return new CellPredicate.Contains(substring); }
+    public static CellPredicate contains(String substring) { return new CellPredicate.Contains(substring); }
 
     /** RTL {@code !~"sub"}. */
-    public static CellPredicate notHas(String substring) { return new CellPredicate.NotContains(substring); }
+    public static CellPredicate notContains(String substring) { return new CellPredicate.NotContains(substring); }
 
     /** Escape hatch: arbitrary Java cell predicate (no RTL analog). */
     public static CellPredicate where(String description, Predicate<Cell> predicate) {
@@ -209,8 +408,14 @@ public final class Rtl {
     /** RTL {@code Ca..b} — absolute column range. */
     public static Prov C(int lo, int hi) { return new Prov(new FilterTerm.ColAbsoluteRange(lo, hi)); }
 
-    /** RTL {@code C+n} / {@code C-n} — column offset from the anchor. */
+    /** RTL {@code C+n} / {@code C-n} — column offset from the anchor (signed delta). */
     public static Prov Crel(int delta) { return new Prov(new FilterTerm.ColOffset(delta)); }
+
+    /** RTL {@code C+lo..hi} — column range relative to the anchor. */
+    public static Prov Crel(int lo, int hi) { return new Prov(new FilterTerm.ColRange(lo, hi)); }
+
+    /** RTL {@code C+lo..*} — open-ended column range relative to the anchor. */
+    public static Prov CrelFrom(int lo) { return new Prov(new FilterTerm.ColRange(lo, Integer.MAX_VALUE)); }
 
     /** RTL {@code Rn} — absolute row. */
     public static Prov R(int n) { return new Prov(new FilterTerm.RowExact(n)); }
@@ -249,6 +454,12 @@ public final class Rtl {
 
     /** RTL {@code !BLANK} item constraint. */
     public static Prov itemNotBlank() { return new Prov(FilterTerm.NotBlank.INSTANCE); }
+
+    /** RTL {@code ~"sub"} item constraint. */
+    public static Prov itemContains(String substring) { return new Prov(new FilterTerm.Contains(substring)); }
+
+    /** RTL {@code !~"sub"} item constraint. */
+    public static Prov itemNotContains(String substring) { return new Prov(new FilterTerm.NotContains(substring)); }
 
     // ==== context providers (RTL: 'text', @'ATTR'='VALUE') ====
 
