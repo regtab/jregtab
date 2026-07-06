@@ -43,4 +43,16 @@ public record CellPattern(
     public static CellPattern of(CellMatchCondition cond, Quantifier q, ContentSpec cs) {
         return new CellPattern(cond, q, cs);
     }
+
+    /** Copy with quantifier {@code +} (RTL postfix). */
+    public CellPattern oneOrMore() { return new CellPattern(condition, Quantifier.oneOrMore(), contentSpec); }
+
+    /** Copy with quantifier {@code *} (RTL postfix). */
+    public CellPattern zeroOrMore() { return new CellPattern(condition, Quantifier.zeroOrMore(), contentSpec); }
+
+    /** Copy with quantifier {@code ?} (RTL postfix). */
+    public CellPattern zeroOrOne() { return new CellPattern(condition, Quantifier.zeroOrOne(), contentSpec); }
+
+    /** Copy with quantifier {@code {n}} (RTL postfix). */
+    public CellPattern exactly(int n) { return new CellPattern(condition, Quantifier.exactly(n), contentSpec); }
 }

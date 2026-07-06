@@ -46,4 +46,16 @@ public record RowPattern(
         return new RowPattern(cond, q,
                 List.of(SubrowPattern.of(cells)));
     }
+
+    /** Copy with quantifier {@code +} (RTL postfix). */
+    public RowPattern oneOrMore() { return new RowPattern(condition, Quantifier.oneOrMore(), subrowPatterns); }
+
+    /** Copy with quantifier {@code *} (RTL postfix). */
+    public RowPattern zeroOrMore() { return new RowPattern(condition, Quantifier.zeroOrMore(), subrowPatterns); }
+
+    /** Copy with quantifier {@code ?} (RTL postfix). */
+    public RowPattern zeroOrOne() { return new RowPattern(condition, Quantifier.zeroOrOne(), subrowPatterns); }
+
+    /** Copy with quantifier {@code {n}} (RTL postfix). */
+    public RowPattern exactly(int n) { return new RowPattern(condition, Quantifier.exactly(n), subrowPatterns); }
 }

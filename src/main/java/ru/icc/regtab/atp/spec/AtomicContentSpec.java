@@ -76,4 +76,24 @@ public record AtomicContentSpec(
     public static AtomicContentSpec valTagged(List<String> tags, ActionSpec... actions) {
         return new AtomicContentSpec(ItemDerivationDirective.VAL, null, tags, List.of(actions));
     }
+
+    /**
+     * Copy with the given tags appended (RTL {@code #'tag'}).
+     * Tags are stored with the leading {@code #}; pass names without it.
+     */
+    public AtomicContentSpec tagged(String... newTags) {
+        var all = new java.util.ArrayList<>(tags);
+        for (String t : newTags) all.add("#" + t);
+        return new AtomicContentSpec(idd, extractor, all, actions);
+    }
+
+    /** Copy with the given string extractor (RTL {@code = NORM}, {@code = TRIM}, …). */
+    public AtomicContentSpec extract(StringExtractor newExtractor) {
+        return new AtomicContentSpec(idd, newExtractor, tags, actions);
+    }
+
+    /** Wraps this atom into a delimited spec (RTL {@code (atom){"delim"}}). */
+    public DelimitedContentSpec splitBy(String delimiter) {
+        return new DelimitedContentSpec(delimiter, this);
+    }
 }

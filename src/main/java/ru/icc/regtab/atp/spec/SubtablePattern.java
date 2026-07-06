@@ -33,4 +33,16 @@ public record SubtablePattern(
     public static SubtablePattern of(RowPattern... rows) {
         return new SubtablePattern(null, Quantifier.one(), List.of(rows));
     }
+
+    /** Copy with quantifier {@code +} (RTL postfix). */
+    public SubtablePattern oneOrMore() { return new SubtablePattern(condition, Quantifier.oneOrMore(), rowPatterns); }
+
+    /** Copy with quantifier {@code *} (RTL postfix). */
+    public SubtablePattern zeroOrMore() { return new SubtablePattern(condition, Quantifier.zeroOrMore(), rowPatterns); }
+
+    /** Copy with quantifier {@code ?} (RTL postfix). */
+    public SubtablePattern zeroOrOne() { return new SubtablePattern(condition, Quantifier.zeroOrOne(), rowPatterns); }
+
+    /** Copy with quantifier {@code {n}} (RTL postfix). */
+    public SubtablePattern exactly(int n) { return new SubtablePattern(condition, Quantifier.exactly(n), rowPatterns); }
 }

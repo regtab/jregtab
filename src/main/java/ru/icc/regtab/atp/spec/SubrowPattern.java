@@ -33,4 +33,16 @@ public record SubrowPattern(
     public static SubrowPattern of(Quantifier q, CellPattern... cells) {
         return new SubrowPattern(null, q, List.of(cells));
     }
+
+    /** Copy with quantifier {@code +} (RTL postfix). */
+    public SubrowPattern oneOrMore() { return new SubrowPattern(condition, Quantifier.oneOrMore(), cellPatterns); }
+
+    /** Copy with quantifier {@code *} (RTL postfix). */
+    public SubrowPattern zeroOrMore() { return new SubrowPattern(condition, Quantifier.zeroOrMore(), cellPatterns); }
+
+    /** Copy with quantifier {@code ?} (RTL postfix). */
+    public SubrowPattern zeroOrOne() { return new SubrowPattern(condition, Quantifier.zeroOrOne(), cellPatterns); }
+
+    /** Copy with quantifier {@code {n}} (RTL postfix). */
+    public SubrowPattern exactly(int n) { return new SubrowPattern(condition, Quantifier.exactly(n), cellPatterns); }
 }
