@@ -40,6 +40,7 @@ public sealed interface FilterTerm permits
         FilterTerm.Tagged,
         FilterTerm.NotTagged,
         FilterTerm.SameStr,
+        FilterTerm.External,
         FilterTerm.Custom {
 
     /** RTL token for this constraint (e.g. {@code "ST"}, {@code "BW"}). */
@@ -299,6 +300,17 @@ public sealed interface FilterTerm permits
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.sameStr(a);
         }
+    }
+
+    /**
+     * Externally bound item filter — RTL analog {@code EXT('name')}, resolved from
+     * {@code Bindings} passed to the RTL compiler. Unlike {@link Custom}, it is
+     * serializable back to RTL because the name identifies the binding.
+     */
+    record External(String name,
+                    BiPredicate<CellDerivedItem, CellDerivedItem> predicate) implements FilterTerm {
+        public String toRtl() { return "EXT('" + name + "')"; }
+        public ItemFilterCondition toCondition() { return predicate::test; }
     }
 
     /** Escape hatch — {@code toRtl()} throws {@link UnsupportedOperationException}. */

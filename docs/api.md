@@ -37,6 +37,18 @@ TablePattern pattern = RtlCompiler.compile("""
 | Method | Description |
 |---|---|
 | `static TablePattern compile(String rtl)` | Parses and compiles the RTL string. Throws `RtlCompileException` on syntax or semantic errors. |
+| `static TablePattern compile(String rtl, Bindings bindings)` | Same, resolving `EXT('name')` constraints against named Java predicates. |
+
+### `Bindings`
+
+Named Java predicates for `EXT('name')` constraints (see the
+[RTL reference](rtl-reference.md#external-java-bindings--extname)). Immutable; chain calls:
+
+```java
+Bindings.of()
+        .cell("isTotal", c -> c.text().startsWith("Total"))       // cell match condition
+        .filter("isNum", (a, c) -> c.str().matches("\\d+"));      // provider constraint
+```
 
 ---
 

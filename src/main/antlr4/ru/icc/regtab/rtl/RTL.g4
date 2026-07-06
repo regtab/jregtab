@@ -136,7 +136,7 @@ xContSpec    : atomContSpec | delimContSpec | compContSpec ;
 
 // Cell match condition
 cellMatchCond : cellMatchConstr ;
-cellMatchConstr : regex | blank | contains ;
+cellMatchConstr : regex | blank | contains | ext ;
 
 // Item provider specification
 provSpec : tblProvSpec | ctxProvSpec | ctxAvpSpec ;
@@ -200,7 +200,11 @@ end   : offset | INT ;
 offset : (MINUS INT) | (PLUS INT) ;
 
 // Content constraints
-contConstr : regex | blank | tag | sameStr | contains ;
+contConstr : regex | blank | tag | sameStr | contains | ext ;
+
+// External Java binding: EXT('name') — resolved against Bindings at compile time
+ext : EXT LPAREN STRING RPAREN ;
+EXT : 'EXT' ;
 
 // Contains constraint
 contains : EXCLAMATION? TILDA STRING ;

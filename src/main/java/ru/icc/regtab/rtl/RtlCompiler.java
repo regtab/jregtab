@@ -39,6 +39,20 @@ public final class RtlCompiler {
      * @throws RtlCompileException if the string cannot be parsed or compiled
      */
     public static TablePattern compile(String rtl) {
+        return compile(rtl, Bindings.of());
+    }
+
+    /**
+     * Compiles the given RTL string, resolving {@code EXT('name')} constraints against
+     * the supplied {@link Bindings}.
+     *
+     * @param rtl      the RTL source string
+     * @param bindings named Java predicates for {@code EXT('name')} constraints
+     * @return compiled table pattern
+     * @throws RtlCompileException if the string cannot be parsed or compiled, or if it
+     *                             references an {@code EXT} name absent from {@code bindings}
+     */
+    public static TablePattern compile(String rtl, Bindings bindings) {
         var lexer  = new RTLLexer(CharStreams.fromString(rtl));
         var tokens = new CommonTokenStream(lexer);
         var parser = new RTLParser(tokens);
@@ -54,7 +68,7 @@ public final class RtlCompiler {
 
         InlineRecParams inline = extractInlineRecParams(tree);
         List<RecordsetTransformation> transforms = buildTransformations(tree.settings(), inline);
-        TablePattern tablePattern = new ATPBuilder().visitTablePattern(tree);
+        TablePattern tablePattern = new ATPBuilder(bindings).visitTablePattern(tree);
         if (transforms.isEmpty()) return tablePattern;
         return new TablePattern(tablePattern.condition(), tablePattern.subtablePatterns(), transforms);
     }

@@ -18,6 +18,7 @@ public sealed interface CellPredicate permits
         CellPredicate.NotRegexMatched,
         CellPredicate.Contains,
         CellPredicate.NotContains,
+        CellPredicate.External,
         CellPredicate.Custom {
 
     /** RTL representation of this predicate. */
@@ -58,6 +59,16 @@ public sealed interface CellPredicate permits
     record NotContains(String substring) implements CellPredicate {
         public String toRtl() { return "!~\"" + substring + "\""; }
         public Predicate<Cell> toPredicate() { return c -> !c.text().contains(substring); }
+    }
+
+    /**
+     * Externally bound predicate — RTL analog {@code EXT('name')}, resolved from
+     * {@code Bindings} passed to the RTL compiler. Unlike {@link Custom}, it is
+     * serializable back to RTL because the name identifies the binding.
+     */
+    record External(String name, Predicate<Cell> predicate) implements CellPredicate {
+        public String toRtl() { return "EXT('" + name + "')"; }
+        public Predicate<Cell> toPredicate() { return predicate; }
     }
 
     /** Escape hatch — {@code toRtl()} throws {@link UnsupportedOperationException}. */

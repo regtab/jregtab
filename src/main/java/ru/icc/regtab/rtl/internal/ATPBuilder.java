@@ -5,6 +5,8 @@ import ru.icc.regtab.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.interpret.DelimitedFieldSplit;
 import ru.icc.regtab.interpret.RecordsetTransformation;
 import ru.icc.regtab.interpret.WhitespaceNormalization;
+import ru.icc.regtab.itm.syntax.Cell;
+import ru.icc.regtab.rtl.Bindings;
 import ru.icc.regtab.rtl.RTLBaseVisitor;
 import ru.icc.regtab.rtl.RTLParser;
 import ru.icc.regtab.rtl.RtlCompileException;
@@ -21,11 +23,20 @@ import java.util.Set;
 /** Walks an RTL parse tree and builds the ATP spec hierarchy. */
 public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
+    private final Bindings bindings;
     private final Deque<List<ActionSpec>> inheritedActionsStack = new ArrayDeque<>();
     private final Map<String, RTLParser.CellPatternBodyContext>     cellFragmentTable     = new LinkedHashMap<>();
     private final Map<String, RTLParser.RowPatternBodyContext>      rowFragmentTable      = new LinkedHashMap<>();
     private final Map<String, RTLParser.SubrowPatternBodyContext>   subrowFragmentTable   = new LinkedHashMap<>();
     private final Map<String, RTLParser.SubtablePatternBodyContext> subtableFragmentTable = new LinkedHashMap<>();
+
+    public ATPBuilder() {
+        this(Bindings.of());
+    }
+
+    public ATPBuilder(Bindings bindings) {
+        this.bindings = bindings;
+    }
 
     // -------- table --------
 
@@ -320,7 +331,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
                                        RTLParser.OpContext op,
                                        ItemDerivationDirective anchorType) {
         if (ctx.tblProvSpec() != null)
-            return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType);
+            return ProviderTemplateResolver.resolve(ctx.tblProvSpec(), op, anchorType, bindings);
         if (ctx.ctxAvpSpec() != null) {
             String name  = StringExtractorFactory.parseStringLiteral(ctx.ctxAvpSpec().STRING(0).getText());
             String value = StringExtractorFactory.parseStringLiteral(ctx.ctxAvpSpec().STRING(1).getText());
@@ -365,12 +376,29 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
 
     // -------- cell match condition --------
 
-    private static CellMatchCondition buildCellMatchCondition(RTLParser.CellMatchCondContext ctx) {
+    private CellMatchCondition buildCellMatchCondition(RTLParser.CellMatchCondContext ctx) {
         var constr = ctx.cellMatchConstr();
         if (constr.regex()    != null) return buildRegexCond(constr.regex());
         if (constr.blank()    != null) return buildBlankCond(constr.blank());
         if (constr.contains() != null) return buildContainsCond(constr.contains());
+        if (constr.ext()      != null) return buildExtCond(constr.ext());
         throw new RtlCompileException("Unknown cell match constraint");
+    }
+
+    private CellMatchCondition buildExtCond(RTLParser.ExtContext ctx) {
+        String name = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
+        int line = ctx.getStart().getLine();
+        int col  = ctx.getStart().getCharPositionInLine();
+        if (name.isBlank())
+            throw new RtlCompileException("EXT binding name must not be blank", line, col);
+        java.util.function.Predicate<Cell> predicate = bindings.cellPredicate(name);
+        if (predicate == null) {
+            String hint = bindings.itemFilter(name) != null
+                    ? " ('" + name + "' is bound as a filter; a cell match condition needs Bindings.cell(...))"
+                    : "";
+            throw new RtlCompileException("Unbound EXT cell predicate: '" + name + "'" + hint, line, col);
+        }
+        return new CellMatchCondition(new CellPredicate.External(name, predicate));
     }
 
     private static CellMatchCondition buildContainsCond(RTLParser.ContainsContext ctx) {

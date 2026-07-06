@@ -58,7 +58,10 @@ Recordset rs = pattern.transform(new TableInterpreter()
 reverse mapping, turning an ATP `TablePattern` back into an RTL string. It is the tool used to
 cross-check the two representations. Two limitations apply: actions are emitted at the atom level
 only (inherited-level action specs are not reconstructed), and custom Java predicates
-(`CellPredicate.Custom`, `ItemFilterConditionSpec.Custom`) cannot be serialized.
+(`CellPredicate.Custom`, `ItemFilterConditionSpec.Custom`) cannot be serialized. Named external
+bindings (`EXT('name')`, see [External Java bindings](#external-java-bindings--extname)) *are*
+serializable — the name identifies the binding; compiling the output back requires the same
+`Bindings` object.
 
 ---
 
@@ -151,6 +154,7 @@ A cell match condition guards pattern application; it tests the **cell**, not th
 | `BLANK ?` | Cell text is blank |
 | `!BLANK ?` | Cell text is not blank |
 | `~"sub" ?` | Cell text contains the substring |
+| `EXT('name') ?` | Cell satisfies the Java predicate bound under `name` — see [External Java bindings](#external-java-bindings--extname) |
 
 The `?` separator is required when a `contSpec` follows the condition (guarded form).
 When the cell body contains **only** a condition and nothing else, `?` must be omitted:
@@ -184,6 +188,37 @@ A regex guard at row level selects header/data rows by content:
 ```
 
 *(Task 116 — the leading cell of every data row must look like a 4-digit year.)*
+
+---
+
+## External Java bindings — `EXT('name')`
+
+`EXT('name')` is the escape hatch from RTL into Java: it references a named predicate supplied
+alongside the RTL string via `ru.icc.regtab.rtl.Bindings`. The same syntax works in two
+positions, resolved by where it appears:
+
+| Position | Binding kind | Java type |
+|---|---|---|
+| Cell match condition (`EXT('n') ?`, `[EXT('n')]`) | `Bindings.cell(name, …)` | `Predicate<Cell>` |
+| Provider constraint (`(ROW & EXT('n'))->REC`) | `Bindings.filter(name, …)` | `BiPredicate<CellDerivedItem, CellDerivedItem>` (anchor, candidate) |
+
+```java
+TablePattern p = RtlCompiler.compile("""
+        { [ [EXT('isTotal') ? VAL : (ROW & EXT('isNum'))*->REC] [VAL]+ ] }+
+        """,
+        Bindings.of()
+                .cell("isTotal", c -> c.text().startsWith("Total"))
+                .filter("isNum", (a, c) -> c.str().matches("\\d+")));
+```
+
+Rules:
+
+- Referencing a name that is not bound (or bound under the other kind) raises
+  `RtlCompileException` at compile time, with the position of the `EXT` constraint.
+- The two kinds form independent namespaces; a `Bindings` object may carry bindings that a
+  particular pattern does not use.
+- Unlike opaque `Custom` predicates, `EXT` constraints survive ATP→RTL serialization
+  (they serialize back to `EXT('name')`); recompiling the output requires the same `Bindings`.
 
 ---
 
@@ -420,6 +455,7 @@ cell to the left") pick the *closest* neighbour rather than the farthest.
 | `TAG #t1 #t2` | any of the given tags matches (OR) |
 | `!TAG #t1 #t2` | none of the given tags matches |
 | `STR` | `sameStr(a)` (same string as the anchor) |
+| `EXT('name')` | Java item filter bound under `name` — see [External Java bindings](#external-java-bindings--extname) |
 
 When a content constraint is attached to a spatial one with `&`, the `#'tag'` shorthand stands
 for `TAG #tag`: `COL&#'H'*` means "same column **and** tagged `H`, unbounded".

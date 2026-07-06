@@ -19,7 +19,10 @@ import java.util.stream.Collectors;
  *   <li>Actions are emitted at atom level (after {@code :}) — inherited-level action specs
  *       are not reconstructed from the merged {@link AtomicContentSpec#actions()} list.</li>
  *   <li>{@link CellPredicate.Custom} and {@link ItemFilterConditionSpec.Custom} throw
- *       {@link UnsupportedOperationException} — use only for tasks without custom predicates.</li>
+ *       {@link UnsupportedOperationException} — use only for tasks without custom predicates.
+ *       Externally bound predicates ({@link CellPredicate.External}, {@link FilterTerm.External})
+ *       serialize to {@code EXT('name')}; compiling the output back requires the same
+ *       {@link Bindings}.</li>
  * </ul>
  */
 public final class AtpToRtlSerializer {

@@ -4,10 +4,14 @@ import ru.icc.regtab.atp.spec.FilterTerm;
 import ru.icc.regtab.atp.spec.ItemDerivationDirective;
 import ru.icc.regtab.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.atp.spec.ProviderSpec;
+import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.provider.CellDerivedProviderKind;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
+import ru.icc.regtab.rtl.Bindings;
 import ru.icc.regtab.rtl.RTLParser;
 import ru.icc.regtab.rtl.RtlCompileException;
+
+import java.util.function.BiPredicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,18 +45,24 @@ import java.util.List;
  */
 final class ProviderTemplateResolver {
 
-    private ProviderTemplateResolver() {}
+    private final Bindings bindings;
+
+    private ProviderTemplateResolver(Bindings bindings) {
+        this.bindings = bindings;
+    }
 
     /**
      * Builds a {@link ProviderSpec} from an RTL {@code tblProvSpec} context.
-     * The provider kind is inferred from the action type and anchor item type.
+     * The provider kind is inferred from the action type and anchor item type;
+     * {@code EXT('name')} constraints are resolved against {@code bindings}.
      */
     static ProviderSpec resolve(RTLParser.TblProvSpecContext ctx,
                                 RTLParser.OpContext op,
-                                ItemDerivationDirective anchorType) {
+                                ItemDerivationDirective anchorType,
+                                Bindings bindings) {
         TraversalOrder order = parseTraversalOrder(ctx.traversalOrderMark());
         int cardinality = parseCardinality(ctx.cardinality());
-        ItemFilterConditionSpec condition = buildCondition(ctx);
+        ItemFilterConditionSpec condition = new ProviderTemplateResolver(bindings).buildCondition(ctx);
         CellDerivedProviderKind kind = inferKind(op, anchorType);
         int actualCardinality = (kind == CellDerivedProviderKind.ATTR) ? 1 : cardinality;
         return new ProviderSpec(actualCardinality, order, condition, kind, null);
@@ -88,7 +98,7 @@ final class ProviderTemplateResolver {
 
     // --- Condition building ---
 
-    private static ItemFilterConditionSpec buildCondition(RTLParser.TblProvSpecContext ctx) {
+    private ItemFilterConditionSpec buildCondition(RTLParser.TblProvSpecContext ctx) {
         if (ctx.spatConstr() != null) {
             List<FilterTerm> parts = new ArrayList<>();
             addSpatConstrParts(ctx.spatConstr(), parts);
@@ -99,7 +109,7 @@ final class ProviderTemplateResolver {
         return ItemFilterConditionSpec.bare(new FilterTerm.SameCell());
     }
 
-    private static ItemFilterConditionSpec buildBareConj(RTLParser.BareConjConstraintsContext ctx) {
+    private ItemFilterConditionSpec buildBareConj(RTLParser.BareConjConstraintsContext ctx) {
         List<FilterTerm> spatParts = new ArrayList<>();
         addSpatConstrParts(ctx.spatConstr(), spatParts);
         List<List<FilterTerm>> distributed = new ArrayList<>();
@@ -120,7 +130,7 @@ final class ProviderTemplateResolver {
                 distributed.stream().map(ProviderTemplateResolver::toAndSpec).toList());
     }
 
-    private static ItemFilterConditionSpec buildConstraints(RTLParser.ConstraintsContext ctx) {
+    private ItemFilterConditionSpec buildConstraints(RTLParser.ConstraintsContext ctx) {
         List<RTLParser.OrGroupContext> orGroups = ctx.orGroup();
         if (orGroups.size() == 1) return buildOrGroup(orGroups.get(0));
         List<ItemFilterConditionSpec.And> allAnds = new ArrayList<>();
@@ -141,14 +151,14 @@ final class ProviderTemplateResolver {
      * Expands an orGroup (possibly containing nested parenthesized ORs) into a list of
      * And-groups by distributing nested ORs: {@code A & (B|C)} → {@code (A&B)|(A&C)}.
      */
-    private static ItemFilterConditionSpec buildOrGroup(RTLParser.OrGroupContext ctx) {
+    private ItemFilterConditionSpec buildOrGroup(RTLParser.OrGroupContext ctx) {
         List<List<FilterTerm>> distributed = expandOrGroup(ctx);
         if (distributed.size() == 1) return toSpec(distributed.get(0));
         return new ItemFilterConditionSpec.Or(
                 distributed.stream().map(ProviderTemplateResolver::toAndSpec).toList());
     }
 
-    private static List<List<FilterTerm>> expandOrGroup(RTLParser.OrGroupContext ctx) {
+    private List<List<FilterTerm>> expandOrGroup(RTLParser.OrGroupContext ctx) {
         List<List<FilterTerm>> result = new ArrayList<>();
         result.add(new ArrayList<>());
         for (RTLParser.BaseConstrContext bc : ctx.baseConstr()) {
@@ -166,7 +176,7 @@ final class ProviderTemplateResolver {
         return result;
     }
 
-    private static List<List<FilterTerm>> expandBaseConstr(RTLParser.BaseConstrContext ctx) {
+    private List<List<FilterTerm>> expandBaseConstr(RTLParser.BaseConstrContext ctx) {
         if (ctx.constraints() != null) {
             ItemFilterConditionSpec inner = buildConstraints(ctx.constraints());
             return switch (inner) {
@@ -181,7 +191,7 @@ final class ProviderTemplateResolver {
         return List.of(buildConstrConstraints(ctx.constr()));
     }
 
-    private static List<FilterTerm> buildConstrConstraints(RTLParser.ConstrContext ctx) {
+    private List<FilterTerm> buildConstrConstraints(RTLParser.ConstrContext ctx) {
         List<FilterTerm> parts = new ArrayList<>();
         if (ctx.spatConstr() != null) addSpatConstrParts(ctx.spatConstr(), parts);
         else if (ctx.contConstr() != null) parts.add(buildContentConstraint(ctx.contConstr()));
@@ -254,13 +264,30 @@ final class ProviderTemplateResolver {
 
     // --- Content constraint builders ---
 
-    private static FilterTerm buildContentConstraint(RTLParser.ContConstrContext ctx) {
+    private FilterTerm buildContentConstraint(RTLParser.ContConstrContext ctx) {
         if (ctx.regex()    != null) return regexConstraint(ctx.regex());
         if (ctx.blank()    != null) return blankConstraint(ctx.blank());
         if (ctx.tag()      != null) return tagConstraint(ctx.tag());
         if (ctx.sameStr()  != null) return FilterTerm.SameStr.INSTANCE;
         if (ctx.contains() != null) return containsConstraint(ctx.contains());
+        if (ctx.ext()      != null) return extConstraint(ctx.ext());
         throw new RtlCompileException("Unknown content constraint");
+    }
+
+    private FilterTerm extConstraint(RTLParser.ExtContext ctx) {
+        String name = StringExtractorFactory.parseStringLiteral(ctx.STRING().getText());
+        int line = ctx.getStart().getLine();
+        int col  = ctx.getStart().getCharPositionInLine();
+        if (name.isBlank())
+            throw new RtlCompileException("EXT binding name must not be blank", line, col);
+        BiPredicate<CellDerivedItem, CellDerivedItem> predicate = bindings.itemFilter(name);
+        if (predicate == null) {
+            String hint = bindings.cellPredicate(name) != null
+                    ? " ('" + name + "' is bound as a cell predicate; a provider constraint needs Bindings.filter(...))"
+                    : "";
+            throw new RtlCompileException("Unbound EXT item filter: '" + name + "'" + hint, line, col);
+        }
+        return new FilterTerm.External(name, predicate);
     }
 
     private static FilterTerm regexConstraint(RTLParser.RegexContext ctx) {
