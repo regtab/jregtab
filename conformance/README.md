@@ -18,6 +18,12 @@ conformance/
     └── <name>.rtl             — must be rejected with a compile error
 ```
 
+**Byte-exactness caveat:** RTL string literals may contain raw CR/CRLF bytes as
+*payload* (e.g. `task_099` uses `'\r\n'` compound delimiters matching CRLF inside
+cell text). Line endings of the files themselves are always LF. Tooling that syncs
+or checks out the corpus must not perform any end-of-line conversion — in git the
+corpus is marked `-text` (see `.gitattributes`).
+
 Positive ids: `task_001` … `task_150` (the benchmark task suite) plus curated extras
 (`illustrative` — the paper/README worked example).
 

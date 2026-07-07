@@ -1,3 +1,5 @@
-# RTL conformance corpus: the byte-exact contract (canonical forms compared
-# byte-for-byte, single trailing LF) requires LF in every checkout on every OS.
-conformance/** text eol=lf
+# RTL conformance corpus: byte-exact payload. RTL strings may legitimately
+# contain raw CR/CRLF bytes as data (e.g. task_099 compound delimiters '\r\n'),
+# so ANY git EOL conversion corrupts them — treat the whole corpus as binary.
+# The generator always writes LF line endings itself.
+conformance/** -text
