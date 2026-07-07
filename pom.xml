@@ -4,7 +4,7 @@
 
     <groupId>ru.icc.regtab</groupId>
     <artifactId>regtab</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RegTab</name>
@@ -31,7 +31,7 @@
         <connection>scm:git:git://github.com/regtab/jregtab.git</connection>
         <developerConnection>scm:git:ssh://github.com/regtab/jregtab.git</developerConnection>
         <url>https://github.com/regtab/jregtab</url>
-        <tag>v0.2.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
