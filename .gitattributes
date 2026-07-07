@@ -3,3 +3,7 @@
 # so ANY git EOL conversion corrupts them — treat the whole corpus as binary.
 # The generator always writes LF line endings itself.
 conformance/** -text
+
+# Task 099 fixtures: cell fields contain CRLF as payload (the pattern splits
+# compound cells on literal '\r\n'), so EOL conversion corrupts the data.
+src/test/resources/tasks/task_099/** -text
