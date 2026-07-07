@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-07
+
+### Changed
+- Embedded RTL: renamed `Rtl.sub(...)` to `Rtl.subtable(...)` for naming symmetry with `Rtl.subrow(...)` (both mirror `SubtablePattern`/`SubrowPattern`)
+
 ## [0.2.0] - 2026-07-07
 
 ### Added
