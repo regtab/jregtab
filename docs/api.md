@@ -61,7 +61,7 @@ A Java DSL mirroring RTL syntax with escape hatches into Java — see the dedica
 import static ru.icc.regtab.dsl.Rtl.*;
 
 TablePattern p = table(
-    sub( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
+    subtable( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
          row( skip(),                         cell(VAL).exactly(4), skip().oneOrMore() )
     ).oneOrMore());
 ```

@@ -26,7 +26,7 @@ Embedded RTL:
 
 ```java
 TablePattern p = table(
-    sub( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
+    subtable( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
          row( skip(),                         cell(VAL).exactly(4), skip().oneOrMore() )
     ).oneOrMore());
 ```
@@ -41,8 +41,8 @@ The pattern is matched and interpreted exactly like any other `TablePattern`.
 
 | RTL | Embedded RTL |
 |---|---|
-| table pattern | `table(sub…)` |
-| `{ rows }` subtable | `sub(row…)` |
+| table pattern | `table(subtable…)` |
+| `{ rows }` subtable | `subtable(row…)` |
 | `[ cells ]` row | `row(cell…)` |
 | `{ cells }` explicit subrow | `subrow(cell…)`, mixed with implicit runs: `row(subrow(…), subrow(…))` |
 | `+` `*` `?` `{n}` | postfix `.oneOrMore()` `.zeroOrMore()` `.zeroOrOne()` `.exactly(n)` |
@@ -118,7 +118,7 @@ row(acts(rec(BW.unbounded())),
     subrow(cell(ATTR), cell(VAL)).zeroOrMore())
 
 // RTL: !BLANK ? BW*->REC [ [VAL] ]+
-table(notBlank(), acts(rec(BW.unbounded())), sub(row(cell(VAL)).oneOrMore()))
+table(notBlank(), acts(rec(BW.unbounded())), subtable(row(cell(VAL)).oneOrMore()))
 ```
 
 ### Settings
@@ -151,7 +151,7 @@ row(cell(blank()).oneOrMore(), v.oneOrMore())
 The reason embedded RTL exists: anywhere the model accepts a predicate, plain Java works.
 
 ```java
-TablePattern p = table(sub(row(
+TablePattern p = table(subtable(row(
     cell(where("isTotal", c -> c.text().startsWith("Total")), VAL,
          rec(ROW.where("isNum", (a, c) -> c.str().matches("\\d+")).unbounded())),
     cell(VAL).oneOrMore())));

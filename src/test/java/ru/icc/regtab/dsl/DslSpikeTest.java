@@ -30,7 +30,7 @@ class DslSpikeTest {
                 [ [] [VAL]{4} []+ ] }+
                 """,
                 table(
-                        sub(
+                        subtable(
                                 row(cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore()),
                                 row(skip(), cell(VAL).exactly(4), skip().oneOrMore())
                         ).oneOrMore()));
@@ -45,7 +45,7 @@ class DslSpikeTest {
                   [ [BLANK] [] ]? }+
                 """,
                 table(
-                        sub(
+                        subtable(
                                 row(cell(val().extract(NORM)), skip()).exactly(2),
                                 row(cell(notBlank(), VAL, rec(2, SC.card(2), SR)), cell(VAL)).oneOrMore(),
                                 row(cell(blank()), skip()).zeroOrOne()
@@ -60,7 +60,7 @@ class DslSpikeTest {
                   [ [BLANK ? _ | VAL]+ ]{4} }+
                 """,
                 table(
-                        sub(
+                        subtable(
                                 row(cell(VAL, rec(ST.unbounded())), cell(when(blank(), SKIP, VAL)).oneOrMore()),
                                 row(cell(when(blank(), SKIP, VAL)).oneOrMore()).exactly(4)
                         ).oneOrMore()));
@@ -72,7 +72,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1)] ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(val()
                                 .then(" ", val(rec(1, CL)))
                                 .then(" ", val(rec(1, CL)))
@@ -86,7 +86,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL : RT->REC, BW&STR*->JOIN(0)] [VAL] ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(VAL, rec(RT), join(0, BW.and(STR).unbounded())), cell(VAL))
                                 .oneOrMore())));
     }
@@ -98,7 +98,7 @@ class DslSpikeTest {
                 { [ [VAL : ^ST&C2..5*->REC] [] [VAL]+ ] [ []{2} [VAL]+ ] }+
                 """,
                 table(
-                        sub(
+                        subtable(
                                 row(cell(VAL, rec(ST.and(C(2, 5)).unbounded().colMajor())),
                                         skip(), cell(VAL).oneOrMore()),
                                 row(skip().exactly(2), cell(VAL).oneOrMore())
@@ -112,7 +112,7 @@ class DslSpikeTest {
                 { [ [VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [ATTR : RT->SUFFIX] [AUX] [VAL : SR->AVP] ]{3} }+
                 """,
                 table(
-                        sub(
+                        subtable(
                                 row(cell(VAL, avp(""), rec(SR.unbounded()), join(0, BW.and(STR).unbounded())),
                                         cell(ATTR, suffix(RT)),
                                         cell(AUX),
@@ -127,7 +127,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(notBlank(), VAL),
                                 cell(notBlank(), val(rec(1, SR.and(C(0)))).splitBy(",")))
                                 .oneOrMore())));
@@ -141,7 +141,7 @@ class DslSpikeTest {
                 [ [VAL : 'AIRPORT'->AVP]
                   [VAL : (COL, ROW, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(skip(), cell(VAL, avp("AIRLINE")).oneOrMore()),
                         row(cell(VAL, avp("AIRPORT")),
                                 cell(val(rec(COL, ROW, CL, ctxAvp("YEAR", "2025")), avp("ND"))
@@ -157,7 +157,7 @@ class DslSpikeTest {
                 [ [BLANK] [VAL #'HEAD']+ ]+
                 [ [!BLANK? VAL] [VAL: (COL&#'HEAD'*, ROW)->REC]+ ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(blank()), cell(val().tagged("HEAD")).oneOrMore()).oneOrMore(),
                         row(cell(notBlank(), VAL),
                                 cell(VAL, rec(COL.and(tag("HEAD")).unbounded(), ROW)).oneOrMore())
@@ -171,7 +171,7 @@ class DslSpikeTest {
                 [ [] [VAL = REPL('\\s+', '')]{5} ]
                 [ { [VAL] [BLANK? _ | VAL : (SR, SC)->REC(2)]+ } ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(skip(), cell(val().extract(repl("\\s+", ""))).exactly(5)),
                         row(subrow(cell(VAL),
                                 cell(when(blank(), SKIP, val(rec(2, SR, SC)))).oneOrMore()))
@@ -185,7 +185,7 @@ class DslSpikeTest {
                 [ [ATTR]{5} []+ ]
                 [ [VAL : SC->AVP, (SR&C2, SR&C4, SR&C1, SR&C3)->REC] [VAL : SC->AVP]{4} []+ ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(ATTR).exactly(5), skip().oneOrMore()),
                         row(cell(VAL, avp(SC), rec(SR.and(C(2)), SR.and(C(4)), SR.and(C(1)), SR.and(C(3)))),
                                 cell(VAL, avp(SC)).exactly(4), skip().oneOrMore())
@@ -198,7 +198,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
                 """,
-                table(sub(row(
+                table(subtable(row(
                         cell(VAL, suffix("/", RT),
                                 recSplit("/", RT.and(CrelFrom(2)).unbounded()),
                                 join(0, BW.and(STR).unbounded())),
@@ -211,7 +211,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL]{6} { [VAL : (ROW{6}, RT*)->REC(6)] [VAL]{3} }+ ]+
                 """,
-                table(sub(row(
+                table(subtable(row(
                         subrow(cell(VAL).exactly(6)),
                         subrow(cell(VAL, rec(6, ROW.card(6), RT.unbounded())),
                                 cell(VAL).exactly(3)).oneOrMore())
@@ -224,7 +224,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->JOIN][VAL#'2': ROW&#'2'*->JOIN] }* ]
                 """,
-                table(sub(row(acts(rec(BW.unbounded())),
+                table(subtable(row(acts(rec(BW.unbounded())),
                         subrow(cell(ATTR),
                                 cell(val(join(ROW.and(tag("1")).unbounded())).tagged("1")),
                                 cell(val(join(ROW.and(tag("2")).unbounded())).tagged("2")))
@@ -238,7 +238,7 @@ class DslSpikeTest {
                 [ [BLANK]+           [VAL#'H']+ ]+
                 [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: (COL&#'H'*, ROW&#'S'*)->REC]+ ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(blank()).oneOrMore(), cell(val().tagged("H")).oneOrMore()).oneOrMore(),
                         row(cell(notRe("\\d+"), val().tagged("S")).oneOrMore(),
                                 cell(re("\\d+"), VAL,
@@ -254,7 +254,7 @@ class DslSpikeTest {
                 [ [BLANK]+       [VAL#'H': BW&#'H'*->SUFFIX('/')]+ ]+
                 [ [!'\\d+'? VAL#'S': RT&#'S'*->SUFFIX('/')]+ ['\\d+'? VAL: (COL, ROW)->REC]+ ]+
                 """,
-                table(sub(
+                table(subtable(
                         row(cell(blank()).oneOrMore(),
                                 cell(val(suffix("/", BW.and(tag("H")).unbounded())).tagged("H")).oneOrMore())
                                 .oneOrMore(),
@@ -270,7 +270,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ COL->AVP [VAL: (RT*, @'D'='d')->REC][VAL]{2} ]+
                 """,
-                table(sub(row(acts(avp(COL)),
+                table(subtable(row(acts(avp(COL)),
                         cell(VAL, rec(RT.unbounded(), ctxAvp("D", "d"))),
                         cell(VAL).exactly(2)).oneOrMore())));
     }
@@ -289,13 +289,13 @@ class DslSpikeTest {
                 }+
                 """,
                 table(
-                        sub(row(cell(blank()).oneOrMore(),
+                        subtable(row(cell(blank()).oneOrMore(),
                                 cell(notBlank(), val().tagged("H")),
                                 cell(when(blank(),
                                         val(fill(LT.and(itemNotBlank()).reversed())).tagged("H"),
                                         val().tagged("H"))).oneOrMore())
                                 .oneOrMore()),
-                        sub(
+                        subtable(
                                 row(cell(re("\\D.*"), val().tagged("S")).oneOrMore(), v.oneOrMore()),
                                 row(cell(blank(), val(fill(SC)).tagged("S")).oneOrMore(),
                                         cell(re("\\D.*"), val().tagged("S")).oneOrMore(),
@@ -327,7 +327,7 @@ class DslSpikeTest {
                 }+
                 """,
                 table(
-                        sub(row(skip().oneOrMore()),
+                        subtable(row(skip().oneOrMore()),
                                 row(skip(), cell(VAL, avp("TERRITORY")).oneOrMore()),
                                 row(cell(AUX).oneOrMore()),
                                 row(acts(avp("LOCATION")),
@@ -335,7 +335,7 @@ class DslSpikeTest {
                                                 cell(VAL), v1, cell(VAL),
                                                 v1, cell(VAL), skip()),
                                         subrow(cell(VAL), v1, cell(VAL), skip()).zeroOrOne())),
-                        sub(
+                        subtable(
                                 row(cell(val(avp("INDICATOR")).tagged("IND")
                                         .then(",", val(avp("UNIT")))).oneOrMore()),
                                 row(subrow(cell(re("20\\d\\d"), VAL, avp("YEAR"))),
@@ -351,7 +351,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL : (SR&#'t1'|#'t2')*->REC] [VAL] ]+
                 """,
-                table(sub(row(
+                table(subtable(row(
                         cell(VAL, rec(SR.and(tag("t1")).or(tag("t2")).unbounded())),
                         cell(VAL)).oneOrMore())));
     }
@@ -362,7 +362,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [VAL : (SR&(#'a'|#'b'))*->REC] [VAL] ]+
                 """,
-                table(sub(row(
+                table(subtable(row(
                         cell(VAL, rec(SR.and(tag("a").or(tag("b"))).unbounded())),
                         cell(VAL)).oneOrMore())));
     }
@@ -373,7 +373,7 @@ class DslSpikeTest {
         assertMirrors("""
                 <NORM> [ [VAL : SR->REC] [VAL] ]+
                 """,
-                table(sub(row(cell(VAL, rec(SR)), cell(VAL)).oneOrMore()))
+                table(subtable(row(cell(VAL, rec(SR)), cell(VAL)).oneOrMore()))
                         .withTransformations(norm()));
     }
 
@@ -383,7 +383,7 @@ class DslSpikeTest {
         assertMirrors("""
                 [ [RT*->REC BLANK ? _ | VAL] [VAL] ]+
                 """,
-                table(sub(row(
+                table(subtable(row(
                         cell(acts(rec(RT.unbounded())), when(blank(), SKIP, VAL)),
                         cell(VAL)).oneOrMore())));
     }
@@ -395,14 +395,14 @@ class DslSpikeTest {
                 !BLANK ? BW*->REC [ [VAL] ]+
                 """,
                 table(notBlank(), acts(rec(BW.unbounded())),
-                        sub(row(cell(VAL)).oneOrMore())));
+                        subtable(row(cell(VAL)).oneOrMore())));
     }
 
     @Test
     @DisplayName("Escape hatch: .where() on a provider builds a Custom filter term")
     void escapeHatch() {
         // No RTL equivalent by design — just verify it builds a valid pattern.
-        TablePattern p = table(sub(row(
+        TablePattern p = table(subtable(row(
                 cell(VAL, rec(ROW.where("isNum", (a, c) -> c.str().matches("\\d+")).unbounded())),
                 cell(VAL).oneOrMore())));
         assertEquals(1, p.subtablePatterns().size());

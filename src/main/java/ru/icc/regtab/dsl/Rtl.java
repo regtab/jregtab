@@ -36,7 +36,7 @@ import java.util.function.Predicate;
  * // RTL:  { [ [VAL : ST*->REC] [VAL]{2} []+ ]
  * //         [ []               [VAL]{4} []+ ] }+
  * TablePattern p = table(
- *     sub( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
+ *     subtable( row( cell(VAL, rec(ST.unbounded())), cell(VAL).exactly(2), skip().oneOrMore() ),
  *          row( skip(),                         cell(VAL).exactly(4), skip().oneOrMore() )
  *     ).oneOrMore());
  * }</pre>
@@ -145,22 +145,22 @@ public final class Rtl {
     }
 
     /** Subtable pattern (RTL {@code { rows }}); quantify with postfix methods. */
-    public static SubtablePattern sub(RowPattern... rows) {
+    public static SubtablePattern subtable(RowPattern... rows) {
         return new SubtablePattern(null, Quantifier.one(), List.of(rows));
     }
 
     /** Subtable pattern with subtable-level inherited actions. */
-    public static SubtablePattern sub(Acts acts, RowPattern... rows) {
+    public static SubtablePattern subtable(Acts acts, RowPattern... rows) {
         return new SubtablePattern(null, Quantifier.one(), mergeDownRows(List.of(rows), acts.marked()));
     }
 
     /** Subtable pattern with a subtable-level condition (RTL {@code { cond ? rows }}). */
-    public static SubtablePattern sub(CellPredicate condition, RowPattern... rows) {
+    public static SubtablePattern subtable(CellPredicate condition, RowPattern... rows) {
         return new SubtablePattern(new CellMatchCondition(condition), Quantifier.one(), List.of(rows));
     }
 
     /** Subtable pattern with a subtable-level condition and inherited actions. */
-    public static SubtablePattern sub(CellPredicate condition, Acts acts, RowPattern... rows) {
+    public static SubtablePattern subtable(CellPredicate condition, Acts acts, RowPattern... rows) {
         return new SubtablePattern(new CellMatchCondition(condition), Quantifier.one(),
                 mergeDownRows(List.of(rows), acts.marked()));
     }
