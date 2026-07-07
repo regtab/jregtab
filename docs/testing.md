@@ -157,3 +157,29 @@ The illustrative example from the paper has its own pair of tests:
 ```bash
 mvn test -Dtest="AtpIllustrativeExampleTest,RtlIllustrativeExampleTest"
 ```
+
+---
+
+## RTL conformance corpus
+
+The directory `conformance/` at the repository root is the normative test corpus of the
+RTL language (see `conformance/README.md` for the full contract). It contains:
+
+- `positive/<id>.rtl` + `<id>.expected.rtl` — every task's RTL string paired with its
+  canonical form `serialize(compile(rtl))`; any RTL implementation must reproduce the
+  canonical form byte-for-byte, and the canonical form must be a fixed point;
+- `negative/*.rtl` — inputs that must be rejected with a compile error, one per error
+  category (lexer, parser, fragments, `EXT` bindings, settings, conflicting inline params).
+
+Two test classes execute the contract in this repository:
+
+```bash
+mvn test -Dtest="RtlConformanceTest,ConformanceCorpusFreshnessTest"
+```
+
+`RtlConformanceTest` checks the contract itself; `ConformanceCorpusFreshnessTest`
+regenerates the positive corpus in memory from the task tests and fails if the committed
+files are stale (fix: rerun `ConformanceCorpusGenerator`, commit the diff).
+
+Both jobs run in CI (`.github/workflows/ci.yml`): `test` runs the full suite, the fast
+`conformance` job gives downstream RTL implementations (pyRegTab) a named status to pin.

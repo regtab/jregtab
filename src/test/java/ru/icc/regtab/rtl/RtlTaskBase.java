@@ -62,6 +62,16 @@ public abstract class RtlTaskBase {
         return RtlCompiler.compile(buildRtl());
     }
 
+    /** Task id (e.g. {@code "001"}) — public accessor for the conformance corpus tooling. */
+    public final String id() {
+        return taskId();
+    }
+
+    /** RTL source of this task — public accessor for the conformance corpus tooling. */
+    public final String rtl() {
+        return buildRtl();
+    }
+
     protected abstract String taskId();
 
     protected abstract String buildRtl();

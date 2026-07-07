@@ -281,17 +281,23 @@ public sealed interface FilterTerm permits
     }
 
     record Tagged(String tag) implements FilterTerm {
-        public String toRtl() { return tag; }
+        public String toRtl() { return quoted(tag); }
         public ItemFilterCondition toCondition() {
             return (a, c) -> c.hasTag(tag);
         }
     }
 
     record NotTagged(String tag) implements FilterTerm {
-        public String toRtl() { return "!" + tag; }
+        public String toRtl() { return "!" + quoted(tag); }
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.hasTag(tag);
         }
+    }
+
+    /** Tags are stored with the leading {@code #}; the RTL form is always quoted: {@code #'name'}. */
+    private static String quoted(String tag) {
+        String name = tag.startsWith("#") ? tag.substring(1) : tag;
+        return "#'" + name + "'";
     }
 
     record SameStr() implements FilterTerm {

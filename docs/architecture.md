@@ -103,7 +103,12 @@ flowchart TB
     D -->|"RtlCompiler (wraps transformations)"| E["TablePattern<br/>[+ List&lt;RecordsetTransformation&gt;]"]
 ```
 
-The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4`.
+The grammar lives at `src/main/antlr4/ru/icc/regtab/rtl/RTL.g4` and is the **normative
+specification of RTL**: alternative implementations (e.g. the pyRegTab hand-written
+parser) do not have to generate their parser from it, but must pass the shared
+[conformance corpus](testing.md#rtl-conformance-corpus) (`conformance/`), which pairs
+every benchmark RTL string with its canonical serialized form and lists inputs that
+must be rejected.
 
 Named fragment definitions (`$name=[body]`) in the RTL preamble are resolved during the
 `ATPBuilder` pass: each reference expands to a fresh pattern object (syntactic substitution).
