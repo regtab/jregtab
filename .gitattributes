@@ -1,0 +1,3 @@
+# RTL conformance corpus: the byte-exact contract (canonical forms compared
+# byte-for-byte, single trailing LF) requires LF in every checkout on every OS.
+conformance/** text eol=lf
