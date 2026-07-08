@@ -1,8 +1,9 @@
 # jRegTab
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/regtab/jregtab/actions/workflows/ci.yml/badge.svg)](https://github.com/regtab/jregtab/actions/workflows/ci.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/ru.icc.regtab/regtab.svg)](https://central.sonatype.com/artifact/ru.icc.regtab/regtab)
 [![Java](https://img.shields.io/badge/Java-21%2B-blue.svg)](https://www.oracle.com/java/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 **jRegTab** is an open-source Java library implementing **RegTab** — a method for pattern-driven data extraction from editable document tables with regular structure.
 
