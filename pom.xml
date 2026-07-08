@@ -39,6 +39,13 @@
         <maven.compiler.release>21</maven.compiler.release>
         <junit.version>5.11.4</junit.version>
         <regtab.target.dir>${project.basedir}/target</regtab.target.dir>
+        <!-- Central publishing: manual by default (a deployment lands as VALIDATED and
+             is published by hand on the portal — a safety gate, since a published version
+             is immutable). For a one-off automatic release, override on the command line:
+             pass -DautoPublish=true (and optionally -DautoPublish.waitUntil=published) via
+             the release plugin's -Darguments so it reaches the forked release:perform. -->
+        <autoPublish>false</autoPublish>
+        <autoPublish.waitUntil>VALIDATED</autoPublish.waitUntil>
     </properties>
 
     <dependencies>
@@ -192,7 +199,12 @@
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
-                            <autoPublish>false</autoPublish>
+                            <!-- Driven by properties so a single release can opt into
+                                 automatic publishing without editing the pom; defaults
+                                 (autoPublish=false / waitUntil=validated) preserve the
+                                 manual portal-confirmation workflow. -->
+                            <autoPublish>${autoPublish}</autoPublish>
+                            <waitUntil>${autoPublish.waitUntil}</waitUntil>
                         </configuration>
                     </plugin>
 
