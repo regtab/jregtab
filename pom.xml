@@ -48,6 +48,13 @@
             <version>4.13.2</version>
         </dependency>
         <dependency>
+            <!-- @Language("RTL") для IDE-инъекции; provided: не транзитивна, в рантайме не нужна -->
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "RTL in Java strings",
+  "scopeName": "inline.rtl-java",
+  "injectionSelector": "L:source.java -comment -string",
+  "patterns": [
+    { "include": "#compile-text-block" },
+    { "include": "#compile-string" },
+    { "include": "#marker-text-block" },
+    { "include": "#marker-string" }
+  ],
+  "repository": {
+    "compile-text-block": {
+      "comment": "RtlCompiler.compile(\"\"\" ... \"\"\") — opening triple quote on the same line as compile(",
+      "begin": "\\b(RtlCompiler)\\s*(\\.)\\s*(compile)\\s*(\\()\\s*(\"\"\")",
+      "beginCaptures": {
+        "1": { "name": "entity.name.type.class.java" },
+        "2": { "name": "punctuation.separator.period.java" },
+        "3": { "name": "entity.name.function.member.java" },
+        "4": { "name": "punctuation.definition.parameters.begin.bracket.round.java" },
+        "5": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"\"\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.block.rtl",
+      "patterns": [ { "include": "source.rtl" } ]
+    },
+    "compile-string": {
+      "comment": "RtlCompiler.compile(\"...\") — single-line string literal",
+      "begin": "\\b(RtlCompiler)\\s*(\\.)\\s*(compile)\\s*(\\()\\s*(\")",
+      "beginCaptures": {
+        "1": { "name": "entity.name.type.class.java" },
+        "2": { "name": "punctuation.separator.period.java" },
+        "3": { "name": "entity.name.function.member.java" },
+        "4": { "name": "punctuation.definition.parameters.begin.bracket.round.java" },
+        "5": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "(?<!\\\\)\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.line.rtl",
+      "patterns": [ { "include": "source.rtl" } ]
+    },
+    "marker-text-block": {
+      "comment": "/* language=RTL */ \"\"\" ... \"\"\" — explicit marker before a text block",
+      "begin": "(/\\*\\s*language=RTL\\s*\\*/)\\s*(\"\"\")",
+      "beginCaptures": {
+        "1": { "name": "comment.block.java" },
+        "2": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "\"\"\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.block.rtl",
+      "patterns": [ { "include": "source.rtl" } ]
+    },
+    "marker-string": {
+      "comment": "/* language=RTL */ \"...\" — explicit marker before a single-line literal",
+      "begin": "(/\\*\\s*language=RTL\\s*\\*/)\\s*(\")",
+      "beginCaptures": {
+        "1": { "name": "comment.block.java" },
+        "2": { "name": "punctuation.definition.string.begin.java" }
+      },
+      "end": "(?<!\\\\)\"",
+      "endCaptures": {
+        "0": { "name": "punctuation.definition.string.end.java" }
+      },
+      "contentName": "meta.embedded.line.rtl",
+      "patterns": [ { "include": "source.rtl" } ]
+    }
+  }
+}

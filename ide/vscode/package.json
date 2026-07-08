@@ -1,0 +1,45 @@
+{
+  "name": "rtl-language",
+  "displayName": "RTL (Regular Table Language)",
+  "description": "Syntax highlighting for RTL — the Regular Table Language of the RegTab project — in .rtl files and inside Java string literals passed to RtlCompiler.compile(...).",
+  "version": "0.1.0",
+  "publisher": "regtab",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regtab/jregtab.git",
+    "directory": "ide/vscode"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "rtl",
+        "aliases": ["RTL", "Regular Table Language"],
+        "extensions": [".rtl"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rtl",
+        "scopeName": "source.rtl",
+        "path": "./syntaxes/rtl.tmLanguage.json"
+      },
+      {
+        "scopeName": "inline.rtl-java",
+        "path": "./syntaxes/rtl-java-injection.tmLanguage.json",
+        "injectTo": ["source.java"],
+        "embeddedLanguages": {
+          "meta.embedded.block.rtl": "rtl",
+          "meta.embedded.line.rtl": "rtl"
+        }
+      }
+    ]
+  }
+}

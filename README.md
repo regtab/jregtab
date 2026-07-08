@@ -95,6 +95,7 @@ The full documentation site is published at <https://regtab.github.io/jregtab/>.
 - [ATP](docs/model/atp.md) — pattern hierarchy, content specs, action specs, matching
 - [RTL reference](docs/rtl-reference.md) — complete RTL syntax with tables and examples
 - [Embedded RTL](docs/embedded-rtl.md) — Java DSL mirroring RTL syntax, with escape hatches into Java
+- [IDE support](docs/ide-support.md) — syntax highlighting (VS Code, IntelliJ), `@RtlSource`, compile-time validation of RTL literals
 - [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
 - [Architecture](docs/architecture.md) — package map, data flow, RTL compilation pipeline
 - [API reference](docs/api.md) — public classes, factories, and methods (full Javadoc on [javadoc.io](https://javadoc.io/doc/ru.icc.regtab/regtab))

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- IDE support for RTL (`ide/`): TextMate grammar and a VS Code extension highlighting `.rtl` files and RTL inside Java string literals (`RtlCompiler.compile(...)`, `/* language=RTL */` marker); the same directory imports into IntelliJ as a TextMate bundle
+- `@Language("RTL")` on `RtlCompiler.compile(...)` parameters and the new `@RtlSource` annotation (`ru.icc.regtab.rtl`) for IDE language injection (`org.jetbrains:annotations`, provided scope)
+- `RtlSourceProcessor` — annotation processor validating `@RtlSource`-annotated `String` constants at `javac` time; invalid RTL literals become Java compilation errors (documented in `docs/ide-support.md`)
+
 ## [0.3.0] - 2026-07-07
 
 ### Changed

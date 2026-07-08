@@ -1,6 +1,7 @@
 package ru.icc.regtab.rtl;
 
 import org.antlr.v4.runtime.BaseErrorListener;
+import org.intellij.lang.annotations.Language;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
@@ -38,7 +39,7 @@ public final class RtlCompiler {
      * @return compiled table pattern
      * @throws RtlCompileException if the string cannot be parsed or compiled
      */
-    public static TablePattern compile(String rtl) {
+    public static TablePattern compile(@Language("RTL") String rtl) {
         return compile(rtl, Bindings.of());
     }
 
@@ -52,7 +53,7 @@ public final class RtlCompiler {
      * @throws RtlCompileException if the string cannot be parsed or compiled, or if it
      *                             references an {@code EXT} name absent from {@code bindings}
      */
-    public static TablePattern compile(String rtl, Bindings bindings) {
+    public static TablePattern compile(@Language("RTL") String rtl, Bindings bindings) {
         var lexer  = new RTLLexer(CharStreams.fromString(rtl));
         var tokens = new CommonTokenStream(lexer);
         var parser = new RTLParser(tokens);

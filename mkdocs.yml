@@ -54,6 +54,7 @@ nav:
       - ATP (Abstract Table Pattern): model/atp.md
   - RTL reference: rtl-reference.md
   - Embedded RTL: embedded-rtl.md
+  - IDE support: ide-support.md
   - Examples: examples.md
   - Architecture: architecture.md
   - API reference: api.md
