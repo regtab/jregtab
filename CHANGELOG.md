@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-07-10
+
+### Fixed
+- Clean build failure: `maven-compiler-plugin` no longer runs implicit annotation processing on this module's own sources, which previously failed a from-scratch build (e.g. on CI) because the self-registered `RtlSourceProcessor` was not yet compiled when the compiler tried to load it
+
+### Changed
+- Bumped `jackson-databind` (test scope) to 2.18.9, addressing known CVEs in that version range
+- Central Publishing Portal auto-publish is now opt-in per release via Maven properties, without editing `pom.xml`; manual portal confirmation remains the default
+
 ## [0.4.0] - 2026-07-08
 
 ### Added
