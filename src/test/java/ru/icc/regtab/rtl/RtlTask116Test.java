@@ -47,7 +47,7 @@ public class RtlTask116Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 $V1=[VAL: -AV->PREFIX(', ')]
                 $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
                 [ []+ ]

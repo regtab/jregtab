@@ -19,6 +19,6 @@ public class RtlTask104Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return "[ [VAL: RT*->SUFFIX(' '), ()->REC] [AUX]+ ]+";
+        return /* language=RTL */ "[ [VAL: RT*->SUFFIX(' '), ()->REC] [AUX]+ ]+";
     }
 }

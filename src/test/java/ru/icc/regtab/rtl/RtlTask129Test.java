@@ -21,7 +21,7 @@ public class RtlTask129Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [] [] [VAL=SUBSTR(0,4): 'YEAR'->AVP]+ ]
                 [ [] [VAL: 'HYDROBIONT_GROUP'->AVP ',' VAL=TRIM: 'UNIT'->AVP]
                   ['\\s*-\\s*' ? _ | VAL: 'MIN'->AVP '-' VAL: 'MAX'->AVP '\\n' 

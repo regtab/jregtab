@@ -22,7 +22,7 @@ public class RtlTask049Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [] [!BLANK? VAL]+ ]
                 [ [!BLANK? VAL] [!BLANK? VAL : (SR, SC)->REC(2)]+ ]+
                 """;

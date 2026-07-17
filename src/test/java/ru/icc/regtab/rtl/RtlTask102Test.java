@@ -21,7 +21,7 @@ public class RtlTask102Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [ATTR] []+ ]
                 { [ [!BLANK? VAL: COL->AVP, ST*->REC] { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]
                   [ [BLANK]                          { [BLANK ? _ | ATTR] [BLANK ? _ | VAL: SR->AVP] }+ ]+ }+

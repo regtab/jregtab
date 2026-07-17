@@ -20,7 +20,7 @@ public class RtlTask141Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [] [VAL : 'ZONE'->AVP, COL*->REC]+ ]
                 [ [ATTR=UC] [VAL : ROW->AVP]+ ]+
                 """;

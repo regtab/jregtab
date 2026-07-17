@@ -26,7 +26,7 @@ public class RtlTask040Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 { [ [~'Reported crime in'? VAL = REPL('Reported crime in', '').TRIM : ''->AVP, ST&C1*->REC] [] ]
                   [ []{2} ]
                   [ [ATTR] [VAL : SR->AVP] ]{5}

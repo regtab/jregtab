@@ -21,7 +21,7 @@ public class RtlTask095Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 { CL->AVP
                   [ [ATTR '=' VAL: BW*->REC]+ ]
                   [ [ATTR '=' VAL]+ ]{2} }+

@@ -22,7 +22,7 @@ public class RtlTask118Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ []{2} [VAL: 'LOCATION'->AVP]+ ]
                 [ []+ ]
                 [ [~'\\n' ? VAL: 'INDICATOR'->AVP '\\n' VAL: 'OBSERVATION'->AVP | VAL: 'INDICATOR'->AVP]

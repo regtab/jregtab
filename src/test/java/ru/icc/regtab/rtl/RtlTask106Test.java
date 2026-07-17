@@ -18,7 +18,7 @@ public class RtlTask106Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [] [VAL: 'MON'->AVP]+ ]
                 [ [VAL: 'INDICATOR'->AVP ',' VAL=TRIM: 'UNIT'->AVP] 
                   [VAL: 'MIN'->AVP, (CL*,ROW{2},COL)->REC '-' VAL: 'MAX'->AVP '/' VAL: 'AVE'->AVP]+ ]+

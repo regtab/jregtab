@@ -22,7 +22,7 @@ public class RtlTask051Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
                   [VAL : (COL, ROW, CL)->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+

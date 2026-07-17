@@ -18,7 +18,7 @@ public class RtlTask109Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [VAL: ROW&#'ODD'*->REC] [VAL: ROW&#'EVEN'*->REC] { [VAL#'ODD'] [VAL#'EVEN'] }+ ]+
                 """;
     }

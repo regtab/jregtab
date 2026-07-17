@@ -20,7 +20,7 @@ public class RtlTask020Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ [VAL : ST*->REC] [VAL] ] [ [VAL]{2} ]+
                 """;
     }

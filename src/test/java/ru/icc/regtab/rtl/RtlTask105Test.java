@@ -18,7 +18,7 @@ public class RtlTask105Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 '\\d+' ?
                 [ [VAL: NCL*->REC] [VAL]+ ]
                 [ [VAL]+ ]+

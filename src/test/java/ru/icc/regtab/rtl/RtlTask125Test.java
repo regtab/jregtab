@@ -19,7 +19,7 @@ public class RtlTask125Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ []{2} [VAL: 'MONTH'->AVP]+ ]
                 [ [] [VAL: 'INDICATOR'->AVP]
                   ['\\s*-?\\s*' ? _ | VAL: 'AVE'->AVP, (ROW&C1,COL)->REC]+ ]+

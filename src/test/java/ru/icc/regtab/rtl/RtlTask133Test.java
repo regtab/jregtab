@@ -21,7 +21,7 @@ public class RtlTask133Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                   [ [] [VAL : 'YEAR'->AVP]+ ]
                 { [ [VAL : 'LOCATION'->AVP] []+ ]
                   [ [VAL : 'INDICATOR'->AVP] [!BLANK ? VAL : 'DATA'->AVP, (ROW,COL,ST)->REC]+ ]+ }+

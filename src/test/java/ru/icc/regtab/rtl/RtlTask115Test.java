@@ -23,7 +23,7 @@ public class RtlTask115Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 [ []+ ]
                 [ []{7} [VAL: 'POLLUTANT'->AVP]+ ]
                 { [ [VAL: 'ORGANIZATION'->AVP ',' VAL=TRIM: 'LOCATION'->AVP]

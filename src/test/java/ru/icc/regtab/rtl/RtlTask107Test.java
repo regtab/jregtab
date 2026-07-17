@@ -23,7 +23,7 @@ public class RtlTask107Test extends RtlTaskBase {
 
     @Override
     protected String buildRtl() {
-        return """
+        return /* language=RTL */ """
                 $V=['\\d+' ? VAL: (COL&#'H'*,ROW&#'S'*)->REC]
                 [ [BLANK]+ [!BLANK ? VAL#'H'] [BLANK ? VAL#'H': -LT&!BLANK->FILL | VAL#'H']+ ]+
                 {
