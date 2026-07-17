@@ -38,7 +38,7 @@ public final class ConformanceCorpus {
      * the freshness test guards the generated files against drift.
      */
     private static final Map<String, String> EXTRA_SOURCES = Map.of(
-            "illustrative", """
+            "illustrative", /* language=RTL */ """
                     [ [] [VAL: 'AIRLINE'->AVP]+ ]
                     [ [VAL: 'AIRPORT'->AVP] [VAL: (COL,ROW,CL)->REC, 'ND'->AVP ' ' VAL: 'MON'->AVP]+ ]+
                     """

@@ -25,7 +25,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("001: explicit subtable, unbounded REC, exact and one-or-more quantifiers")
     void task001() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 { [ [VAL : ST*->REC] [VAL]{2} []+ ]
                 [ [] [VAL]{4} []+ ] }+
                 """,
@@ -39,7 +39,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("002: NORM extractor, guard, provider cardinality, REC(n), optional row")
     void task002() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 { [ [VAL=NORM] [] ]{2}
                   [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
                   [ [BLANK] [] ]? }+
@@ -55,7 +55,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("006: conditional content spec BLANK ? _ | VAL")
     void task006() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 { [ [VAL : ST*->REC] [BLANK ? _ | VAL]+ ]
                   [ [BLANK ? _ | VAL]+ ]{4} }+
                 """,
@@ -69,7 +69,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("015: compound cell with three delimited segments and REC(1)")
     void task015() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1) ' ' VAL : CL->REC(1)] ]+
                 """,
                 table(subtable(
@@ -83,7 +83,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("016: REC + JOIN(0) with bare conjunction BW&STR*")
     void task016() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL : RT->REC, BW&STR*->JOIN(0)] [VAL] ]+
                 """,
                 table(subtable(
@@ -94,7 +94,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("022: column-major traversal, absolute column range ^ST&C2..5*")
     void task022() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 { [ [VAL : ^ST&C2..5*->REC] [] [VAL]+ ] [ []{2} [VAL]+ ] }+
                 """,
                 table(
@@ -108,7 +108,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("023: empty context AVP, SUFFIX, AUX, provider-based AVP")
     void task023() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 { [ [VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [ATTR : RT->SUFFIX] [AUX] [VAL : SR->AVP] ]{3} }+
                 """,
                 table(
@@ -124,7 +124,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("045: guards and a delimited cell (VAL : SR&C0->REC(1)){','}")
     void task045() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
                 """,
                 table(subtable(
@@ -136,7 +136,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("052: compound with context providers 'ND'->AVP and @'YEAR'='2025'")
     void task052() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [] [VAL : 'AIRLINE'->AVP]+ ]
                 [ [VAL : 'AIRPORT'->AVP]
                   [VAL : (COL, ROW, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
@@ -153,7 +153,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("068: tags on atoms and in provider constraints COL&#'HEAD'*")
     void task068() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [BLANK] [VAL #'HEAD']+ ]+
                 [ [!BLANK? VAL] [VAL: (COL&#'HEAD'*, ROW)->REC]+ ]+
                 """,
@@ -167,7 +167,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("009: REPL extractor, explicit subrow, conditional with actions in a branch")
     void task009() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [] [VAL = REPL('\\s+', '')]{5} ]
                 [ { [VAL] [BLANK? _ | VAL : (SR, SC)->REC(2)]+ } ]+
                 """,
@@ -181,7 +181,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("013: AVP per column plus REC with explicitly ordered SR&Cn providers")
     void task013() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [ATTR]{5} []+ ]
                 [ [VAL : SC->AVP, (SR&C2, SR&C4, SR&C1, SR&C3)->REC] [VAL : SC->AVP]{4} []+ ]+
                 """,
@@ -195,7 +195,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("025: SUFFIX('/'), REC('/') split, relative open column range C+2..*")
     void task025() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
                 """,
                 table(subtable(row(
@@ -208,7 +208,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("029: implicit + explicit subrows mixed in one row, ROW{6} provider")
     void task029() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL]{6} { [VAL : (ROW{6}, RT*)->REC(6)] [VAL]{3} }+ ]+
                 """,
                 table(subtable(row(
@@ -221,7 +221,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("069: row-level inherited REC merged down into subrow atoms")
     void task069() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->JOIN][VAL#'2': ROW&#'2'*->JOIN] }* ]
                 """,
                 table(subtable(row(acts(rec(BW.unbounded())),
@@ -234,7 +234,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("070: regex guards with tags on atoms and in constraints")
     void task070() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [BLANK]+           [VAL#'H']+ ]+
                 [ [!'\\d+'? VAL#'S']+ ['\\d+'? VAL: (COL&#'H'*, ROW&#'S'*)->REC]+ ]+
                 """,
@@ -250,7 +250,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("071: SUFFIX('/') on tagged atoms in both header and stub rows")
     void task071() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [BLANK]+       [VAL#'H': BW&#'H'*->SUFFIX('/')]+ ]+
                 [ [!'\\d+'? VAL#'S': RT&#'S'*->SUFFIX('/')]+ ['\\d+'? VAL: (COL, ROW)->REC]+ ]+
                 """,
@@ -267,7 +267,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("074: row-level inherited COL->AVP plus @'D'='d' context pair")
     void task074() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ COL->AVP [VAL: (RT*, @'D'='d')->REC][VAL]{2} ]+
                 """,
                 table(subtable(row(acts(avp(COL)),
@@ -280,7 +280,7 @@ class DslSpikeTest {
     void task107() {
         var v = cell(re("\\d+"), VAL,
                 rec(COL.and(tag("H")).unbounded(), ROW.and(tag("S")).unbounded()));
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 $V=['\\d+' ? VAL: (COL&#'H'*,ROW&#'S'*)->REC]
                 [ [BLANK]+ [!BLANK ? VAL#'H'] [BLANK ? VAL#'H': -LT&!BLANK->FILL | VAL#'H']+ ]+
                 {
@@ -309,7 +309,7 @@ class DslSpikeTest {
         var v1 = cell(VAL, prefix(", ", AV.reversed()));
         var v2 = cell(VAL, avp("VALUE"),
                 rec(ROW, COL.and(R(1, 3)).unbounded(), AV.and(tag("IND")).reversed()));
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 $V1=[VAL: -AV->PREFIX(', ')]
                 $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
                 [ []+ ]
@@ -348,7 +348,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("Ad-hoc: OR disjunction with & precedence (SR&#'t1'|#'t2')")
     void adhocOrDisjunction() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL : (SR&#'t1'|#'t2')*->REC] [VAL] ]+
                 """,
                 table(subtable(row(
@@ -359,7 +359,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("Ad-hoc: distributed OR — A&(B|C) → (A&B)|(A&C)")
     void adhocDistributedOr() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [VAL : (SR&(#'a'|#'b'))*->REC] [VAL] ]+
                 """,
                 table(subtable(row(
@@ -370,7 +370,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("Ad-hoc: settings prefix <NORM> maps to withTransformations(norm())")
     void adhocSettings() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 <NORM> [ [VAL : SR->REC] [VAL] ]+
                 """,
                 table(subtable(row(cell(VAL, rec(SR)), cell(VAL)).oneOrMore()))
@@ -380,7 +380,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("Ad-hoc: cell-level actions before a bare conditional spec")
     void adhocCellLevelActs() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 [ [RT*->REC BLANK ? _ | VAL] [VAL] ]+
                 """,
                 table(subtable(row(
@@ -391,7 +391,7 @@ class DslSpikeTest {
     @Test
     @DisplayName("Ad-hoc: table-level condition and table-level inherited actions")
     void adhocTableLevel() {
-        assertMirrors("""
+        assertMirrors(/* language=RTL */ """
                 !BLANK ? BW*->REC [ [VAL] ]+
                 """,
                 table(notBlank(), acts(rec(BW.unbounded())),
