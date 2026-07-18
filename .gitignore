@@ -40,8 +40,12 @@ docs/PUBLISHING.md
 .settings/
 bin/
 
-# VS Code
-.vscode/
+# VS Code — track shared project config, ignore user-specific files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # NetBeans
 nbproject/
