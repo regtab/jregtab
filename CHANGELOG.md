@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-07-19
+
+### Changed
+- Docs: added a Pygments lexer (`rtl-lexer/`) for RTL code blocks, used by the docs site's syntax highlighting
+- Docs: replaced em-dash annotations with `//` RTL comments in `docs/rtl-reference.md` code snippets so they are valid, correctly highlighted RTL
+- Docs: VS Code install instructions now point at the dedicated [regtab/vscode-rtl](https://github.com/regtab/vscode-rtl) extension (VSIX releases with a bundled `rtl-lsp` language server) instead of copying `ide/vscode` manually
+
 ## [0.4.1] - 2026-07-10
 
 ### Fixed

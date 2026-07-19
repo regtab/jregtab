@@ -78,14 +78,14 @@ ND | AIRLINE | AIRPORT | MON
     <dependency>
         <groupId>ru.icc.regtab</groupId>
         <artifactId>regtab</artifactId>
-        <version>0.4.1</version>
+        <version>0.4.2</version>
     </dependency>
     ```
 
 === "Gradle"
 
     ```groovy
-    implementation 'ru.icc.regtab:regtab:0.4.1'
+    implementation 'ru.icc.regtab:regtab:0.4.2'
     ```
 
 Requires **Java 21+**.
@@ -123,4 +123,4 @@ Requires **Java 21+**.
 ---
 
 !!! note "Status"
-    Current release: **0.4.1** · License: **MIT** · [Maven Central](https://central.sonatype.com/artifact/ru.icc.regtab/regtab) · [GitHub](https://github.com/regtab/jregtab)
+    Current release: **0.4.2** · License: **MIT** · [Maven Central](https://central.sonatype.com/artifact/ru.icc.regtab/regtab) · [GitHub](https://github.com/regtab/jregtab)
