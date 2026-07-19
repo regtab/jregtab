@@ -12,26 +12,31 @@ by default. jregtab ships three layers of tooling that improve this:
 
 ## Syntax highlighting
 
-The grammar lives in the repository under [`ide/`](https://github.com/regtab/jregtab/tree/main/ide):
-`ide/vscode/` is simultaneously a VS Code extension and an IntelliJ TextMate bundle.
+For VS Code there is a dedicated extension, [regtab/vscode-rtl](https://github.com/regtab/vscode-rtl).
+The TextMate grammar also lives in this repository under
+[`ide/`](https://github.com/regtab/jregtab/tree/main/ide): `ide/vscode/` serves as an
+IntelliJ TextMate bundle (and works in any TextMate-compatible editor).
 
 ### VS Code
 
-Copy the extension into your extensions directory and reload:
+Install the [RegTab RTL extension](https://github.com/regtab/vscode-rtl). Until the
+Marketplace listing is live, install it from a VSIX: download the package for your platform
+from [Releases](https://github.com/regtab/vscode-rtl/releases) (the `universal` build ships
+highlighting and snippets only, without the bundled language server), then:
 
 ```bash
-# Linux / macOS
-cp -r ide/vscode ~/.vscode/extensions/regtab.rtl-language-0.1.0
+code --install-extension regtab-rtl-<version>-<platform>.vsix
 ```
 
-```bat
-:: Windows
-xcopy /E /I ide\vscode %USERPROFILE%\.vscode\extensions\regtab.rtl-language-0.1.0
-```
+or via the UI: *Extensions panel → ⋯ menu → Install from VSIX…* → pick the file, then reload
+the window. A VSIX installed this way does not auto-update — install a newer VSIX over it to
+upgrade (settings and state are kept).
 
-(Or package a proper `.vsix` with `npx @vscode/vsce package` inside `ide/vscode`.)
+Beyond highlighting, the extension bundles a native language server (`rtl-lsp`): compile
+diagnostics, live match preview against CSV fixtures, expected-result diffing, fragment
+navigation, completion, and code snippets.
 
-This highlights `*.rtl` files and RTL inside Java strings in these forms:
+The extension highlights `*.rtl` files and RTL inside Java strings in these forms:
 
 ```java
 TablePattern p = RtlCompiler.compile("""

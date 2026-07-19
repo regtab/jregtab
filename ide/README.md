@@ -11,21 +11,16 @@ The same `vscode/` directory doubles as a TextMate bundle for IntelliJ-based IDE
 
 ## VS Code
 
-Copy (or symlink) the extension into your local extensions directory and reload:
+Use the dedicated extension [regtab/vscode-rtl](https://github.com/regtab/vscode-rtl) —
+download the VSIX for your platform from its
+[Releases](https://github.com/regtab/vscode-rtl/releases) and install via
+`code --install-extension <file>.vsix` or *Extensions → … → Install from VSIX*.
+Besides highlighting it bundles a native language server (`rtl-lsp`) with compile
+diagnostics, live match preview, and more.
 
-```
-# Windows
-xcopy /E /I ide\vscode %USERPROFILE%\.vscode\extensions\regtab.rtl-language-0.1.0
-
-# Linux / macOS
-cp -r ide/vscode ~/.vscode/extensions/regtab.rtl-language-0.1.0
-```
-
-Alternatively, package it properly with [vsce](https://github.com/microsoft/vscode-vsce):
-`cd ide/vscode && npx @vscode/vsce package`, then install the produced `.vsix` via
-*Extensions → … → Install from VSIX*.
-
-You get:
+The `vscode/` directory here remains a minimal highlighting-only bundle; you can still
+copy it into your extensions directory as a fallback
+(`cp -r ide/vscode ~/.vscode/extensions/regtab.rtl-language-0.1.0`), which gives you:
 
 - syntax highlighting for `*.rtl` files;
 - highlighting of RTL inside Java strings for these forms:
