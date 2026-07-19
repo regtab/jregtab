@@ -87,7 +87,7 @@ TablePattern pattern = TablePattern.of(
 
 ### RTL equivalent
 
-```
+```rtl
 [ [] [VAL : 'AIRLINE'->AVP]+ ]
 [ [VAL : 'AIRPORT'->AVP]
   [VAL : (COL, ROW, CL, @'YEAR'='2025')->REC, 'ND'->AVP " " VAL : 'MON'->AVP]+ ]+
@@ -210,7 +210,7 @@ TablePattern pattern = TablePattern.of(
 
 ### RTL equivalent
 
-```
+```rtl
 [ [] [AUX]+ ]
 [ [VAL : ROW*->REC, BW&STR->JOIN(0), 'ID'->AVP]
   {[ATTR : AV->PREFIX('_')] [VAL : SR->AVP]}+ ]+
@@ -334,7 +334,7 @@ TablePattern pattern = TablePattern.of(
 
 ### RTL equivalent
 
-```
+```rtl
 { [ [!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+ }+
 ```
 
@@ -387,7 +387,7 @@ definitions** eliminate the repetition. Fragments are declared in the RTL preamb
 Without fragments, `[VAL: -AV->PREFIX(', ')]` appears five times and
 `[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]` appears eight times.
 
-```
+```rtl
 $V1=[VAL: -AV->PREFIX(', ')]
 $V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
 [ []+ ]

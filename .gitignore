@@ -1,3 +1,7 @@
+# Python build artifacts (from `pip install ./rtl-lexer`)
+rtl-lexer/build/
+rtl-lexer/*.egg-info/
+
 # Maven build output
 target/
 
