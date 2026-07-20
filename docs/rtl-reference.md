@@ -82,7 +82,7 @@ cellPattern      : [ ] q?                               // skip cell
                  | [ cellPatternBody ] q?
 
 cellPatternBody  : cond ? [acts] contSpec   // guarded: ? required when contSpec follows
-                 | cond                    // condition-only: no ? (skip cell with guard)
+                 | cond                     // condition-only: no ? (skip cell with guard)
                  | [acts] contSpec          // unguarded (condContSpec bare form included)
 ```
 
@@ -255,7 +255,7 @@ Tags let a later provider find exactly the right items. In Task 107 header value
 `#H` (column headers) and `#S` (row headers) so that data cells can gather them:
 
 ```rtl
-[!BLANK ? VAL#'H']            // tag a column-header value
+[!BLANK ? VAL#'H']                // tag a column-header value
 VAL: (COL&#'H'*, ROW&#'S'*)->REC  // collect tagged headers into the record
 ```
 
@@ -273,7 +273,7 @@ VAL: (COL&#'H'*, ROW&#'S'*)->REC  // collect tagged headers into the record
 Extractors can be chained with `.`: `=REPL(" ","_").LC`. Real uses:
 
 ```rtl
-[VAL=NORM] [] ]{2}                 // normalise whitespace in header cells (Task 02)
+[VAL=NORM]                         // normalise whitespace in header cells (Task 02)
 [VAL=SUBSTR(0,4): 'YEAR'->AVP]+    // keep the first 4 chars as the year (Task 127)
 [VAL=TRIM: 'UNIT'->AVP]            // trim the unit token (Task 127)
 ```
