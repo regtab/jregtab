@@ -96,7 +96,7 @@ The full documentation site is published at <https://regtab.github.io/jregtab/>.
 - [ATP](docs/model/atp.md) — pattern hierarchy, content specs, action specs, matching
 - [RTL reference](docs/rtl-reference.md) — complete RTL syntax with tables and examples
 - [Embedded RTL](docs/embedded-rtl.md) — Java DSL mirroring RTL syntax, with escape hatches into Java
-- [IDE support](docs/ide-support.md) — the [Regular Table Language (RTL)](https://marketplace.visualstudio.com/items?itemName=regtab.regtab) VS Code extension (`ext install regtab.regtab`), IntelliJ highlighting, `@RtlSource`, compile-time validation of RTL literals
+- [IDE support](docs/ide-support.md) — IDE tooling for RTL: VS Code extension, IntelliJ highlighting, `@RtlSource`, compile-time validation
 - [Examples](docs/examples.md) — worked examples with ATP and RTL patterns side by side
 - [Architecture](docs/architecture.md) — package map, data flow, RTL compilation pipeline
 - [API reference](docs/api.md) — public classes, factories, and methods (full Javadoc on [javadoc.io](https://javadoc.io/doc/ru.icc.regtab/regtab))
@@ -140,6 +140,26 @@ mvn test         # compile and run the full test suite
 The library is evaluated on **150 benchmark tasks** (Foofah, RegTab, and Baikal collections),
 covering **1 500 test variants (750 ATP + 750 RTL)** with 100 % accuracy. See
 [Benchmark](docs/benchmark.md) and [Testing](docs/testing.md) for details.
+
+---
+
+## IDE support
+
+RTL patterns usually live inside Java string literals, which editors treat as plain text.
+Install **[Regular Table Language (RTL)](https://marketplace.visualstudio.com/items?itemName=regtab.regtab)**
+from the VS Code Marketplace (`ext install regtab.regtab`): syntax highlighting for `.rtl`
+files and for RTL embedded in Java strings passed to `RtlCompiler.compile(...)`, plus a native
+language server with compile diagnostics, live match preview against CSV fixtures, completion,
+and snippets. The extension sources are at
+[regtab/vscode-rtl](https://github.com/regtab/vscode-rtl); a TextMate bundle for IntelliJ IDEA
+and other TextMate editors is under [`ide/`](ide/README.md).
+
+In IntelliJ-based IDEs, both `RtlCompiler.compile(...)` overloads annotate their parameter with
+`@Language("RTL")`, and `@RtlSource` marks your own RTL string constants for injection. RTL is
+also validated at compile time: the `RtlSourceProcessor` annotation processor turns an invalid
+`@RtlSource` literal into a Java compilation error during `javac`.
+
+See [IDE support](docs/ide-support.md) for the full setup.
 
 ---
 
