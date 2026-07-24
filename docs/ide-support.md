@@ -19,18 +19,13 @@ IntelliJ TextMate bundle (and works in any TextMate-compatible editor).
 
 ### VS Code
 
-Install the [RegTab RTL extension](https://github.com/regtab/vscode-rtl). Until the
-Marketplace listing is live, install it from a VSIX: download the package for your platform
-from [Releases](https://github.com/regtab/vscode-rtl/releases) (the `universal` build ships
-highlighting and snippets only, without the bundled language server), then:
+Install **[Regular Table Language (RTL)](https://marketplace.visualstudio.com/items?itemName=regtab.regtab)**
+from the Marketplace — open the Extensions view (`Ctrl+Shift+X`), search for
+*Regular Table Language*, or run:
 
 ```bash
-code --install-extension regtab-rtl-<version>-<platform>.vsix
+ext install regtab.regtab
 ```
-
-or via the UI: *Extensions panel → ⋯ menu → Install from VSIX…* → pick the file, then reload
-the window. A VSIX installed this way does not auto-update — install a newer VSIX over it to
-upgrade (settings and state are kept).
 
 Beyond highlighting, the extension bundles a native language server (`rtl-lsp`): compile
 diagnostics, live match preview against CSV fixtures, expected-result diffing, fragment
