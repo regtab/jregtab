@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING (semantics)** — delimited content specification `(VAL){"δ"}` now passes tokens through verbatim: surrounding whitespace is preserved and empty tokens are no longer dropped, so `n` substrings always derive `n` items (`"a, b"` → `"a"`, `" b"`; `"a,,b"` → `"a"`, `""`, `"b"`). This aligns the implementation with `def:delimited-content-spec` (where `sₖ ∈ Σ*`) and with `pandas str.split`, and makes the delimited specification behave like the atomic and compound ones, which already receive their text raw. Trimming is now opt-in via the atom's string extractor. **Migration:** if you relied on the implicit trimming, add `=TRIM` (or `=NORM`) to the delimited atom — `(VAL){","}` → `(VAL=TRIM){","}`. Atomic and compound specifications are unaffected; RTL syntax, the grammar and ATP→RTL serialization do not change
+- Conformance corpus: new positive case `delim_raw` pinning both forms, and a normative “Semantics of S_delim” section in `conformance/README.md`
+
+### Added
+- Conformance corpus: executable **semantic** section (`conformance/semantic/<case>/` with `pattern.rtl`, `input.csv`, `expected.csv` and an optional `options.json`), run by `RtlSemanticConformanceTest` and added to the `conformance` CI job. Contract item 5: matching `pattern.rtl` against `input.csv` and interpreting the result must yield `expected.csv`. Items 1–4 pin syntax and canonical form only — two implementations can agree on the canonical RTL of a pattern and still execute it differently. Starter cases pin the S_delim rules: `delim_raw_tokens`, `delim_empty_tokens`, `delim_trim`, `compound_delim_raw`
+
 ## [0.4.2] - 2026-07-19
 
 ### Changed

@@ -110,6 +110,15 @@ public final class SemanticConstructor {
         }
     }
 
+    /**
+     * Delimited content (def:delimited-content-spec): the input text decomposes as
+     * s₁ · δ · s₂ · δ ⋯ δ · sₙ with sₖ ∈ Σ*, and S_atom is applied to each sₖ
+     * <em>verbatim</em>: substrings are never trimmed and empty substrings are never
+     * dropped, so n items are always derived from n substrings.
+     * <p>
+     * Whitespace removal is opt-in through the atom's string extractor ξ
+     * ({@code =TRIM}, {@code =NORM}), applied per token by {@link #processAtomic}.
+     */
     private static void processDelimited(
             DelimitedContentSpec delimSpec,
             Cell cell,
@@ -119,10 +128,7 @@ public final class SemanticConstructor {
 
         String[] parts = cell.text().split(java.util.regex.Pattern.quote(delimSpec.delimiter()), -1);
         for (int i = 0; i < parts.length; i++) {
-            String part = parts[i].trim();
-            if (!part.isEmpty()) {
-                processAtomic(delimSpec.atomicSpec(), cell, part, i, allItems, contextItems, actions);
-            }
+            processAtomic(delimSpec.atomicSpec(), cell, parts[i], i, allItems, contextItems, actions);
         }
     }
 
@@ -169,13 +175,11 @@ public final class SemanticConstructor {
                 processAtomic(a, cell, substring, itemIndex, allItems, contextItems, actions);
                 itemIndex++;
             } else if (segSpec instanceof DelimitedContentSpec d) {
+                // Same verbatim semantics as processDelimited: no trimming, empties kept.
                 String[] parts = substring.split(java.util.regex.Pattern.quote(d.delimiter()), -1);
                 for (String part : parts) {
-                    String trimmed = part.trim();
-                    if (!trimmed.isEmpty()) {
-                        processAtomic(d.atomicSpec(), cell, trimmed, itemIndex, allItems, contextItems, actions);
-                        itemIndex++;
-                    }
+                    processAtomic(d.atomicSpec(), cell, part, itemIndex, allItems, contextItems, actions);
+                    itemIndex++;
                 }
             }
             if (nextDelim != null && !nextDelim.isEmpty()) {

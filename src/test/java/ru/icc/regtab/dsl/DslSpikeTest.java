@@ -122,14 +122,14 @@ class DslSpikeTest {
     }
 
     @Test
-    @DisplayName("045: guards and a delimited cell (VAL : SR&C0->REC(1)){','}")
+    @DisplayName("045: guards and a delimited cell (VAL=TRIM : SR&C0->REC(1)){','}")
     void task045() {
         assertMirrors(/* language=RTL */ """
-                [ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
+                [ [!BLANK? VAL] [!BLANK? (VAL=TRIM : SR&C0->REC(1)){','}] ]+
                 """,
                 table(subtable(
                         row(cell(notBlank(), VAL),
-                                cell(notBlank(), val(rec(1, SR.and(C(0)))).splitBy(",")))
+                                cell(notBlank(), val(rec(1, SR.and(C(0)))).extract(TRIM).splitBy(",")))
                                 .oneOrMore())));
     }
 
