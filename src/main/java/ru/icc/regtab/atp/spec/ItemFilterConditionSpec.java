@@ -45,7 +45,14 @@ public sealed interface ItemFilterConditionSpec permits
             return "(" + terms.stream().map(FilterTerm::toRtl).collect(Collectors.joining(" & ")) + ")";
         }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> terms.stream().allMatch(t -> t.toCondition().test(a, c));
+            ItemFilterCondition[] conditions = terms.stream()
+                    .map(FilterTerm::toCondition).toArray(ItemFilterCondition[]::new);
+            return (a, c) -> {
+                for (ItemFilterCondition condition : conditions) {
+                    if (!condition.test(a, c)) return false;
+                }
+                return true;
+            };
         }
     }
 
@@ -58,7 +65,14 @@ public sealed interface ItemFilterConditionSpec permits
             return "(" + groups.stream().map(And::toRtl).collect(Collectors.joining(" | ")) + ")";
         }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> groups.stream().anyMatch(g -> g.toCondition().test(a, c));
+            ItemFilterCondition[] conditions = groups.stream()
+                    .map(And::toCondition).toArray(ItemFilterCondition[]::new);
+            return (a, c) -> {
+                for (ItemFilterCondition condition : conditions) {
+                    if (condition.test(a, c)) return true;
+                }
+                return false;
+            };
         }
     }
 

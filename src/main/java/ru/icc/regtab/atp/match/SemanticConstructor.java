@@ -13,8 +13,10 @@ import ru.icc.regtab.itm.syntax.Cell;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -34,10 +36,11 @@ public final class SemanticConstructor {
 
         var cellDerivedItems = new LinkedHashSet<CellDerivedItem>();
         var contextItemSet = new LinkedHashSet<>(contextItems);
+        var ctx = new Context(cellDerivedItems, contextItemSet);
         var actions = new ArrayList<InterpretationAction>();
 
         for (MatchedPair pair : matchedPairs) {
-            processMatchedPair(pair, cellDerivedItems, contextItemSet, actions);
+            processMatchedPair(pair, ctx, actions);
         }
 
         var semantics = new TableSemantics(cellDerivedItems, contextItemSet, actions);
@@ -51,8 +54,7 @@ public final class SemanticConstructor {
 
     private static void processMatchedPair(
             MatchedPair pair,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
+            Context ctx,
             List<InterpretationAction> actions) {
 
         CellPattern pattern = pair.pattern();
@@ -62,22 +64,21 @@ public final class SemanticConstructor {
             return;
         }
 
-        processContentSpec(cs, cell, allItems, contextItems, actions);
+        processContentSpec(cs, cell, ctx, actions);
     }
 
     private static void processContentSpec(
             ContentSpec cs,
             Cell cell,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
+            Context ctx,
             List<InterpretationAction> actions) {
         switch (cs) {
-            case AtomicContentSpec a -> processAtomic(a, cell, cell.text(), 0, allItems, contextItems, actions);
-            case DelimitedContentSpec d -> processDelimited(d, cell, allItems, contextItems, actions);
-            case CompoundContentSpec comp -> processCompound(comp, cell, allItems, contextItems, actions);
+            case AtomicContentSpec a -> processAtomic(a, cell, cell.text(), 0, ctx, actions);
+            case DelimitedContentSpec d -> processDelimited(d, cell, ctx, actions);
+            case CompoundContentSpec comp -> processCompound(comp, cell, ctx, actions);
             case ConditionalContentSpec cond -> {
                 ContentSpec branch = cond.condition().test(cell) ? cond.positive() : cond.negative();
-                processContentSpec(branch, cell, allItems, contextItems, actions);
+                processContentSpec(branch, cell, ctx, actions);
             }
         }
     }
@@ -87,8 +88,7 @@ public final class SemanticConstructor {
             Cell cell,
             String inputText,
             int itemIndex,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
+            Context ctx,
             List<InterpretationAction> actions) {
 
         if (atomicSpec.idd() == ItemDerivationDirective.SKIP) {
@@ -102,11 +102,10 @@ public final class SemanticConstructor {
 
         ItemType type = atomicSpec.idd().toItemType();
         var item = new CellDerivedItem(str, atomicSpec.tags(), itemIndex, cell, type);
-        allItems.add(item);
+        ctx.index.items().add(item);
 
         for (ActionSpec as : atomicSpec.actions()) {
-            var action = instantiateAction(item, as, allItems, contextItems);
-            actions.add(action);
+            actions.add(ctx.instantiateAction(item, as));
         }
     }
 
@@ -122,21 +121,19 @@ public final class SemanticConstructor {
     private static void processDelimited(
             DelimitedContentSpec delimSpec,
             Cell cell,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
+            Context ctx,
             List<InterpretationAction> actions) {
 
         String[] parts = cell.text().split(java.util.regex.Pattern.quote(delimSpec.delimiter()), -1);
         for (int i = 0; i < parts.length; i++) {
-            processAtomic(delimSpec.atomicSpec(), cell, parts[i], i, allItems, contextItems, actions);
+            processAtomic(delimSpec.atomicSpec(), cell, parts[i], i, ctx, actions);
         }
     }
 
     private static void processCompound(
             CompoundContentSpec compSpec,
             Cell cell,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
+            Context ctx,
             List<InterpretationAction> actions) {
 
         String text = cell.text();
@@ -172,13 +169,13 @@ public final class SemanticConstructor {
             String substring = text.substring(pos, endPos);
             ContentSpec segSpec = seg.spec();
             if (segSpec instanceof AtomicContentSpec a) {
-                processAtomic(a, cell, substring, itemIndex, allItems, contextItems, actions);
+                processAtomic(a, cell, substring, itemIndex, ctx, actions);
                 itemIndex++;
             } else if (segSpec instanceof DelimitedContentSpec d) {
                 // Same verbatim semantics as processDelimited: no trimming, empties kept.
                 String[] parts = substring.split(java.util.regex.Pattern.quote(d.delimiter()), -1);
                 for (String part : parts) {
-                    processAtomic(d.atomicSpec(), cell, part, itemIndex, allItems, contextItems, actions);
+                    processAtomic(d.atomicSpec(), cell, part, itemIndex, ctx, actions);
                     itemIndex++;
                 }
             }
@@ -188,68 +185,90 @@ public final class SemanticConstructor {
         }
     }
 
-    private static InterpretationAction instantiateAction(
-            CellDerivedItem anchor,
-            ActionSpec actionSpec,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems) {
+    /**
+     * Per-table construction context: the target set J with its shared spatial index, the context
+     * items, and caches of providers and operations. A {@link ProviderSpec} / {@link ActionSpec} is
+     * shared by every cell matched by the same cell pattern, and the runtime objects built from it
+     * are immutable and stateless (the index is shared), so one instance serves all those actions —
+     * this keeps the memory of the semantic layer linear in the number of cells with a small constant.
+     */
+    private static final class Context {
+        final CellDerivedItemIndex index;
+        final Set<ContextDerivedItem> contextItems;
+        private final Map<ProviderSpec, ItemProvider> strictProviders = new IdentityHashMap<>();
+        private final Map<ProviderSpec, ItemProvider> lenientProviders = new IdentityHashMap<>();
+        private final Map<ActionSpec, WorkingStateOperation> operations = new IdentityHashMap<>();
 
-        WorkingStateOperation operation = createOperation(actionSpec);
-        List<ItemProvider> providers = new ArrayList<>();
-        for (ProviderSpec ps : actionSpec.providers()) {
-            providers.add(toItemProvider(ps, allItems, contextItems, actionSpec.inherited()));
+        Context(Set<CellDerivedItem> cellDerivedItems, Set<ContextDerivedItem> contextItems) {
+            // One spatial index over J, shared by every cell-derived provider of this table.
+            this.index = new CellDerivedItemIndex(cellDerivedItems);
+            this.contextItems = contextItems;
         }
-        return new InterpretationAction(anchor, providers, operation);
-    }
 
-    private static ItemProvider toItemProvider(
-            ProviderSpec spec,
-            Set<CellDerivedItem> allItems,
-            Set<ContextDerivedItem> contextItems,
-            boolean lenient) {
-        if (spec.isContextLiteral()) {
-            if (spec.contextLiteral().constValue() != null) {
-                ContextDerivedItem item = new ContextDerivedItem(
-                        spec.contextLiteral().text(), ItemType.ATTRIBUTE,
-                        spec.contextLiteral().constValue());
-                return new ContextDerivedItemProvider(List.of(item), ContextDerivedProviderKind.UNRESTRICTED);
+        InterpretationAction instantiateAction(CellDerivedItem anchor, ActionSpec actionSpec) {
+            WorkingStateOperation operation = operations.computeIfAbsent(actionSpec, Context::createOperation);
+            Map<ProviderSpec, ItemProvider> cache = actionSpec.inherited() ? lenientProviders : strictProviders;
+            List<ItemProvider> providers = new ArrayList<>(actionSpec.providers().size());
+            for (ProviderSpec ps : actionSpec.providers()) {
+                if (ps.isContextLiteral() && ps.contextLiteral().constValue() != null) {
+                    // constant AVP provider: a fresh context item per action, as before
+                    providers.add(toItemProvider(ps, actionSpec.inherited()));
+                    continue;
+                }
+                ItemProvider provider = cache.get(ps);
+                if (provider == null) {
+                    provider = toItemProvider(ps, actionSpec.inherited());
+                    cache.put(ps, provider);
+                }
+                providers.add(provider);
             }
-            ContextDerivedItem item = getOrCreateContextItem(contextItems, spec.contextLiteral());
-            return new ContextDerivedItemProvider(List.of(item), spec.contextLiteral().kind());
+            return new InterpretationAction(anchor, providers, operation);
         }
-        return new CellDerivedItemProvider(
-                spec.filterCondition().toCondition(),
-                spec.traversalOrder(),
-                allItems,
-                spec.cardinality(),
-                spec.targetItemKind(),
-                true,     // excludeAnchorFromCandidates (same as 5-arg default)
-                lenient);
-    }
 
-    private static ContextDerivedItem getOrCreateContextItem(
-            Set<ContextDerivedItem> contextItems,
-            ProviderSpec.ContextLiteralSpec spec) {
-        for (ContextDerivedItem item : contextItems) {
-            if (item.str().equals(spec.text()) && item.type() == spec.type()) {
-                return item;
+        private ItemProvider toItemProvider(ProviderSpec spec, boolean lenient) {
+            if (spec.isContextLiteral()) {
+                if (spec.contextLiteral().constValue() != null) {
+                    ContextDerivedItem item = new ContextDerivedItem(
+                            spec.contextLiteral().text(), ItemType.ATTRIBUTE,
+                            spec.contextLiteral().constValue());
+                    return new ContextDerivedItemProvider(List.of(item), ContextDerivedProviderKind.UNRESTRICTED);
+                }
+                ContextDerivedItem item = getOrCreateContextItem(spec.contextLiteral());
+                return new ContextDerivedItemProvider(List.of(item), spec.contextLiteral().kind());
             }
+            return new CellDerivedItemProvider(
+                    new ItemFilter(spec.filterCondition().toCondition()),
+                    new ItemLinearization(spec.traversalOrder()),
+                    index,
+                    CandidateScopes.of(spec.filterCondition()),
+                    spec.cardinality(),
+                    spec.targetItemKind(),
+                    true,     // excludeAnchorFromCandidates (same as 5-arg default)
+                    lenient);
         }
-        ContextDerivedItem created = new ContextDerivedItem(spec.text(), spec.type());
-        contextItems.add(created);
-        return created;
-    }
 
-    private static WorkingStateOperation createOperation(ActionSpec as) {
-        String delim = as.delimiter() != null ? as.delimiter() : "";
-        return switch (as.operationType()) {
-            case FILL -> new FillOperation(delim);
-            case PREFIX -> new PrefixOperation(delim);
-            case SUFFIX -> new SuffixOperation(delim);
-            case AVP -> new AvpOperation();
-            case REC -> new RecOperation();
-            case JOIN -> new JoinOperation(as.keyPositions());
-        };
+        private ContextDerivedItem getOrCreateContextItem(ProviderSpec.ContextLiteralSpec spec) {
+            for (ContextDerivedItem item : contextItems) {
+                if (item.str().equals(spec.text()) && item.type() == spec.type()) {
+                    return item;
+                }
+            }
+            ContextDerivedItem created = new ContextDerivedItem(spec.text(), spec.type());
+            contextItems.add(created);
+            return created;
+        }
+
+        private static WorkingStateOperation createOperation(ActionSpec as) {
+            String delim = as.delimiter() != null ? as.delimiter() : "";
+            return switch (as.operationType()) {
+                case FILL -> new FillOperation(delim);
+                case PREFIX -> new PrefixOperation(delim);
+                case SUFFIX -> new SuffixOperation(delim);
+                case AVP -> new AvpOperation();
+                case REC -> new RecOperation();
+                case JOIN -> new JoinOperation(as.keyPositions());
+            };
+        }
     }
 
     public static final class MatchException extends RuntimeException {

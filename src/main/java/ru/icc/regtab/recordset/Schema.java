@@ -8,6 +8,7 @@ import java.util.*;
 public final class Schema {
 
     private final List<String> attributes;
+    private final Set<String> attributeSet;
 
     public Schema(List<String> attributes) {
         Objects.requireNonNull(attributes, "attributes");
@@ -19,6 +20,7 @@ public final class Schema {
             }
         }
         this.attributes = List.copyOf(attributes);
+        this.attributeSet = Set.copyOf(seen);
     }
 
     public List<String> attributes() { return attributes; }
@@ -27,7 +29,7 @@ public final class Schema {
 
     public int indexOf(String attribute) { return attributes.indexOf(attribute); }
 
-    public boolean contains(String attribute) { return attributes.contains(attribute); }
+    public boolean contains(String attribute) { return attributeSet.contains(attribute); }
 
     @Override
     public boolean equals(Object o) {

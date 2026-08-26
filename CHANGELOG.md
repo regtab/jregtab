@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **performance** — cell-derived item providers no longer copy and sort the whole item set J on every call. `CellDerivedItemProvider.provide()` was O(|J|) in time and allocated three table-sized sets per action, which made interpretation quadratic in the number of cells (7 318 × 5 cells — 198 s; 32 777 × 3 — over 30 min). Now a spatial index over J (`CellDerivedItemIndex`: row-major and column-major orderings with row/column offsets, built once per table, lazily) yields the candidates already in traversal order, and a `CandidateScope` derived statically from the filter specification (`CandidateScopes.of`) restricts the scan to the anchor's row, column, cell, row range or subtable — the filter κ is still applied to every candidate of the scope, and the scan stops after k matches, so the result of Υ^{J,k}_{τ,κ} is unchanged (pinned by `CellDerivedItemProviderEquivalenceTest` against the reference definition on random tables). `SemanticConstructor` now instantiates one provider / operation per `ProviderSpec` / `ActionSpec` (they are immutable and share the index) instead of one per action, so the memory of the semantic layer is linear in the number of cells with a small constant (1.19 M cells — identity pattern — runs in ~5 s within `-Xmx1g`). Related constant-factor fixes: `And`/`Or` filter conditions no longer re-create their term predicates per candidate, regex terms compile their pattern once, `Schema.contains` is O(1). Recordsets are byte-identical to 0.5.1; the public API only gains the new classes and one constructor
+
 ## [0.5.1] - 2026-08-26
 
 ### Fixed
