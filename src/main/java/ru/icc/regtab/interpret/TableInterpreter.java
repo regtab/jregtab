@@ -140,9 +140,15 @@ public final class TableInterpreter {
 
     private void applyAction(WorkingState ws, InterpretationAction action) {
         Item anchor = action.anchor();
-        List<Item> items = new ArrayList<>();
-        for (ItemProvider provider : action.providers()) {
-            items.addAll(provider.provide(anchor));
+        List<? extends Item> items;
+        if (action.providers().size() == 1) {
+            items = action.providers().getFirst().provide(anchor);
+        } else {
+            List<Item> collected = new ArrayList<>();
+            for (ItemProvider provider : action.providers()) {
+                collected.addAll(provider.provide(anchor));
+            }
+            items = collected;
         }
 
         switch (action.operation()) {

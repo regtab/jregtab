@@ -35,11 +35,16 @@ public final class ItemLinearization {
 
     public List<CellDerivedItem> sort(Collection<CellDerivedItem> items) {
         List<CellDerivedItem> result = new ArrayList<>(items);
-        result.sort(comparator());
+        result.sort(comparator(traversalOrder));
         return result;
     }
 
-    private Comparator<CellDerivedItem> comparator() {
+    /**
+     * The precedence relation prec_τ as a comparator: positions are compared according to τ,
+     * and items of the same cell are compared by their index (ascending for every τ).
+     */
+    public static Comparator<CellDerivedItem> comparator(TraversalOrder traversalOrder) {
+        Objects.requireNonNull(traversalOrder, "traversalOrder");
         return (a, b) -> {
             if (a.cell() == b.cell()) {
                 return Integer.compare(a.index(), b.index());

@@ -4,6 +4,7 @@ import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.provider.ItemFilterCondition;
 
 import java.util.function.BiPredicate;
+import java.util.regex.Pattern;
 
 /**
  * Atomic constraint — building block of {@link ItemFilterConditionSpec}.
@@ -239,14 +240,16 @@ public sealed interface FilterTerm permits
     record RegexMatched(String pattern) implements FilterTerm {
         public String toRtl() { return "\"" + pattern + "\""; }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> c.str().matches(pattern);
+            Pattern[] compiled = new Pattern[1];
+            return (a, c) -> compiledPattern(compiled, pattern).matcher(c.str()).matches();
         }
     }
 
     record NotRegexMatched(String pattern) implements FilterTerm {
         public String toRtl() { return "!\"" + pattern + "\""; }
         public ItemFilterCondition toCondition() {
-            return (a, c) -> !c.str().matches(pattern);
+            Pattern[] compiled = new Pattern[1];
+            return (a, c) -> !compiledPattern(compiled, pattern).matcher(c.str()).matches();
         }
     }
 
@@ -292,6 +295,19 @@ public sealed interface FilterTerm permits
         public ItemFilterCondition toCondition() {
             return (a, c) -> !c.hasTag(tag);
         }
+    }
+
+    /**
+     * {@code s.matches(regex)} ≡ {@code Pattern.compile(regex).matcher(s).matches()}; the pattern is
+     * compiled on first use and cached in the holder so the hot filter loop does not recompile it.
+     */
+    private static Pattern compiledPattern(Pattern[] holder, String regex) {
+        Pattern p = holder[0];
+        if (p == null) {
+            p = Pattern.compile(regex);
+            holder[0] = p;
+        }
+        return p;
     }
 
     /** Tags are stored with the leading {@code #}; the RTL form is always quoted: {@code #'name'}. */
