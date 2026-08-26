@@ -5,14 +5,21 @@ import ru.icc.regtab.recordset.Recordset;
 import ru.icc.regtab.recordset.Schema;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Moves the anchor attribute (first in schema) to the given 0-based position.
- * Reassigns values so that $a_0, $a_1, … receive the values from the reordered columns
- * (e.g. for position 2: $a_0←col1, $a_1←col2, $a_2←anchor).
+ * <p>
+ * The <em>attribute</em> is moved — its name travels together with its values, so the
+ * attribute-value binding of every record is preserved: only the order of the schema changes.
+ * The rule is the same for named attributes (produced by AVP) and for anonymous ones:
+ * an anonymous name is <em>not</em> renumbered, so after {@code ANCH(2)} a schema
+ * {@code $a_1, $a_2, $a_3} becomes {@code $a_2, $a_3, $a_1} and the moved attribute stays
+ * visible under its original name.
+ * <p>
+ * This is {@link SchemaReordering} with the order derived from the anchor position.
+ * A position of 0, a position beyond the schema, or a schema of at most one attribute
+ * leaves the recordset unchanged.
  */
 public record AnchorAttributeAtPosition(int position) implements RecordsetTransformation {
 
@@ -25,31 +32,16 @@ public record AnchorAttributeAtPosition(int position) implements RecordsetTransf
     @Override
     public Recordset apply(Recordset recordset) {
         List<String> attrs = recordset.schema().attributes();
-        if (attrs.size() <= 1 || position >= attrs.size()) {
+        if (attrs.size() <= 1 || position == 0 || position >= attrs.size()) {
             return recordset;
         }
-        if (position == 0) {
-            return recordset;
-        }
-        String anchor = attrs.get(0);
-        List<String> rest = attrs.subList(1, attrs.size());
-        List<String> reordered = new ArrayList<>(attrs.size());
-        for (int i = 0; i < position; i++) {
-            reordered.add(rest.get(i));
-        }
-        reordered.add(anchor);
-        for (int i = position; i < rest.size(); i++) {
-            reordered.add(rest.get(i));
-        }
-        List<String> canonicalOrder = new ArrayList<>(attrs);
-        Schema newSchema = new Schema(canonicalOrder);
+        List<String> reordered = new ArrayList<>(attrs.subList(1, attrs.size()));
+        reordered.add(position, attrs.get(0));
+
+        Schema newSchema = new Schema(reordered);
         List<Record> newRecords = new ArrayList<>(recordset.size());
         for (Record r : recordset.records()) {
-            Map<String, String> values = new LinkedHashMap<>();
-            for (int i = 0; i < reordered.size(); i++) {
-                values.put(canonicalOrder.get(i), r.get(reordered.get(i)));
-            }
-            newRecords.add(new Record(newSchema, values));
+            newRecords.add(new Record(newSchema, r.values()));
         }
         return new Recordset(newSchema, newRecords);
     }
