@@ -10,6 +10,7 @@ import ru.icc.regtab.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.atp.spec.ProviderSpec;
 import ru.icc.regtab.atp.spec.Quantifier;
 import ru.icc.regtab.atp.spec.RowPattern;
+import ru.icc.regtab.atp.spec.StringExtractor;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
@@ -39,7 +40,8 @@ class AtpTask055Test extends AtpTaskBase {
                                         new CompoundSegment("", AtomicContentSpec.val(
                                                 ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_CELL))
                                         )),
-                                        new CompoundSegment(",", new DelimitedContentSpec(",", AtomicContentSpec.val()))
+                                        new CompoundSegment(",", new DelimitedContentSpec(",",
+                                                AtomicContentSpec.val().extract(StringExtractor.Trimmed.INSTANCE)))
                                 ), ""))
                         )
                 )

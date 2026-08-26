@@ -1,1 +1,1 @@
-[ [!BLANK? VAL] [!BLANK? (VAL : SR&C0->REC(1)){','}] ]+
+[ [!BLANK? VAL] [!BLANK? (VAL=TRIM : SR&C0->REC(1)){','}] ]+

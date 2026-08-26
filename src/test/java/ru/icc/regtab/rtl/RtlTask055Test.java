@@ -7,10 +7,11 @@ package ru.icc.regtab.rtl;
  * Fixtures: {@code src/test/resources/tasks/task_055/}
  * ATP: {@link ru.icc.regtab.atp.AtpTask055Test}
  * <pre>
- * [ [VAL: CL*-&gt;REC ',' (VAL){','}] ]+
+ * [ [VAL: CL*-&gt;REC ',' (VAL=TRIM){','}] ]+
  * </pre>
  * Each row contains one compound cell: the anchor VAL collects all same-cell items via
  * CL*-&gt;REC, then a comma separator followed by a comma-delimited repetition of VAL values.
+ * The source spacing ("a1, b1, c1") survives the verbatim split, so {@code =TRIM} removes it.
  */
 public class RtlTask055Test extends RtlTaskBase {
 
@@ -20,7 +21,7 @@ public class RtlTask055Test extends RtlTaskBase {
     @Override
     protected String buildRtl() {
         return /* language=RTL */ """
-                [ [VAL: CL*->REC ',' (VAL){','}] ]+
+                [ [VAL: CL*->REC ',' (VAL=TRIM){','}] ]+
                 """;
     }
 }

@@ -11,6 +11,7 @@ import ru.icc.regtab.atp.spec.ItemFilterConditionSpec;
 import ru.icc.regtab.atp.spec.ProviderSpec;
 import ru.icc.regtab.atp.spec.Quantifier;
 import ru.icc.regtab.atp.spec.RowPattern;
+import ru.icc.regtab.atp.spec.StringExtractor;
 import ru.icc.regtab.atp.spec.SubtablePattern;
 import ru.icc.regtab.atp.spec.TablePattern;
 
@@ -41,7 +42,7 @@ class AtpTask045Test extends AtpTaskBase {
                                 CellPattern.of(NOT_BLANK, Quantifier.one(),
                                         new DelimitedContentSpec(",", AtomicContentSpec.val(
                                                 ActionSpec.rec(1, ProviderSpec.val(1, SAME_SUBROW_COL0))
-                                        ))
+                                        ).extract(StringExtractor.Trimmed.INSTANCE))
                                 )
                         )
                 ));

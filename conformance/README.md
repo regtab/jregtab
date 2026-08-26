@@ -43,6 +43,29 @@ Any RTL implementation must satisfy, for this corpus:
 Byte-equality of canonical forms transitively guarantees that two implementations build
 the same ATP without comparing object graphs across languages.
 
+## Semantics of S_delim
+
+The corpus checks syntax and canonical form; it does not yet execute patterns against
+tables. One execution rule is nonetheless normative for every implementation, because
+the canonical form cannot reveal it — the semantics of the delimited content
+specification `S_delim = (δ, S_atom)` (`def:delimited-content-spec`):
+
+- The input text is split on every occurrence of `δ`, keeping trailing empty fields
+  (Java `String.split(…, -1)`, Python `str.split(δ)`).
+- Each substring `sₖ ∈ Σ*` is passed to `S_atom` **verbatim**. Implementations must not
+  trim substrings and must not drop empty ones: `n` substrings always derive `n` items,
+  numbered `0..n-1`. `"a, b"` therefore yields `"a"` and `" b"`; `"a,,b"` yields
+  `"a"`, `""`, `"b"`.
+- Whitespace removal is opt-in, expressed by the atom's string extractor `ξ`:
+  `(VAL=TRIM){","}` (or `=NORM`). The extractor applies to each substring separately.
+- The same rules apply to a delimited specification nested in a compound one.
+
+Positive case `delim_raw` pins both forms syntactically. An executable check of this
+rule is planned as a separate `semantic/` section of the corpus.
+
+> Changed in jRegTab 0.5.0. Earlier versions trimmed each substring and silently
+> dropped empty ones; patterns relying on that must add `=TRIM` to the delimited atom.
+
 In jRegTab the contract is executed by `ru.icc.regtab.conformance.RtlConformanceTest`;
 `ConformanceCorpusFreshnessTest` additionally guards the committed files against drift
 from the task test suite.

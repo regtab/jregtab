@@ -41,6 +41,12 @@ public final class ConformanceCorpus {
             "illustrative", /* language=RTL */ """
                     [ [] [VAL: 'AIRLINE'->AVP]+ ]
                     [ [VAL: 'AIRPORT'->AVP] [VAL: (COL,ROW,CL)->REC, 'ND'->AVP ' ' VAL: 'MON'->AVP]+ ]+
+                    """,
+            // Delimited content specification, both forms side by side: the bare form
+            // splits verbatim (token whitespace and empty tokens are preserved), the
+            // "=TRIM" form opts into trimming. See "Semantics of S_delim" in README.md.
+            "delim_raw", /* language=RTL */ """
+                    [ [(VAL : CL*->REC){','}] [(VAL=TRIM : CL*->REC){','}] ]
                     """
     );
 
