@@ -29,4 +29,4 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: mvn -B test -Dtest="RtlConformanceTest,ConformanceCorpusFreshnessTest"
+      - run: mvn -B test -Dtest="RtlConformanceTest,RtlSemanticConformanceTest,ConformanceCorpusFreshnessTest"

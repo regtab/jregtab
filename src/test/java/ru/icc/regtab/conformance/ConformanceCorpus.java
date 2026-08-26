@@ -22,13 +22,16 @@ import java.util.Map;
  *
  * <p>File layout (see {@code conformance/README.md}):
  * {@code conformance/positive/<id>.rtl} + {@code <id>.expected.rtl} (canonical form),
- * {@code conformance/negative/<name>.rtl} (must fail to compile).
+ * {@code conformance/negative/<name>.rtl} (must fail to compile),
+ * {@code conformance/semantic/<case>/} (pattern + table + expected recordset).
  */
 public final class ConformanceCorpus {
 
     public static final Path ROOT     = Path.of("conformance");
     public static final Path POSITIVE = ROOT.resolve("positive");
     public static final Path NEGATIVE = ROOT.resolve("negative");
+    /** Hand-maintained cases pinning execution semantics; see {@code RtlSemanticConformanceTest}. */
+    public static final Path SEMANTIC = ROOT.resolve("semantic");
 
     /** One positive source: corpus id and the RTL text. */
     public record Entry(String id, String rtl) {}
