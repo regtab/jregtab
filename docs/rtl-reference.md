@@ -129,15 +129,29 @@ post-extraction `RecordsetTransformation`s on the resulting `TablePattern`.
 | Setting | Effect |
 |---|---|
 | `NORM` | Apply whitespace normalisation to all field values after extraction |
-| `ANCH(n)` | Use position *n* in the first record as the attribute name for all records |
+| `ANCH(n)` | Move the anchor attribute to 0-based position *n* in the schema |
 | `SPLIT("s")` | Split all field values by delimiter *s* after extraction |
 
 Example: `<NORM, ANCH(2)> [ … ]` — normalise and anchor at position 2.
+
+The anchor is the first attribute of the extracted schema, and `ANCH(n)` moves that
+**attribute** — its name travels together with its values, so the attribute-value binding
+of every record is untouched and only the order of the schema changes. A position of 0,
+a position beyond the schema, or a single-attribute schema leaves the recordset as is.
+
+The rule is the same for named attributes (produced by `AVP`) and for the anonymous
+`$a_i` names the interpreter invents: an anonymous name is **not** renumbered, it moves
+with its attribute. A schema `$a_1, $a_2, $a_3` under `ANCH(2)` therefore becomes
+`$a_2, $a_3, $a_1` — the values sit in the same positions as before, and the name shows
+which attribute was moved.
 
 !!! note "Inline equivalents"
     The same two transformations can be requested *inline* on a `REC` action:
     `REC(n)` is equivalent to the `ANCH(n)` setting, and `REC('s')` is equivalent to
     `SPLIT("s")`. Inline forms are by far the more common in practice (see Tasks 02, 03).
+    The position of the inline form in the pattern does not matter — `REC(n)` is picked up
+    anywhere, including inside a delimited content specification such as
+    `[(VAL: ROW*->REC(1)){','}]`, and always yields the same transformation.
     The compiler merges inline and prefix forms and raises `RtlCompileException` if they
     conflict (e.g. `ANCH(1)` together with `REC(2)`).
 

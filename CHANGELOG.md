@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `ANCH(n)` / `REC(n)` (`AnchorAttributeAtPosition`) moved only the *values* to the requested position while the schema kept its original order, so with **named** attributes (produced by `AVP`) the attribute-value binding broke: the column carrying the anchor's name received another attribute's values. The transformation now moves the anchor **attribute** — its name travels with its values — so every record keeps its attribute-value pairs and only the schema order changes. All three ways of requesting it behave identically: the `<ANCH(n)>` settings prefix, inline `REC(n)` on an atomic content specification, and inline `REC(n)` inside a delimited one (`[(VAL: ROW*->REC(1)){','}]`)
+- Conformance corpus: two semantic cases pinning the rule — `anch_named_attrs` (settings prefix, named schema) and `anch_named_inline_delim` (inline `REC(n)` under a delimited specification)
+
+### Changed
+- `ANCH(n)` / `REC(n)` on an **anonymous** schema: values and their positions are unchanged, but the anonymous names now travel with their attributes instead of being reassigned positionally, so the schema reads `$a_2, $a_3, $a_1, $a_4` rather than `$a_1, $a_2, $a_3, $a_4` — one rule for named and anonymous attributes alike, and the name shows which attribute was moved. Only visible to code that prints the schema or exports CSV with a header row; recordset contents are identical
+
 ## [0.5.0] - 2026-08-26
 
 ### Changed
