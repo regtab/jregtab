@@ -122,7 +122,7 @@ Add to your `pom.xml`:
 <dependency>
     <groupId>ru.icc.regtab</groupId>
     <artifactId>regtab</artifactId>
-    <version>0.5.1</version>
+    <version>0.5.2</version>
 </dependency>
 ```
 
