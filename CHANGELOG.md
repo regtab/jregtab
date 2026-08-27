@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-08-27
+
 ### Changed
 - **performance (memory)** — the per-cell footprint of the three layers is roughly halved, with no change in results or public API (only additions): `IntRange` no longer allocates a capturing lambda per instance (factories `ofRow`/`ofCol`/`ofValue`; `CellDerivedItem.rows/cols/pos` use them); cell formatting lives in an immutable, shared `CellFormat` holder with copy-on-write setters (`Cell.format()`/`setFormat()` added, all existing getters/setters unchanged) and a non-merged cell no longer carries its own `BoundingBox`; `WorkingState` keeps `val`/`attr`/`avp` in identity maps (items have identity semantics; only `rec` order is observable and it is unchanged); `Record` stores its values positionally (`Record(Schema, String[])` added, `Schema.indexOf` is O(1)). Live heap on a 1.19 M-cell table (identity pattern): 764 MB → 451 MB, minimal working `-Xmx` 1g → 576m; recordsets are byte-identical
 
