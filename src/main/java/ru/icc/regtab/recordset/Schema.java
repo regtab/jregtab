@@ -9,6 +9,7 @@ public final class Schema {
 
     private final List<String> attributes;
     private final Set<String> attributeSet;
+    private final Map<String, Integer> index;
 
     public Schema(List<String> attributes) {
         Objects.requireNonNull(attributes, "attributes");
@@ -21,13 +22,16 @@ public final class Schema {
         }
         this.attributes = List.copyOf(attributes);
         this.attributeSet = Set.copyOf(seen);
+        Map<String, Integer> idx = new HashMap<>();
+        for (int i = 0; i < this.attributes.size(); i++) idx.put(this.attributes.get(i), i);
+        this.index = idx;
     }
 
     public List<String> attributes() { return attributes; }
 
     public int size() { return attributes.size(); }
 
-    public int indexOf(String attribute) { return attributes.indexOf(attribute); }
+    public int indexOf(String attribute) { Integer i = index.get(attribute); return i == null ? -1 : i; }
 
     public boolean contains(String attribute) { return attributeSet.contains(attribute); }
 

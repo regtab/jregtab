@@ -10,27 +10,15 @@ public final class Cell {
 
     // --- Layout properties (Def. 2) ---
     private final GridPosition pos;
+    /** {@code null} for a non-merged cell: the single-cell box is derived from {@link #pos} on demand. */
     private final BoundingBox bbox;
     private final boolean merged;
     private Row parentRow;
     private Subtable subtable;
     private Subrow subrow;
 
-    // --- Formatting properties (Def. 3) ---
-    private FontFamily fontFamily = FontFamily.SERIF;
-    private boolean fontBold;
-    private boolean fontItalic;
-    private boolean fontStrikeout;
-    private boolean fontUnderline;
-    private HorizontalAlignment horzAlign = HorizontalAlignment.LEFT;
-    private VerticalAlignment vertAlign = VerticalAlignment.TOP;
-    private boolean leftBorder;
-    private boolean topBorder;
-    private boolean rightBorder;
-    private boolean bottomBorder;
-    private CellColor bgColor = CellColor.WHITE;
-    private CellColor fgColor = CellColor.BLACK;
-    private double rotation;
+    // --- Formatting properties (Def. 3): shared immutable holder, copy-on-write ---
+    private CellFormat format = CellFormat.DEFAULT;
 
     // --- Content properties (Def. 4) ---
     private String text = "";
@@ -40,12 +28,15 @@ public final class Cell {
 
     public Cell(GridPosition pos, BoundingBox bbox, boolean merged) {
         this.pos = Objects.requireNonNull(pos, "pos");
-        this.bbox = Objects.requireNonNull(bbox, "bbox");
+        Objects.requireNonNull(bbox, "bbox");
+        this.bbox = bbox.equals(BoundingBox.single(pos)) ? null : bbox;
         this.merged = merged;
     }
 
     public Cell(GridPosition pos) {
-        this(pos, BoundingBox.single(pos), false);
+        this.pos = Objects.requireNonNull(pos, "pos");
+        this.bbox = null;
+        this.merged = false;
     }
 
     // --- Layout getters ---
@@ -53,7 +44,7 @@ public final class Cell {
     public GridPosition pos() { return pos; }
     public int row() { return pos.row(); }
     public int col() { return pos.col(); }
-    public BoundingBox bbox() { return bbox; }
+    public BoundingBox bbox() { return bbox != null ? bbox : BoundingBox.single(pos); }
     public boolean merged() { return merged; }
     public Row parentRow() { return parentRow; }
     public Subtable subtable() { return subtable; }
@@ -67,37 +58,39 @@ public final class Cell {
 
     // --- Formatting getters ---
 
-    public FontFamily fontFamily() { return fontFamily; }
-    public boolean fontBold() { return fontBold; }
-    public boolean fontItalic() { return fontItalic; }
-    public boolean fontStrikeout() { return fontStrikeout; }
-    public boolean fontUnderline() { return fontUnderline; }
-    public HorizontalAlignment horzAlign() { return horzAlign; }
-    public VerticalAlignment vertAlign() { return vertAlign; }
-    public boolean leftBorder() { return leftBorder; }
-    public boolean topBorder() { return topBorder; }
-    public boolean rightBorder() { return rightBorder; }
-    public boolean bottomBorder() { return bottomBorder; }
-    public CellColor bgColor() { return bgColor; }
-    public CellColor fgColor() { return fgColor; }
-    public double rotation() { return rotation; }
+    public CellFormat format() { return format; }
+    public FontFamily fontFamily() { return format.fontFamily(); }
+    public boolean fontBold() { return format.fontBold(); }
+    public boolean fontItalic() { return format.fontItalic(); }
+    public boolean fontStrikeout() { return format.fontStrikeout(); }
+    public boolean fontUnderline() { return format.fontUnderline(); }
+    public HorizontalAlignment horzAlign() { return format.horzAlign(); }
+    public VerticalAlignment vertAlign() { return format.vertAlign(); }
+    public boolean leftBorder() { return format.leftBorder(); }
+    public boolean topBorder() { return format.topBorder(); }
+    public boolean rightBorder() { return format.rightBorder(); }
+    public boolean bottomBorder() { return format.bottomBorder(); }
+    public CellColor bgColor() { return format.bgColor(); }
+    public CellColor fgColor() { return format.fgColor(); }
+    public double rotation() { return format.rotation(); }
 
     // --- Formatting setters ---
 
-    public void setFontFamily(FontFamily fontFamily) { this.fontFamily = Objects.requireNonNull(fontFamily); }
-    public void setFontBold(boolean fontBold) { this.fontBold = fontBold; }
-    public void setFontItalic(boolean fontItalic) { this.fontItalic = fontItalic; }
-    public void setFontStrikeout(boolean fontStrikeout) { this.fontStrikeout = fontStrikeout; }
-    public void setFontUnderline(boolean fontUnderline) { this.fontUnderline = fontUnderline; }
-    public void setHorzAlign(HorizontalAlignment horzAlign) { this.horzAlign = Objects.requireNonNull(horzAlign); }
-    public void setVertAlign(VerticalAlignment vertAlign) { this.vertAlign = Objects.requireNonNull(vertAlign); }
-    public void setLeftBorder(boolean leftBorder) { this.leftBorder = leftBorder; }
-    public void setTopBorder(boolean topBorder) { this.topBorder = topBorder; }
-    public void setRightBorder(boolean rightBorder) { this.rightBorder = rightBorder; }
-    public void setBottomBorder(boolean bottomBorder) { this.bottomBorder = bottomBorder; }
-    public void setBgColor(CellColor bgColor) { this.bgColor = Objects.requireNonNull(bgColor); }
-    public void setFgColor(CellColor fgColor) { this.fgColor = Objects.requireNonNull(fgColor); }
-    public void setRotation(double rotation) { this.rotation = rotation; }
+    public void setFormat(CellFormat format) { this.format = Objects.requireNonNull(format); }
+    public void setFontFamily(FontFamily fontFamily) { format = format.withFontFamily(Objects.requireNonNull(fontFamily)); }
+    public void setFontBold(boolean fontBold) { format = format.withFontBold(fontBold); }
+    public void setFontItalic(boolean fontItalic) { format = format.withFontItalic(fontItalic); }
+    public void setFontStrikeout(boolean fontStrikeout) { format = format.withFontStrikeout(fontStrikeout); }
+    public void setFontUnderline(boolean fontUnderline) { format = format.withFontUnderline(fontUnderline); }
+    public void setHorzAlign(HorizontalAlignment horzAlign) { format = format.withHorzAlign(Objects.requireNonNull(horzAlign)); }
+    public void setVertAlign(VerticalAlignment vertAlign) { format = format.withVertAlign(Objects.requireNonNull(vertAlign)); }
+    public void setLeftBorder(boolean leftBorder) { format = format.withLeftBorder(leftBorder); }
+    public void setTopBorder(boolean topBorder) { format = format.withTopBorder(topBorder); }
+    public void setRightBorder(boolean rightBorder) { format = format.withRightBorder(rightBorder); }
+    public void setBottomBorder(boolean bottomBorder) { format = format.withBottomBorder(bottomBorder); }
+    public void setBgColor(CellColor bgColor) { format = format.withBgColor(Objects.requireNonNull(bgColor)); }
+    public void setFgColor(CellColor fgColor) { format = format.withFgColor(Objects.requireNonNull(fgColor)); }
+    public void setRotation(double rotation) { format = format.withRotation(rotation); }
 
     // --- Content getters ---
 
