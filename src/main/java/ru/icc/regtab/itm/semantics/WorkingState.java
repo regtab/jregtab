@@ -14,9 +14,12 @@ import java.util.*;
  */
 public final class WorkingState {
 
-    private final Map<Item, String> val = new LinkedHashMap<>();
-    private final Map<Item, String> attr = new LinkedHashMap<>();
-    private final Map<Item, AttributeValuePair> avp = new LinkedHashMap<>();
+    // Items have identity semantics; iteration order of val/attr/avp is never observable in the
+    // result, so open-addressing identity maps keep the per-item footprint small on large tables.
+    private final Map<Item, String> val = new IdentityHashMap<>();
+    private final Map<Item, String> attr = new IdentityHashMap<>();
+    private final Map<Item, AttributeValuePair> avp = new IdentityHashMap<>();
+    /** Insertion order of rec defines the order of records — keep it. */
     private final Map<CellDerivedItem, List<Item>> rec = new LinkedHashMap<>();
 
     // --- Accessors ---

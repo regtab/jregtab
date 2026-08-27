@@ -237,16 +237,17 @@ public final class TableInterpreter {
     private List<Record> generateRecords(WorkingState ws, Schema schema) {
         List<Record> records = new ArrayList<>();
 
+        List<String> attrs = schema.attributes();
         for (var entry : ws.allRec().entrySet()) {
-            Map<String, String> values = new LinkedHashMap<>();
-            for (String attr : schema.attributes()) {
-                values.put(attr, missingValueHandler.handle(attr));
+            String[] values = new String[attrs.size()];
+            for (int i = 0; i < values.length; i++) {
+                values[i] = missingValueHandler.handle(attrs.get(i));
             }
             for (Item item : entry.getValue()) {
                 String a = ws.assoc(item);
-                if (a != null && schema.contains(a)) {
-                    values.put(a, ws.val(item));
-                }
+                if (a == null) continue;
+                int i = schema.indexOf(a);
+                if (i >= 0) values[i] = ws.val(item);
             }
             records.add(new Record(schema, values));
         }

@@ -38,9 +38,9 @@ public final class CellDerivedItem implements Item {
         this.index = index;
         this.cell = Objects.requireNonNull(cell, "cell");
         this.type = Objects.requireNonNull(type, "type");
-        this.rows = new IntRange(cell::row);
-        this.cols = new IntRange(cell::col);
-        this.pos = new IntRange(() -> index);
+        this.rows = IntRange.ofRow(cell);
+        this.cols = IntRange.ofCol(cell);
+        this.pos = IntRange.ofValue(index);
     }
 
     public CellDerivedItem(String str, int index, Cell cell, ItemType type) {
