@@ -422,6 +422,20 @@ they diverge — `CONCAT` yields one wider record, `JOIN` yields one record per 
 (see Examples 2 and 6). Up to jRegTab 0.5.x the folding operation was spelled `JOIN(K)`; a pattern
 written for 0.5.x must replace `JOIN(K)` by `CONCAT(K)`.
 
+**Choosing the key positions `K`.** `K` is any number of 0-based positions in the item-based
+record — `0` is the anchor, the following positions are the items in the order the `REC`
+providers supplied them. At every position in `K` all records being concatenated must agree, and
+the item is not repeated in the result; every other position is carried over as is, so a named
+attribute that occurs at such a position in two records is a conflict. Put into `K` **every**
+position that repeats in each row of a group — the anchor plus all fields that are identical
+across the group. With rows `k1 | k11 | a1:A | b1:B | c1` and `k1 | k11 | a1:A | b1:B | c2`, the key
+is four positions, `CONCAT(0,1,2,3)`, not two: `A` and `B` repeat exactly like `k1` and `k11`
+(`CONCAT(0,1)` would report the shared attribute `A` and leave both rows unfolded). A row whose
+`A` differs within the group is then rejected with a diagnostic instead of being folded silently.
+`K = ∅` is right only when the records share nothing, not even the anchor (task 069). `K` names
+positions, not attributes — if the repeated fields sit to the right of the varying ones, the
+positions shift accordingly (`CONCAT(0,1,4,5)`).
+
 Examples by operation:
 
 ```rtl
