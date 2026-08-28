@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-28
+
 ### Changed (breaking)
 - **`JOIN(K)` is now the record product; the folding operation is `CONCAT(K)`.** Up to 0.5.x
   `JOIN(K)` *folded* records: the records of the provided anchors were concatenated to the anchor's
