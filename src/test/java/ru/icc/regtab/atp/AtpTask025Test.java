@@ -14,7 +14,7 @@ import ru.icc.regtab.atp.spec.TablePattern;
 
 /**
  * Task 25: flat table where each row's first cell uses SUFFIX, slash-delimited REC
- * over values to the right, and JOIN(0) to group rows with the same ID string.
+ * over values to the right, and CONCAT(0) to group rows with the same ID string.
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_025/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask025Test}
@@ -40,7 +40,7 @@ class AtpTask025Test extends AtpTaskBase {
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.suffix(SEP, ProviderSpec.any(1, RIGHT_OF)),
                                         ActionSpec.rec(SEP, ProviderSpec.val(ProviderSpec.UNBOUNDED, SUBROW_AFTER_ANCHOR)),
-                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.concat(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(Quantifier.oneOrMore(), AtomicContentSpec.val())
                         )

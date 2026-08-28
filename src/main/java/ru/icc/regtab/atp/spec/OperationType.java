@@ -15,6 +15,8 @@ public enum OperationType {
     AVP,
     /** O_rec: construct an item-based record. */
     REC,
-    /** O_join^K: join item-based records with key-position dropping and deduplication. */
+    /** O_concat^K: concatenate item-based records into one wide record (key positions K not repeated). */
+    CONCAT,
+    /** O_join^K: record product — every record of the anchor by every joined record (equi-join on K). */
     JOIN
 }

@@ -8,9 +8,17 @@ import ru.icc.regtab.itm.semantics.item.ItemType;
 import java.util.*;
 
 /**
- * Working state of an ITM instance (def:working-state).
+ * Working state of an ITM instance (def:working-state):
+ * {@code ws = (V, A, val, attr, avp, rec, J)}.
  * Tracks values, attributes, attribute-value pairs, and item-based records
  * as they are built up during table interpretation.
+ * <p>
+ * {@code rec} maps an anchor item to a <em>non-empty sequence</em> of item-based records:
+ * a single record after {@code O_rec}/{@code O_concat}, several after {@code O_join}
+ * (the record product). {@code J} — the <em>joined-away anchors</em> — are items whose records
+ * have been consumed by a join; they stay in {@code rec} (a later join may consume the same
+ * records again, irrespective of action order) but are excluded from recordset extraction.
+ * {@link #allRec()} therefore returns the <em>live</em> anchors {@code dom(rec) \ J} only.
  */
 public final class WorkingState {
 
@@ -20,24 +28,68 @@ public final class WorkingState {
     private final Map<Item, String> attr = new IdentityHashMap<>();
     private final Map<Item, AttributeValuePair> avp = new IdentityHashMap<>();
     /** Insertion order of rec defines the order of records — keep it. */
-    private final Map<CellDerivedItem, List<Item>> rec = new LinkedHashMap<>();
+    private final Map<CellDerivedItem, List<List<Item>>> rec = new LinkedHashMap<>();
+    /** J: joined-away anchors (identity semantics, like the items themselves). */
+    private final Set<CellDerivedItem> joined = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** Preconditions violated during completion; the operations had no effect. */
+    private final List<Diagnostic> diagnostics = new ArrayList<>();
+    private final boolean strictPreconditions;
+
+    public WorkingState() {
+        this(false);
+    }
+
+    /**
+     * @param strictPreconditions if {@code true}, a violated precondition of {@code O_concat} /
+     *                            {@code O_join} raises an {@link IllegalStateException} instead of
+     *                            being recorded as a {@link Diagnostic} with no effect
+     */
+    public WorkingState(boolean strictPreconditions) {
+        this.strictPreconditions = strictPreconditions;
+    }
 
     // --- Accessors ---
 
     public String val(Item item) { return val.get(item); }
     public String attr(Item item) { return attr.get(item); }
     public AttributeValuePair avp(Item item) { return avp.get(item); }
-    public List<Item> rec(CellDerivedItem item) { return rec.get(item); }
+
+    /** rec(ι): the records of the anchor, also for joined-away anchors; {@code null} if ι ∉ dom(rec). */
+    public List<List<Item>> rec(CellDerivedItem item) {
+        List<List<Item>> records = rec.get(item);
+        return records == null ? null : Collections.unmodifiableList(records);
+    }
 
     public boolean hasVal(Item item) { return val.containsKey(item); }
     public boolean hasAttr(Item item) { return attr.containsKey(item); }
     public boolean hasAvp(Item item) { return avp.containsKey(item); }
     public boolean hasRec(CellDerivedItem item) { return rec.containsKey(item); }
+    /** ι ∈ J. */
+    public boolean isJoined(CellDerivedItem item) { return joined.contains(item); }
 
     public Map<Item, String> allVal() { return Collections.unmodifiableMap(val); }
     public Map<Item, String> allAttr() { return Collections.unmodifiableMap(attr); }
     public Map<Item, AttributeValuePair> allAvp() { return Collections.unmodifiableMap(avp); }
-    public Map<CellDerivedItem, List<Item>> allRec() { return Collections.unmodifiableMap(rec); }
+
+    /**
+     * The records of the <em>live</em> anchors, {@code dom(rec) \ J}, in insertion order —
+     * exactly what recordset extraction sees. Joined-away anchors are reachable through
+     * {@link #rec(CellDerivedItem)} and {@link #allJoined()}.
+     */
+    public Map<CellDerivedItem, List<List<Item>>> allRec() {
+        if (joined.isEmpty()) return Collections.unmodifiableMap(rec);
+        Map<CellDerivedItem, List<List<Item>>> live = new LinkedHashMap<>();
+        for (var entry : rec.entrySet()) {
+            if (!joined.contains(entry.getKey())) live.put(entry.getKey(), entry.getValue());
+        }
+        return Collections.unmodifiableMap(live);
+    }
+
+    /** J: the joined-away anchors. */
+    public Set<CellDerivedItem> allJoined() { return Collections.unmodifiableSet(joined); }
+
+    /** Preconditions violated so far (the corresponding operations had no effect). */
+    public List<Diagnostic> diagnostics() { return Collections.unmodifiableList(diagnostics); }
 
     /**
      * Derived function: assoc(iota) = a iff avp(iota) = (a, v).
@@ -105,7 +157,7 @@ public final class WorkingState {
         avp.put(anchor, new AttributeValuePair(a, v));
     }
 
-    // --- O_rec: rec(anchor) := <anchor, i1, ..., in> ---
+    // --- O_rec: rec(anchor) := <<anchor, i1, ..., in>> ---
 
     public void applyRec(CellDerivedItem anchor, List<? extends Item> items) {
         if (!val.containsKey(anchor)) return;
@@ -119,23 +171,99 @@ public final class WorkingState {
             }
             sequence.add(item);
         }
-        rec.put(anchor, sequence);
+        List<List<Item>> records = new ArrayList<>(1);
+        records.add(sequence);
+        rec.put(anchor, records);
     }
 
-    // --- O_join^K: rec(anchor) := dedup(rec(anchor) · drop_K(rec(i1)) · ... · drop_K(rec(in))) ---
+    // --- O_concat^K: rec(anchor) := <rho_anch · drop_K(rho_1) · ... · drop_K(rho_n)>; rec.remove(i_k) ---
 
-    public void applyJoin(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
-        List<Item> anchorRec = rec.get(anchor);
-        if (anchorRec == null || items.isEmpty()) return;
-        List<Item> result = new ArrayList<>(anchorRec);
+    /**
+     * Concatenates the records of the provided anchors to the anchor's record (one wide record)
+     * and removes them from dom(rec). Applicable iff (i) the anchor and at least one provided
+     * item have records, (ii) all records agree at the key positions K, and (iii) apart from the
+     * key no named attribute occurs in more than one of the concatenated records; otherwise
+     * the operation has no effect and a {@link Diagnostic} is recorded.
+     */
+    public void applyConcat(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
+        List<List<Item>> anchorRecs = rec.get(anchor);
+        if (anchorRecs == null || items.isEmpty()) return;
+        List<CellDerivedItem> others = new ArrayList<>();
         for (Item item : items) {
-            if (!(item instanceof CellDerivedItem cdi)) continue;
-            List<Item> otherRec = rec.get(cdi);
-            if (otherRec == null) continue;
-            result.addAll(dropK(otherRec, keyPositions));
-            rec.remove(cdi);
+            if (item instanceof CellDerivedItem cdi && cdi != anchor && rec.containsKey(cdi) && !others.contains(cdi)) {
+                others.add(cdi);
+            }
         }
-        rec.put(anchor, dedup(result));
+        if (others.isEmpty()) return;                                   // (i)
+
+        List<Item> anchorRec = anchorRecs.getFirst();
+        List<Item> result = new ArrayList<>(anchorRec);
+        for (CellDerivedItem other : others) {
+            List<Item> otherRec = rec.get(other).getFirst();
+            String problem = keyMismatch(anchorRec, otherRec, keyPositions);   // (ii)
+            if (problem != null) {
+                skip(anchor, "CONCAT", problem);
+                return;
+            }
+            result.addAll(dropK(otherRec, keyPositions));
+        }
+        String duplicate = duplicateAttribute(result);                  // (iii)
+        if (duplicate != null) {
+            skip(anchor, "CONCAT", "named attribute '" + duplicate
+                    + "' occurs in more than one of the concatenated records");
+            return;
+        }
+        List<List<Item>> records = new ArrayList<>(1);
+        records.add(result);
+        rec.put(anchor, records);
+        for (CellDerivedItem other : others) {
+            rec.remove(other);
+            joined.remove(other);
+        }
+    }
+
+    // --- O_join^K: rec(anchor) := <dedup(rho_i · drop_K(rho'_j)) : compat_K ∧ agree>; J := J ∪ {i_k} ---
+
+    /**
+     * Multiplies every record of the anchor by every record of the provided anchors
+     * (a cross product for K = ∅, an equi-join on the key positions K otherwise; a named
+     * attribute shared by two records acts as a natural-join condition) and marks the provided
+     * anchors as joined-away. Pairs whose key positions differ or whose shared attributes
+     * disagree are dropped; if no pair survives, the anchor keeps its records (left outer join).
+     */
+    public void applyJoin(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
+        List<List<Item>> anchorRecs = rec.get(anchor);
+        if (anchorRecs == null || items.isEmpty()) return;
+        List<CellDerivedItem> others = new ArrayList<>();
+        List<List<Item>> joinedRecs = new ArrayList<>();
+        for (Item item : items) {
+            if (item instanceof CellDerivedItem cdi && cdi != anchor && rec.containsKey(cdi) && !others.contains(cdi)) {
+                others.add(cdi);
+                joinedRecs.addAll(rec.get(cdi));
+            }
+        }
+        if (others.isEmpty()) return;
+
+        List<List<Item>> result = new ArrayList<>();
+        int dropped = 0;
+        for (List<Item> rho : anchorRecs) {
+            for (List<Item> rho2 : joinedRecs) {
+                if (keyMismatch(rho, rho2, keyPositions) != null || !agree(rho, rho2)) {
+                    dropped++;
+                    continue;
+                }
+                List<Item> combined = new ArrayList<>(rho);
+                combined.addAll(dropK(rho2, keyPositions));
+                result.add(dedup(combined));
+            }
+        }
+        if (result.isEmpty()) {
+            skip(anchor, "JOIN", "none of the " + dropped + " record pairs satisfies the key/attribute conditions; "
+                    + "the anchor keeps its records");
+        } else {
+            rec.put(anchor, result);
+        }
+        joined.addAll(others);
     }
 
     /** drop_K(ρ̄): returns sequence with items at positions k ∈ K removed (0-based). */
@@ -159,15 +287,73 @@ public final class WorkingState {
         return result;
     }
 
+    /**
+     * compat_K(ρ, ρ'): {@code null} if for every k ∈ K both records are long enough and the items
+     * at k are compatible (both with the same attribute-value pair, or both unnamed with the same
+     * value); otherwise a description of the first mismatch.
+     */
+    private String keyMismatch(List<Item> rho, List<Item> rho2, Set<Integer> keyPositions) {
+        for (int k : keyPositions) {
+            if (k >= rho.size() || k >= rho2.size()) {
+                return "key position " + k + " is beyond the end of a record";
+            }
+            Item a = rho.get(k), b = rho2.get(k);
+            AttributeValuePair pa = avp.get(a), pb = avp.get(b);
+            if (pa != null && pb != null) {
+                if (!pa.equals(pb)) return "key position " + k + " differs: " + pa + " vs " + pb;
+            } else if (pa == null && pb == null) {
+                if (!Objects.equals(val.get(a), val.get(b)))
+                    return "key position " + k + " differs: '" + val.get(a) + "' vs '" + val.get(b) + "'";
+            } else {
+                return "key position " + k + " mixes a named and an unnamed item";
+            }
+        }
+        return null;
+    }
+
+    /** agree(ρ, ρ'): every named attribute appearing in both records carries the same value. */
+    private boolean agree(List<Item> rho, List<Item> rho2) {
+        Map<String, String> named = new HashMap<>();
+        for (Item item : rho) {
+            AttributeValuePair p = avp.get(item);
+            if (p != null) named.putIfAbsent(p.attribute(), p.value());
+        }
+        for (Item item : rho2) {
+            AttributeValuePair p = avp.get(item);
+            if (p == null) continue;
+            String v = named.get(p.attribute());
+            if (v != null && !v.equals(p.value())) return false;
+        }
+        return true;
+    }
+
+    /** The first named attribute occurring twice in the sequence, or {@code null}. */
+    private String duplicateAttribute(List<Item> sequence) {
+        Set<String> seen = new HashSet<>();
+        for (Item item : sequence) {
+            String a = assoc(item);
+            if (a != null && !seen.add(a)) return a;
+        }
+        return null;
+    }
+
+    private void skip(CellDerivedItem anchor, String operation, String message) {
+        Diagnostic d = new Diagnostic(anchor, operation, message);
+        diagnostics.add(d);
+        if (strictPreconditions) throw new IllegalStateException(d.toString());
+    }
+
     // --- Consistency checks ---
 
     /**
-     * For every iota in dom(rec): rec(iota)[0] == iota.
+     * For every iota in dom(rec) and every record of it: record[0] == iota.
      */
     public boolean isRecAnchored() {
         for (var entry : rec.entrySet()) {
-            if (entry.getValue().isEmpty() || entry.getValue().getFirst() != entry.getKey()) {
-                return false;
+            for (List<Item> record : entry.getValue()) {
+                if (record.isEmpty() || record.getFirst() != entry.getKey()) {
+                    return false;
+                }
             }
         }
         return true;
@@ -194,13 +380,14 @@ public final class WorkingState {
     }
 
     /**
-     * All anchors in dom(rec) either have no associated attribute,
+     * All live anchors in dom(rec) \ J either have no associated attribute,
      * or share the same attribute.
      */
     public boolean isAnchorAttributeUniform() {
         String commonAttr = null;
         boolean found = false;
         for (CellDerivedItem anchor : rec.keySet()) {
+            if (joined.contains(anchor)) continue;
             String a = assoc(anchor);
             if (a != null) {
                 if (!found) {
@@ -215,17 +402,14 @@ public final class WorkingState {
     }
 
     /**
-     * For every item-based record, the attributes of items
+     * For every item-based record of every live anchor, the attributes of items
      * that have associated attributes are pairwise distinct.
      */
     public boolean isRecordAttributesDistinct() {
-        for (List<Item> sequence : rec.values()) {
-            Set<String> seen = new HashSet<>();
-            for (Item item : sequence) {
-                String a = assoc(item);
-                if (a != null && !seen.add(a)) {
-                    return false;
-                }
+        for (var entry : rec.entrySet()) {
+            if (joined.contains(entry.getKey())) continue;
+            for (List<Item> record : entry.getValue()) {
+                if (duplicateAttribute(record) != null) return false;
             }
         }
         return true;

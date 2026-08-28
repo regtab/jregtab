@@ -409,11 +409,32 @@ provSpecs -> op
 | `REC(n)` | `prov->REC(n)` | Same + use attribute at position *n* as the record's attribute name |
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
-| `JOIN` | `prov->JOIN` | Join item-based records: all items included, then dedup by named attribute (K=∅) |
-| `JOIN(K)` | `prov->JOIN(0)` | Join with key positions K dropped from each joined record before dedup (e.g. `JOIN(0)` drops the anchor position) |
+| `CONCAT` | `prov->CONCAT` | Concatenate the provided records to the anchor's record — one wide record, the provided anchors are removed (K=∅: all items included) |
+| `CONCAT(K)` | `prov->CONCAT(0)` | Same, with the key positions K not repeated: dropped from each concatenated record, and all records must agree there (e.g. `CONCAT(0)` drops the anchor of each concatenated record). A named attribute shared by two records (apart from the key) is an error: the action has no effect and a diagnostic is reported |
+| `JOIN` | `prov->JOIN` | Record product: every record of the anchor is combined with every provided record (cross product); the provided anchors are joined-away. A named attribute shared by two records acts as a natural-join condition |
+| `JOIN(K)` | `prov->JOIN(0)` | Equi-join on the key positions K: a record pair is combined only if it agrees at K, the key of the joined record is not repeated |
 | `FILL('s')` | `prov->FILL('/')` | Fill anchor value forward from provider, separated by *s* |
 | `PREFIX('s')` | `prov->PREFIX(' ')` | Prepend provider value to anchor, separated by *s* |
 | `SUFFIX('s')` | `prov->SUFFIX(' ')` | Append provider value to anchor, separated by *s* |
+
+`CONCAT` folds, `JOIN` multiplies: with a single provided record the two coincide, with two or more
+they diverge — `CONCAT` yields one wider record, `JOIN` yields one record per provided record
+(see Examples 2 and 6). Up to jRegTab 0.5.x the folding operation was spelled `JOIN(K)`; a pattern
+written for 0.5.x must replace `JOIN(K)` by `CONCAT(K)`.
+
+**Choosing the key positions `K`.** `K` is any number of 0-based positions in the item-based
+record — `0` is the anchor, the following positions are the items in the order the `REC`
+providers supplied them. At every position in `K` all records being concatenated must agree, and
+the item is not repeated in the result; every other position is carried over as is, so a named
+attribute that occurs at such a position in two records is a conflict. Put into `K` **every**
+position that repeats in each row of a group — the anchor plus all fields that are identical
+across the group. With rows `k1 | k11 | a1:A | b1:B | c1` and `k1 | k11 | a1:A | b1:B | c2`, the key
+is four positions, `CONCAT(0,1,2,3)`, not two: `A` and `B` repeat exactly like `k1` and `k11`
+(`CONCAT(0,1)` would report the shared attribute `A` and leave both rows unfolded). A row whose
+`A` differs within the group is then rejected with a diagnostic instead of being folded silently.
+`K = ∅` is right only when the records share nothing, not even the anchor (task 069). `K` names
+positions, not attributes — if the repeated fields sit to the right of the varying ones, the
+positions shift accordingly (`CONCAT(0,1,4,5)`).
 
 Examples by operation:
 
@@ -421,6 +442,8 @@ Examples by operation:
 [VAL : ST*->REC]                        // REC, collect whole subtable (Task 01)
 [VAL : SR->REC(1)]{2}                   // REC(1), name the record by attribute at position 1 (Task 03)
 [VAL: 'AIRLINE'->AVP]                   // AVP with a literal attribute (Illustrative example)
+[VAL : RT->REC, BW&STR*->CONCAT(0)]     // CONCAT(0): fold the rows below with the same key into one record (Task 16)
+[(VAL: COL->AVP, RT*->JOIN){';'}]       // JOIN: one record per token × per cell to the right (Example 6)
 [VAL: -AV->PREFIX(', ')]                // PREFIX: prepend the value above, separator ", " (Task 116)
 [BLANK ? VAL#'H': -LT&!BLANK->FILL | …] // FILL: copy the nearest non-blank cell to the left (Task 107)
 ```
@@ -536,7 +559,7 @@ A quoted string literal supplies a fixed string as an attribute or value:
 ('AIRLINE')->AVP
 ```
 
-The item type is inferred from the action: `->AVP` → ATTR, `->REC` → VAL.
+The item type is inferred from the action: `->AVP` → ATTR, `->REC` / `->CONCAT` / `->JOIN` → VAL.
 
 ---
 
@@ -549,7 +572,9 @@ The item type is inferred from the action: `->AVP` → ATTR, `->REC` → VAL.
 | `^COL->AVP` | Associate with an attribute from the same column (column-major) |
 | `('LABEL')->AVP` | Associate with a fixed string attribute |
 | `(ST*)->REC` (in parentheses) | Same as `ST*->REC` but explicit grouping |
-| `CL->JOIN(0)` | Join (drop anchor) another item from the same cell |
+| `CL->CONCAT(0)` | Concatenate (drop anchor) the record of another item from the same cell |
+| `BW&STR*->CONCAT(0)` | Fold the rows below with the same key into the anchor's record (group by key) |
+| `RT*->JOIN` | One record per cell to the right (record product, e.g. explode × stack) |
 | `(COL)->FILL('/')` | Fill forward from same-column values, delimiter `/` |
 | `-AV->PREFIX(', ')` | Prepend the nearest value above, separator ", " |
 

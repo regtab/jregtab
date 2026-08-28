@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (breaking)
+- **`JOIN(K)` is now the record product; the folding operation is `CONCAT(K)`.** Up to 0.5.x
+  `JOIN(K)` *folded* records: the records of the provided anchors were concatenated to the anchor's
+  record (one wide record, the number of records strictly decreased) — what `pandas.concat(axis=1)`
+  does, not what a join does. The operation keeps that semantics under its original name
+  `CONCAT(K)` (RTL `CONCAT`, `CONCAT(k1, k2, …)`; `ActionSpec.concat(…)`, `Rtl.concat(…)`,
+  `ConcatOperation`, `OperationType.CONCAT`, `WorkingState.applyConcat`). `JOIN(K)` is redefined
+  as the **record product**: every record of the anchor is combined with every record of the
+  provided anchors — a cross product for `K = ∅`, an equi-join on the key positions `K` otherwise;
+  a named attribute shared by the two records is a natural-join condition (the pair is kept only
+  if the values agree, the attribute occurs once). The provided anchors become *joined-away*
+  (`J`): they are excluded from the recordset but their records stay available, so several
+  anchors may join the same records irrespective of action order. Migration: replace `JOIN(K)`
+  by `CONCAT(K)` in every existing pattern (`JOIN` → `CONCAT`, `JOIN(0)` → `CONCAT(0)`, …); the
+  corpus tasks 016, 023, 025, 033, 046, 047, 050, 053, 069, 094, 097, 098 were migrated this way
+  and produce byte-identical recordsets
+- **`CONCAT(K)` no longer deduplicates named attributes.** The former `JOIN(K)` silently kept the
+  first occurrence of a named attribute shared by the concatenated records, which hid
+  specification errors (a pattern that joined several stacked cells to one token lost all but
+  the first `value`). Now a shared named attribute (apart from the key positions `K`) is a
+  precondition violation: the action has **no effect** — both records survive — and a
+  `Diagnostic` is recorded (`TableInterpreter.diagnostics()`); `withStrictPreconditions(true)`
+  raises an `IllegalStateException` instead. The key positions are likewise checked (`compat_K`).
+  In the corpus this changed one pattern: task 098 lists its full group key,
+  `(BW&STR)*->CONCAT(0,1,2,3)` instead of `JOIN(0,1)` — the named attributes `A`/`B` repeated on
+  every row of a group are part of the key, not duplicates to drop; the expected recordsets are unchanged
+- **Working state: `rec` is multi-valued, recordsets are multisets.** `rec(ι)` is a non-empty
+  sequence of item-based records (`WorkingState.rec(item)` → `List<List<Item>>`, a single record
+  until a join multiplies it); the working state gains the component `J` (`WorkingState.allJoined()`,
+  `isJoined(item)`), and `WorkingState.allRec()` returns the **live** anchors `dom(rec) \ J` only —
+  exactly what recordset extraction sees. `SchemaConstructionStrategy.buildVisitOrder` visits
+  `(anchor, record, position)` triples. The order of records in a `Recordset` is a documented
+  default (anchor visit order, then nested-loop order of the join), not part of the semantics
+- Grammar: `concatOp : CONCAT (LPAREN INT (COMMA INT)* RPAREN)?`, keyword `CONCAT`; the ATP→RTL
+  serializer emits `CONCAT(k1, k2)`; the VS Code grammar highlights `CONCAT`
+
+### Added
+- `Diagnostic` (`ru.icc.regtab.itm.semantics`), `WorkingState.diagnostics()`,
+  `TableInterpreter.diagnostics()`, `TableInterpreter.withStrictPreconditions(boolean)`,
+  `WorkingState(boolean strictPreconditions)`
+- Conformance corpus, semantic section: `concat_by_key` (task 016 shape), `join_product`
+  (explode × stack — six records from two rows), `join_equi_key` (`JOIN(0)` on a positional key)
+- Docs: Example 6 (record join) and a `CONCAT` vs `JOIN` comparison in `examples.md`;
+  `rtl-reference.md`, `model/itm.md`, `model/atp.md`, `api.md`, `architecture.md`,
+  `embedded-rtl.md` updated
+
 ## [0.5.3] - 2026-08-27
 
 ### Changed

@@ -266,6 +266,7 @@ public final class SemanticConstructor {
                 case SUFFIX -> new SuffixOperation(delim);
                 case AVP -> new AvpOperation();
                 case REC -> new RecOperation();
+                case CONCAT -> new ConcatOperation(as.keyPositions());
                 case JOIN -> new JoinOperation(as.keyPositions());
             };
         }

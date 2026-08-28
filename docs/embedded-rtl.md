@@ -98,9 +98,10 @@ compiler.
 |---|---|
 | `(…)->REC` / `REC(n)` / `REC('s')` | `rec(…)` / `rec(n, …)` / `recSplit("s", …)` |
 | `prov->AVP` / `'NAME'->AVP` | `avp(prov)` / `avp("NAME")` |
+| `(…)->CONCAT` / `CONCAT(k)` | `concat(…)` / `concat(k, …)` |
 | `(…)->JOIN` / `JOIN(k)` | `join(…)` / `join(k, …)` |
 | `(…)->FILL('d')`, `PREFIX`, `SUFFIX` | `fill("d", …)`, `prefix(…)`, `suffix(…)` (delimiter optional) |
-| `'EUR'` context literal | `lit("EUR")` (VALUE under REC/JOIN, ATTRIBUTE otherwise — as in the compiler) |
+| `'EUR'` context literal | `lit("EUR")` (VALUE under REC/CONCAT/JOIN, ATTRIBUTE otherwise — as in the compiler) |
 | `@'K'='V'` | `ctxAvp("K", "V")` |
 
 Provider kinds (VAL/ATTR/UNRESTRICTED) are inferred from the action, exactly as in the

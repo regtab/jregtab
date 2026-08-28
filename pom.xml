@@ -4,7 +4,7 @@
 
     <groupId>ru.icc.regtab</groupId>
     <artifactId>regtab</artifactId>
-    <version>0.5.4-SNAPSHOT</version>
+    <version>0.6.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>RegTab</name>

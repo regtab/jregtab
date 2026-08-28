@@ -463,7 +463,7 @@ public final class Rtl {
 
     // ==== context providers (RTL: 'text', @'ATTR'='VALUE') ====
 
-    /** Context literal (RTL {@code 'EUR'}): VALUE under REC/JOIN, ATTRIBUTE otherwise. */
+    /** Context literal (RTL {@code 'EUR'}): VALUE under REC/CONCAT/JOIN, ATTRIBUTE otherwise. */
     public static Ctx lit(String text) { return new Ctx(text); }
 
     /** Constant attribute-value pair (RTL {@code @'ATTR'='VALUE'}). */
@@ -503,19 +503,37 @@ public final class Rtl {
         return ActionSpec.avp(literal);
     }
 
-    /** RTL {@code (…)->JOIN}. */
+    /** RTL {@code (…)->CONCAT} — fold the provided records into the anchor's record. */
+    public static ActionSpec concat(ProvArg... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, resolve(providers, OperationType.CONCAT),
+                null, null, Set.of(), false);
+    }
+
+    /** RTL {@code (…)->CONCAT(k)} — with a key position. */
+    public static ActionSpec concat(int keyPosition, ProvArg... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, resolve(providers, OperationType.CONCAT),
+                null, null, Set.of(keyPosition), false);
+    }
+
+    /** RTL {@code (…)->CONCAT(k1,k2,…)} — with key positions. */
+    public static ActionSpec concat(Set<Integer> keyPositions, ProvArg... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, resolve(providers, OperationType.CONCAT),
+                null, null, keyPositions, false);
+    }
+
+    /** RTL {@code (…)->JOIN} — the record product (cross product with the provided records). */
     public static ActionSpec join(ProvArg... providers) {
         return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
                 null, null, Set.of(), false);
     }
 
-    /** RTL {@code (…)->JOIN(k)} — with a key position. */
+    /** RTL {@code (…)->JOIN(k)} — equi-join on a key position. */
     public static ActionSpec join(int keyPosition, ProvArg... providers) {
         return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
                 null, null, Set.of(keyPosition), false);
     }
 
-    /** RTL {@code (…)->JOIN(k1,k2,…)} — with key positions. */
+    /** RTL {@code (…)->JOIN(k1,k2,…)} — equi-join on key positions. */
     public static ActionSpec join(Set<Integer> keyPositions, ProvArg... providers) {
         return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
                 null, null, keyPositions, false);
@@ -552,7 +570,7 @@ public final class Rtl {
         for (ProvArg arg : providers) {
             result.add(switch (arg) {
                 case Prov p   -> p.spec(kindFor(op));
-                case Ctx c    -> (op == OperationType.REC || op == OperationType.JOIN)
+                case Ctx c    -> (op == OperationType.REC || op == OperationType.CONCAT || op == OperationType.JOIN)
                         ? ProviderSpec.ctxVal(c.text())
                         : ProviderSpec.ctxAttr(c.text());
                 case CtxAvp x -> ProviderSpec.ctxAvp(x.attribute(), x.value());
@@ -563,9 +581,9 @@ public final class Rtl {
 
     private static CellDerivedProviderKind kindFor(OperationType op) {
         return switch (op) {
-            case REC, JOIN -> CellDerivedProviderKind.VAL;
-            case AVP       -> CellDerivedProviderKind.ATTR;
-            default        -> CellDerivedProviderKind.UNRESTRICTED;
+            case REC, CONCAT, JOIN -> CellDerivedProviderKind.VAL;
+            case AVP               -> CellDerivedProviderKind.ATTR;
+            default                -> CellDerivedProviderKind.UNRESTRICTED;
         };
     }
 }

@@ -235,6 +235,7 @@ Specifies how an item participates in the semantic layer. Actions are attached t
 ```java
 ActionSpec.rec(ProviderSpec.val(ItemFilterConditionSpec.sameRow()))   // REC
 ActionSpec.avp("AIRLINE")                                             // AVP with literal attribute
+ActionSpec.concat(0, ProviderSpec.val(...))                           // CONCAT(0)
 ActionSpec.join(ProviderSpec.val(...))                                // JOIN
 ActionSpec.fill("/", ProviderSpec.val(...))                           // FILL
 ActionSpec.prefix(" ", ProviderSpec.val(...))                         // PREFIX
@@ -247,8 +248,10 @@ ActionSpec.suffix(" ", ProviderSpec.val(...))                         // SUFFIX
 | `rec(int anchorPos, ProviderSpec... providers)` | REC with schema anchor at position N. |
 | `avp(ProviderSpec provider)` | Attribute-value pair via provider. |
 | `avp(String literal)` | AVP with constant attribute name. |
-| `join(ProviderSpec... providers)` | JOIN: merge co-anchored items. |
-| `join(Set<Integer> keyPositions, ProviderSpec... providers)` | JOIN with key positions. |
+| `concat(ProviderSpec... providers)` | CONCAT: fold the provided records into the anchor's record (one wider record). |
+| `concat(int keyPosition, ProviderSpec... providers)`, `concat(Set<Integer> keyPositions, ProviderSpec... providers)` | CONCAT with key positions K (must agree, not repeated). Was `join(…)` up to 0.5.x. |
+| `join(ProviderSpec... providers)` | JOIN: the record product — one record per (anchor record × provided record). |
+| `join(int keyPosition, ProviderSpec... providers)`, `join(Set<Integer> keyPositions, ProviderSpec... providers)` | Equi-join on the key positions K. |
 | `fill(String delimiter, ProviderSpec... providers)` | Fill gap in REC sequence. |
 | `prefix(String delimiter, ProviderSpec... providers)` | Prepend to anchor value. |
 | `suffix(String delimiter, ProviderSpec... providers)` | Append to anchor value. |
@@ -361,6 +364,8 @@ Recordset rs = new TableInterpreter()
 | `withMissingValueHandler(MissingValueHandler h)` | Handling of missing attribute values (default: `NULL_HANDLER`). |
 | `withTransformations(List<RecordsetTransformation> t)` | Post-processing transformations. |
 | `withAnonymousAttributeTemplate(String template)` | Name template for unnamed attributes; `%i` → index. Default: `"$a_%i"`. |
+| `withStrictPreconditions(boolean strict)` | A violated `CONCAT`/`JOIN` precondition (e.g. a named attribute shared by two concatenated records) raises an `IllegalStateException` instead of having no effect. Default: `false`. |
+| `List<Diagnostic> diagnostics()` | The `CONCAT`/`JOIN` actions skipped during the most recent `interpret(...)` because a precondition was violated — each with the anchor, the operation and the reason. Empty when nothing was skipped. |
 
 ---
 

@@ -2,9 +2,9 @@ package ru.icc.regtab.itm.semantics.operation;
 
 /**
  * Working-state update operation (def:ws-update-operation).
- * Sealed interface with six permitted implementations.
+ * Sealed interface with seven permitted implementations.
  */
 public sealed interface WorkingStateOperation
         permits FillOperation, PrefixOperation, SuffixOperation,
-                AvpOperation, RecOperation, JoinOperation {
+                AvpOperation, RecOperation, ConcatOperation, JoinOperation {
 }

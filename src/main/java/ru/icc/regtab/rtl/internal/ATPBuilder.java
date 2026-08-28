@@ -338,7 +338,7 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             return ProviderSpec.ctxAvp(name, value);
         }
         String literal = StringExtractorFactory.parseStringLiteral(ctx.ctxProvSpec().STRING().getText());
-        if (op != null && (op.recOp() != null || op.joinOp() != null))
+        if (op != null && (op.recOp() != null || op.concatOp() != null || op.joinOp() != null))
             return ProviderSpec.ctxVal(literal);
         return ProviderSpec.ctxAttr(literal);
     }
@@ -350,6 +350,11 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             Integer anchorPos      = rec.INT()    != null ? Integer.parseInt(rec.INT().getText()) : null;
             String  splitDelimiter = rec.STRING() != null ? StringExtractorFactory.parseStringLiteral(rec.STRING().getText()) : null;
             return new ActionSpec(OperationType.REC, null, providers, anchorPos, splitDelimiter);
+        }
+        if (ctx.concatOp() != null) {
+            Set<Integer> kp = new LinkedHashSet<>();
+            for (var t : ctx.concatOp().INT()) kp.add(Integer.parseInt(t.getText()));
+            return new ActionSpec(OperationType.CONCAT, null, providers, null, null, Set.copyOf(kp), false);
         }
         if (ctx.joinOp() != null) {
             Set<Integer> kp = new LinkedHashSet<>();

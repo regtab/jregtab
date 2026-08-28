@@ -67,7 +67,7 @@
       ]
     },
     "action": {
-      "match": "(?i)\\b(FILL|PREFIX|SUFFIX|AVP|REC|JOIN)\\b",
+      "match": "(?i)\\b(FILL|PREFIX|SUFFIX|AVP|REC|CONCAT|JOIN)\\b",
       "name": "keyword.control.action.rtl"
     },
     "provider": {

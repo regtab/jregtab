@@ -99,7 +99,7 @@ Requires **Java 21+**.
 - **RTL** (Regular Table Language) — compact DSL that compiles to ATP; dramatically reduces pattern verbosity.
 - **ATP → RTL serializer** — round-trip: serialize any `TablePattern` back to an RTL string.
 - **Content specs** — atomic, delimited, compound, and conditional cell content.
-- **Action specs** — `REC`, `AVP`, `JOIN`, `FILL`, `PREFIX`, `SUFFIX` for rich schema construction.
+- **Action specs** — `REC`, `AVP`, `CONCAT`, `JOIN`, `FILL`, `PREFIX`, `SUFFIX` for rich schema construction (fold records with `CONCAT`, multiply them with `JOIN`).
 - **Named fragments** — reuse recurring sub-patterns in RTL with `$name` definitions.
 - **Post-processing** — whitespace normalization, field splitting, schema reordering.
 - **150-task benchmark** — Foofah (50), RegTab (60), and Baikal (40) tasks, 1 500 test variants, 100 % pass rate.
