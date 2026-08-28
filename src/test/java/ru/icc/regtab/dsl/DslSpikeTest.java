@@ -81,13 +81,13 @@ class DslSpikeTest {
     }
 
     @Test
-    @DisplayName("016: REC + JOIN(0) with bare conjunction BW&STR*")
+    @DisplayName("016: REC + CONCAT(0) with bare conjunction BW&STR*")
     void task016() {
         assertMirrors(/* language=RTL */ """
-                [ [VAL : RT->REC, BW&STR*->JOIN(0)] [VAL] ]+
+                [ [VAL : RT->REC, BW&STR*->CONCAT(0)] [VAL] ]+
                 """,
                 table(subtable(
-                        row(cell(VAL, rec(RT), join(0, BW.and(STR).unbounded())), cell(VAL))
+                        row(cell(VAL, rec(RT), concat(0, BW.and(STR).unbounded())), cell(VAL))
                                 .oneOrMore())));
     }
 
@@ -109,11 +109,11 @@ class DslSpikeTest {
     @DisplayName("023: empty context AVP, SUFFIX, AUX, provider-based AVP")
     void task023() {
         assertMirrors(/* language=RTL */ """
-                { [ [VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [ATTR : RT->SUFFIX] [AUX] [VAL : SR->AVP] ]{3} }+
+                { [ [VAL : ''->AVP, SR*->REC, BW&STR*->CONCAT(0)] [ATTR : RT->SUFFIX] [AUX] [VAL : SR->AVP] ]{3} }+
                 """,
                 table(
                         subtable(
-                                row(cell(VAL, avp(""), rec(SR.unbounded()), join(0, BW.and(STR).unbounded())),
+                                row(cell(VAL, avp(""), rec(SR.unbounded()), concat(0, BW.and(STR).unbounded())),
                                         cell(ATTR, suffix(RT)),
                                         cell(AUX),
                                         cell(VAL, avp(SR))
@@ -196,12 +196,12 @@ class DslSpikeTest {
     @DisplayName("025: SUFFIX('/'), REC('/') split, relative open column range C+2..*")
     void task025() {
         assertMirrors(/* language=RTL */ """
-                [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->JOIN(0)] [VAL]+ ]+
+                [ [VAL : RT->SUFFIX('/'), RT&C+2..*->REC('/'), BW&STR*->CONCAT(0)] [VAL]+ ]+
                 """,
                 table(subtable(row(
                         cell(VAL, suffix("/", RT),
                                 recSplit("/", RT.and(CrelFrom(2)).unbounded()),
-                                join(0, BW.and(STR).unbounded())),
+                                concat(0, BW.and(STR).unbounded())),
                         cell(VAL).oneOrMore()).oneOrMore())));
     }
 
@@ -222,12 +222,12 @@ class DslSpikeTest {
     @DisplayName("069: row-level inherited REC merged down into subrow atoms")
     void task069() {
         assertMirrors(/* language=RTL */ """
-                [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->JOIN][VAL#'2': ROW&#'2'*->JOIN] }* ]
+                [ BW*->REC { [ATTR] [VAL#'1': ROW&#'1'*->CONCAT][VAL#'2': ROW&#'2'*->CONCAT] }* ]
                 """,
                 table(subtable(row(acts(rec(BW.unbounded())),
                         subrow(cell(ATTR),
-                                cell(val(join(ROW.and(tag("1")).unbounded())).tagged("1")),
-                                cell(val(join(ROW.and(tag("2")).unbounded())).tagged("2")))
+                                cell(val(concat(ROW.and(tag("1")).unbounded())).tagged("1")),
+                                cell(val(concat(ROW.and(tag("2")).unbounded())).tagged("2")))
                                 .zeroOrMore()))));
     }
 

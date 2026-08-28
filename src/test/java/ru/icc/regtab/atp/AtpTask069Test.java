@@ -45,11 +45,11 @@ class AtpTask069Test extends AtpTaskBase {
                                         CellPattern.of(AtomicContentSpec.attr()),
                                         CellPattern.of(AtomicContentSpec.valTagged("#1",
                                                 avpSR, recBW,
-                                                ActionSpec.join(ProviderSpec.val(ProviderSpec.UNBOUNDED, ROW_TAG1))
+                                                ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, ROW_TAG1))
                                         )),
                                         CellPattern.of(AtomicContentSpec.valTagged("#2",
                                                 avpSR, recBW,
-                                                ActionSpec.join(ProviderSpec.val(ProviderSpec.UNBOUNDED, ROW_TAG2))
+                                                ActionSpec.concat(ProviderSpec.val(ProviderSpec.UNBOUNDED, ROW_TAG2))
                                         ))
                                 )
                         ),

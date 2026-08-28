@@ -15,7 +15,7 @@ public class RtlTask098Test extends RtlTaskBase {
     protected String buildRtl() {
         return /* language=RTL */ """
                 [ []                                    []    [ATTR]+ ]
-                [ [VAL: RT*->REC, (BW&STR)*->JOIN(0,1)] [VAL] [VAL: COL->AVP]{2} [VAL]+ ]+
+                [ [VAL: RT*->REC, (BW&STR)*->CONCAT(0,1,2,3)] [VAL] [VAL: COL->AVP]{2} [VAL]+ ]+
                 """;
     }
 }

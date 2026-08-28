@@ -1,2 +1,5 @@
-generated: 2026-08-26
+generated: 2026-08-28
 sources: RtlTask001..150 + curated extras
+note: CONCAT(K) reintroduced (the former JOIN(K)); JOIN(K) redefined as the record product;
+      semantic cases concat_by_key, join_product, join_equi_key added; task_098 lists its full
+      group key CONCAT(0,1,2,3)

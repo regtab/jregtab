@@ -154,7 +154,7 @@ class RtlCompilerTest {
         compile("[ [VAL : (CL)->FILL('/')] ]");
         compile("[ [VAL : (CL)->PREFIX(' ')] ]");
         compile("[ [VAL : (CL)->SUFFIX(',')] ]");
-        compile("[ [VAL : (CL)->JOIN(0)] ]");
+        compile("[ [VAL : (CL)->CONCAT(0)] ]");
     }
 
     @Test

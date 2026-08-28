@@ -41,7 +41,7 @@ class AtpTask053Test extends AtpTaskBase {
                                 SubrowPattern.of(
                                         CellPattern.of(AtomicContentSpec.val(
                                                 ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_ROW)),
-                                                ActionSpec.join(0, ProviderSpec.val(1, BELOW_STR)),
+                                                ActionSpec.concat(0, ProviderSpec.val(1, BELOW_STR)),
                                                 ActionSpec.avp("ID")
                                         ))
                                 ),

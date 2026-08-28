@@ -245,6 +245,12 @@ public final class AtpToRtlSerializer {
                 if (as.splitDelimiter() != null) yield "REC('" + escapeString(as.splitDelimiter()) + "')";
                 yield "REC";
             }
+            case CONCAT -> {
+                Set<Integer> kp = as.keyPositions();
+                if (kp.isEmpty()) yield "CONCAT";
+                String args = kp.stream().sorted().map(Object::toString).collect(Collectors.joining(", "));
+                yield "CONCAT(" + args + ")";
+            }
             case JOIN -> {
                 Set<Integer> kp = as.keyPositions();
                 if (kp.isEmpty()) yield "JOIN";

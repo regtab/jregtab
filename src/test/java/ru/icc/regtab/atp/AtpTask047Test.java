@@ -16,7 +16,7 @@ import ru.icc.regtab.atp.spec.TablePattern;
 
 /**
  * Task 47: repeated subtables with one-or-more non-blank two-cell rows —
- * anchor VAL with same-row REC and below-same-string JOIN(0), plus a plain VAL.
+ * anchor VAL with same-row REC and below-same-string CONCAT(0), plus a plain VAL.
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_047/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask047Test}
@@ -40,7 +40,7 @@ class AtpTask047Test extends AtpTaskBase {
                         RowPattern.of(Quantifier.oneOrMore(),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
                                         ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
-                                        ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                        ActionSpec.concat(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                                 )),
                                 CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val())
                         )

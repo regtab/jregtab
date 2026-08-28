@@ -17,13 +17,13 @@ import ru.icc.regtab.atp.spec.TablePattern;
 /**
  * Task 94: single header row (groups separated by optional blank) above one-or-more
  * blank-separated data blocks; COL*-&gt;REC collects all same-column VALs regardless of
- * subtable boundaries, (ROW &amp; C+1.. &amp; STR)*-&gt;JOIN(0) merges sibling header columns
+ * subtable boundaries, (ROW &amp; C+1.. &amp; STR)*-&gt;CONCAT(0) merges sibling header columns
  * into one record.
  * <p>
  * Fixtures: {@code src/test/resources/tasks/task_094/}
  * RTL: {@link ru.icc.regtab.rtl.RtlTask094Test}
  * <pre>
- * [ { [!BLANK? VAL: COL*-&gt;REC, (ROW &amp; C+1.. &amp; STR)*-&gt;JOIN(0)]+ [BLANK?]? }+ ]
+ * [ { [!BLANK? VAL: COL*-&gt;REC, (ROW &amp; C+1.. &amp; STR)*-&gt;CONCAT(0)]+ [BLANK?]? }+ ]
  * { [ { [!BLANK? VAL]+ [BLANK?]? }+ ]+
  *   [ [BLANK?]+ ]? }+
  * </pre>
@@ -46,7 +46,7 @@ class AtpTask094Test extends AtpTaskBase {
         );
 
         ActionSpec colRec  = ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, sameCol));
-        ActionSpec rowJoin = ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, rowColRightStr));
+        ActionSpec rowJoin = ActionSpec.concat(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, rowColRightStr));
 
         CellPattern headerCell = CellPattern.of(NOT_BLANK, Quantifier.oneOrMore(),
                 AtomicContentSpec.val(colRec, rowJoin));

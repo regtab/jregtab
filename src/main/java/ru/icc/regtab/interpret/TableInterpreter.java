@@ -1,6 +1,7 @@
 package ru.icc.regtab.interpret;
 
 import ru.icc.regtab.itm.InterpretableTable;
+import ru.icc.regtab.itm.semantics.Diagnostic;
 import ru.icc.regtab.itm.semantics.TableSemantics;
 import ru.icc.regtab.itm.semantics.WorkingState;
 import ru.icc.regtab.itm.semantics.action.InterpretationAction;
@@ -18,6 +19,12 @@ import java.util.*;
 /**
  * Table interpreter: derives a recordset from an InterpretableTable
  * by executing 4 phases (Sec. 3.3).
+ * <p>
+ * Working state completion applies the actions in operation-type order
+ * {@code FILL/PREFIX/SUFFIX → AVP → REC → CONCAT → JOIN}: records are folded by concatenation
+ * before they are multiplied by joins. Preconditions violated by {@code CONCAT}/{@code JOIN}
+ * leave the working state unchanged and are reported through {@link #diagnostics()}
+ * (or raise an exception under {@link #withStrictPreconditions(boolean) strict preconditions}).
  */
 public final class TableInterpreter {
 
@@ -28,6 +35,8 @@ public final class TableInterpreter {
     private MissingValueHandler missingValueHandler = MissingValueHandler.NULL_HANDLER;
     private List<RecordsetTransformation> transformations = List.of();
     private String anonymousAttributeTemplate = DEFAULT_ANONYMOUS_ATTRIBUTE_TEMPLATE;
+    private boolean strictPreconditions = false;
+    private List<Diagnostic> diagnostics = List.of();
 
     public TableInterpreter withStrategy(SchemaConstructionStrategy strategy) {
         this.strategy = Objects.requireNonNull(strategy);
@@ -65,6 +74,27 @@ public final class TableInterpreter {
     }
 
     /**
+     * Strict preconditions: a {@code CONCAT} / {@code JOIN} action whose precondition is violated
+     * (e.g. a named attribute shared by two records being concatenated) raises an
+     * {@link IllegalStateException} instead of having no effect. Default: {@code false} —
+     * by the formal model the operation has no effect, and the violation is reported through
+     * {@link #diagnostics()}.
+     */
+    public TableInterpreter withStrictPreconditions(boolean strict) {
+        this.strictPreconditions = strict;
+        return this;
+    }
+
+    /**
+     * Diagnostics of the most recent {@link #interpret(InterpretableTable)} call: every
+     * {@code CONCAT} / {@code JOIN} action that was skipped because its precondition was violated.
+     * Empty if nothing was skipped (or before the first call).
+     */
+    public List<Diagnostic> diagnostics() {
+        return diagnostics;
+    }
+
+    /**
      * Interprets the given table and returns the resulting recordset.
      */
     public Recordset interpret(InterpretableTable table) {
@@ -75,6 +105,7 @@ public final class TableInterpreter {
 
         // Phase 2: Working state completion
         completeWorkingState(ws, sem.actions());
+        diagnostics = List.copyOf(ws.diagnostics());
 
         // Phase 3: Recordset extraction
         Recordset recordset = extractRecordset(ws);
@@ -88,7 +119,7 @@ public final class TableInterpreter {
     // --- Phase 1: Working state initialization ---
 
     private WorkingState initWorkingState(TableSemantics sem) {
-        WorkingState ws = new WorkingState();
+        WorkingState ws = new WorkingState(strictPreconditions);
 
         for (CellDerivedItem item : sem.cellDerivedItems()) {
             switch (item.type()) {
@@ -113,6 +144,7 @@ public final class TableInterpreter {
         List<InterpretationAction> strActions = new ArrayList<>();
         List<InterpretationAction> avpActions = new ArrayList<>();
         List<InterpretationAction> recActions = new ArrayList<>();
+        List<InterpretationAction> concatActions = new ArrayList<>();
         List<InterpretationAction> joinActions = new ArrayList<>();
 
         for (InterpretationAction action : actions) {
@@ -122,6 +154,7 @@ public final class TableInterpreter {
                 case SuffixOperation ignored -> strActions.add(action);
                 case AvpOperation ignored -> avpActions.add(action);
                 case RecOperation ignored -> recActions.add(action);
+                case ConcatOperation ignored -> concatActions.add(action);
                 case JoinOperation ignored -> joinActions.add(action);
             }
         }
@@ -130,11 +163,13 @@ public final class TableInterpreter {
         strActions.sort(cmp);
         avpActions.sort(cmp);
         recActions.sort(cmp);
+        concatActions.sort(cmp);
         joinActions.sort(cmp);
 
         for (InterpretationAction action : strActions) applyAction(ws, action);
         for (InterpretationAction action : avpActions) applyAction(ws, action);
         for (InterpretationAction action : recActions) applyAction(ws, action);
+        for (InterpretationAction action : concatActions) applyAction(ws, action);
         for (InterpretationAction action : joinActions) applyAction(ws, action);
     }
 
@@ -158,7 +193,8 @@ public final class TableInterpreter {
             // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
             case AvpOperation ignored  -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
             case RecOperation ignored  -> ws.applyRec((CellDerivedItem) anchor, items);
-            case JoinOperation op  -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.keyPositions()); }
+            case ConcatOperation op -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items, op.keyPositions()); }
+            case JoinOperation op   -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.keyPositions()); }
         }
     }
 
@@ -176,7 +212,7 @@ public final class TableInterpreter {
     }
 
     private Schema constructSchema(WorkingState ws) {
-        Map<CellDerivedItem, List<Item>> allRec = ws.allRec();
+        Map<CellDerivedItem, List<List<Item>>> allRec = ws.allRec();      // live anchors only
         List<CellDerivedItem> anchors = new ArrayList<>(allRec.keySet());
 
         List<String> schemaAttrs = new ArrayList<>();
@@ -198,13 +234,15 @@ public final class TableInterpreter {
         }
         schemaAttrs.add(a1);
 
-        List<int[]> pairs = strategy.buildVisitOrder(anchors, allRec);
+        List<int[]> triples = strategy.buildVisitOrder(anchors, allRec);
         Set<String> inSchema = new LinkedHashSet<>(schemaAttrs);
 
-        for (int[] pair : pairs) {
-            CellDerivedItem anchor = anchors.get(pair[0]);
-            int posIdx = pair[1];
-            List<Item> sequence = allRec.get(anchor);
+        for (int[] triple : triples) {
+            CellDerivedItem anchor = anchors.get(triple[0]);
+            List<List<Item>> records = allRec.get(anchor);
+            if (triple[1] >= records.size()) continue;
+            List<Item> sequence = records.get(triple[1]);
+            int posIdx = triple[2];
             if (posIdx >= sequence.size()) continue;
             Item item = sequence.get(posIdx);
 
@@ -238,18 +276,20 @@ public final class TableInterpreter {
         List<Record> records = new ArrayList<>();
 
         List<String> attrs = schema.attributes();
-        for (var entry : ws.allRec().entrySet()) {
-            String[] values = new String[attrs.size()];
-            for (int i = 0; i < values.length; i++) {
-                values[i] = missingValueHandler.handle(attrs.get(i));
+        for (var entry : ws.allRec().entrySet()) {                       // live anchors only
+            for (List<Item> sequence : entry.getValue()) {
+                String[] values = new String[attrs.size()];
+                for (int i = 0; i < values.length; i++) {
+                    values[i] = missingValueHandler.handle(attrs.get(i));
+                }
+                for (Item item : sequence) {
+                    String a = ws.assoc(item);
+                    if (a == null) continue;
+                    int i = schema.indexOf(a);
+                    if (i >= 0) values[i] = ws.val(item);
+                }
+                records.add(new Record(schema, values));
             }
-            for (Item item : entry.getValue()) {
-                String a = ws.assoc(item);
-                if (a == null) continue;
-                int i = schema.indexOf(a);
-                if (i >= 0) values[i] = ws.val(item);
-            }
-            records.add(new Record(schema, values));
         }
         return records;
     }
