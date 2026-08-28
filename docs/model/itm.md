@@ -234,10 +234,13 @@ During interpretation, semantic information is accumulated in a **working state*
 - `val(ι)` — maps each VAL item to a value in `V`;
 - `attr(ι)` — maps each ATTR item to an attribute in `A`;
 - `avp(ι)` — partial map from VAL items to `(attribute, value)` pairs;
-- `rec(ι)` — partial map from cell-derived VAL items to sequences of VAL items
-  (the *item-based records*).
+- `rec(ι)` — partial map from cell-derived VAL items to a *non-empty sequence* of item-based
+  records (each a sequence of VAL items); a single record until a join multiplies it;
+- `J ⊆ dom(rec)` — the *joined-away anchors*: items whose records were consumed by a join. They
+  stay in `rec` (a later join may consume the same records again) but are excluded from recordset
+  extraction; `dom*(rec) = dom(rec) \ J` are the *live* anchors.
 
-Six **working-state update operations** populate or modify the working state:
+Seven **working-state update operations** populate or modify the working state:
 
 | Operation | Symbol | Effect |
 |---|---|---|
@@ -246,10 +249,11 @@ Six **working-state update operations** populate or modify the working state:
 | Suffix | `O_suffix^δ` | Appends provider strings (joined by `δ`) to the anchor's value/attribute |
 | AVP construction | `O_avp` | Creates an attribute-value pair `(attr(ι₁), val(ι_anch))` for the anchor VAL item using the single ATTR item `ι₁` returned by the provider |
 | Record construction | `O_rec` | Creates an item-based record with the anchor VAL item as its first element and the provided VAL items as the remaining elements |
-| Record join | `O_join^K` | Merges previously created records; key positions `K` are dropped from joined records, duplicate named attributes are removed, and the merged result is stored under the anchor |
+| Record concatenation | `O_concat^K` | Folds previously created records into one wide record under the anchor: the key positions `K` (at which all records must agree) are not repeated; the concatenated anchors are removed from `dom(rec)`. A named attribute shared by two records (apart from the key) is a precondition violation: no effect, a diagnostic is recorded |
+| Record join | `O_join^K` | The record product: every record of the anchor is combined with every record of the provided anchors — a cross product for `K = ∅`, an equi-join on the key positions `K` otherwise; a shared named attribute is a natural-join condition (kept once if the values agree, the pair is dropped otherwise). The provided anchors are added to `J` |
 
 ??? note "Java mapping — WorkingState"
-    **Definition (Working state):** `ws = (V, A, val, attr, avp, rec)`.
+    **Definition (Working state):** `ws = (V, A, val, attr, avp, rec, J)`.
 
     | Formal component | Java |
     |---|---|
@@ -258,10 +262,12 @@ Six **working-state update operations** populate or modify the working state:
     | `val(ι)` | `WorkingState.val(item)` |
     | `attr(ι)` | `WorkingState.attr(item)` |
     | `avp(ι)` | `WorkingState.avp(item)` → `AttributeValuePair(attribute, value)` |
-    | `rec(ι)` | `WorkingState.rec(item)` → `List<Item>` |
+    | `rec(ι)` | `WorkingState.rec(item)` → `List<List<Item>>` (the records of the anchor, also for joined-away anchors) |
+    | `J` | `WorkingState.allJoined()`, `WorkingState.isJoined(item)` |
+    | `dom*(rec) = dom(rec) \ J` | `WorkingState.allRec()` — the **live** anchors only, in insertion order; this is what recordset extraction sees |
     | Derived `assoc(ι)` | `WorkingState.assoc(item)` — attribute of `avp(ι)`, or `null` |
 
-    Six working-state update operations:
+    Seven working-state update operations:
 
     | Formal operation | Java method | Anchor type |
     |---|---|---|
@@ -270,14 +276,19 @@ Six **working-state update operations** populate or modify the working state:
     | `O_suffix^δ` | `WorkingState.applySuffix(anchor, items, delimiter)` | VAL or ATTR |
     | `O_avp` | `WorkingState.applyAvp(anchor, items)` | VAL |
     | `O_rec` | `WorkingState.applyRec(anchor, items)` | cell-derived VAL |
+    | `O_concat^K` | `WorkingState.applyConcat(anchor, items, keyPositions)` | cell-derived VAL |
     | `O_join^K` | `WorkingState.applyJoin(anchor, items, keyPositions)` | cell-derived VAL |
+
+    A violated precondition of `O_concat^K` / `O_join^K` has no effect and is recorded as a
+    `Diagnostic` (`WorkingState.diagnostics()`, surfaced as `TableInterpreter.diagnostics()`);
+    `new WorkingState(true)` / `TableInterpreter.withStrictPreconditions(true)` raise instead.
 
     Consistency predicates:
 
     | Predicate | Java method |
     |---|---|
-    | Basic consistency: `rec(ι)[0] = ι` and `avp(ι) = (a,v) ⟹ val(ι) = v` | `WorkingState.isConsistent()` |
-    | Recordset-consistency: uniform anchor attribute + distinct per-record attributes | `WorkingState.isRecordsetConsistent()` |
+    | Basic consistency: `ρ[0] = ι` for every `ρ ∈ rec(ι)`, and `avp(ι) = (a,v) ⟹ val(ι) = v` | `WorkingState.isConsistent()` |
+    | Recordset-consistency over the live anchors: uniform anchor attribute + distinct attributes in every record | `WorkingState.isRecordsetConsistent()` |
 
 ### Interpretation actions
 
@@ -299,7 +310,8 @@ satisfy the constraints of the chosen operation (Tab. I in the paper):
 | String modification | VAL or ATTR (cell-derived) | any | ≥ 1 |
 | AVP construction | VAL (cell- or context-derived) | ATTR provider | = 1 |
 | Record construction | VAL (cell-derived) | VAL providers | ≥ 0 |
-| Record join | VAL (cell-derived) | VAL providers (cell-derived) | ≥ 0 |
+| Record concatenation | VAL (cell-derived) | VAL providers (cell-derived) | ≥ 1 |
+| Record join | VAL (cell-derived) | VAL providers (cell-derived) | ≥ 1 |
 
 ??? note "Java API — ActionSpec"
     **Action spec:** `S_act = (op, ⟨S_prov¹, …, S_provⁿ⟩)` where `op` is a
@@ -309,8 +321,10 @@ satisfy the constraints of the chosen operation (Tab. I in the paper):
     |---|---|---|
     | `REC` | `ActionSpec.rec(providers…)` | Anchor item → record; providers supply the remaining fields |
     | `AVP` | `ActionSpec.avp(provider)` | Associates a VAL item (anchor) with an ATTR item from the provider |
-    | `JOIN` | `ActionSpec.join(providers…)` | Joins item-based records; dedup by named attribute (K=∅) |
-    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Joins with key positions K dropped (e.g. `JOIN(0)` drops the anchor position) |
+    | `CONCAT` | `ActionSpec.concat(providers…)` | Folds the provided records into the anchor's record (K=∅) |
+    | `CONCAT(K)` | `ActionSpec.concat(Set.of(0), providers…)` | Same, key positions K not repeated (e.g. `CONCAT(0)` drops the anchor position of each provided record) |
+    | `JOIN` | `ActionSpec.join(providers…)` | Record product: one record per (anchor record × provided record) |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Equi-join on the key positions K |
     | `FILL` | `ActionSpec.fill(delimiter, providers…)` | Fills anchor value using provider values |
     | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | Prepends provider values to the anchor |
     | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | Appends provider values to the anchor |
@@ -327,7 +341,12 @@ satisfy the constraints of the chosen operation (Tab. I in the paper):
 ## Recordset and schema
 
 **Definition (Recordset):** given a schema `S = ⟨a₁, …, aₙ⟩`, a *record* is an
-n-tuple `⟨(a₁,v₁), …, (aₙ,vₙ)⟩`; a *recordset* is a finite sequence of records.
+n-tuple `⟨(a₁,v₁), …, (aₙ,vₙ)⟩`; a *recordset* is a finite **multiset** of records — as in the
+relational model, the order of records is not part of the result, whereas duplicates are.
+Implementations materialize a recordset as a sequence (e.g. for CSV export); the reference
+implementation emits records in the order in which their anchors were visited during working
+state completion and, for an anchor carrying several records after a join, in the nested-loop
+order of the join. This order is a documented default, not a guarantee of the model.
 
 ??? note "Java mapping — Schema, Record, Recordset"
     | Formal concept | Java class / method |
@@ -349,7 +368,7 @@ An initial working state `ws₀` is constructed directly from the semantic layer
 
 - each VAL item is assigned its value `val(ι) ∈ V`;
 - each ATTR item is assigned its attribute `attr(ι) ∈ A`;
-- `dom(avp)` and `dom(rec)` are initialised to empty.
+- `dom(avp)`, `dom(rec)` and `J` are initialised to empty.
 
 ### Phase 2 — Working state completion
 
@@ -358,7 +377,8 @@ The interpretation actions `A` are applied to `ws₀` in a fixed order:
 1. String-modification actions (`O_fill`, `O_prefix`, `O_suffix`);
 2. AVP-construction actions (`O_avp`);
 3. Record-construction actions (`O_rec`);
-4. Record-join actions (`O_join`).
+4. Record-concatenation actions (`O_concat`) — records are folded …
+5. Record-join actions (`O_join`) — … before they are multiplied.
 
 Within each phase, actions are applied in *traversal order* over their anchor
 items.  The default strategy visits anchors in row-major order
@@ -384,12 +404,13 @@ item-based records:
    `S = ⟨a₁, a₂, …, aₙ⟩`; unnamed items receive a fresh anonymous attribute for
    their position.
 
-**Record generation** iterates over `dom(rec)` in the order in which record-construction
-actions were applied:
+**Record generation** iterates over the live anchors `dom*(rec) = dom(rec) \ J` in the order in
+which record-construction actions were applied, and over the records `ρ ∈ rec(ι)` of each anchor
+(several after a join):
 
-- For each anchor `ι`, initialise all `n` field values to a *missing value* (via
+- For each record `ρ`, initialise all `n` field values to a *missing value* (via
   an optional user-defined handler `μ`; default: `⊥`).
-- For each item `ι'` in `rec(ι)` that has an associated attribute in `S`, fill in
+- For each item `ι'` in `ρ` that has an associated attribute in `S`, fill in
   `val(ι')` at the corresponding position.
 - Emit the resulting record `⟨(a₁, v₁), …, (aₙ, vₙ)⟩`.
 

@@ -1,6 +1,7 @@
 # Examples
 
-Three worked examples drawn from the benchmark test suite — tasks **052**, **053**, and **046**.
+Six worked examples: five drawn from the benchmark test suite — tasks **052**, **053**, **046**,
+**116**, and **051** — and one from the conformance corpus (`join_product`, the record product).
 For each task the ATP pattern and its RTL equivalent are shown side by side.
 
 ---
@@ -127,10 +128,11 @@ mvn test -Dtest="RtlTask052Test"
 
 ---
 
-## Example 2 — Task 053: compound attribute names and paired-row JOIN
+## Example 2 — Task 053: compound attribute names and paired-row CONCAT
 
 Two physical rows describe one logical record. Attribute names are *composed* from a group header
-(`REF`, `SPECS`) and a per-row qualifier (`TP`, `HV`, …), and the paired rows are merged by JOIN.
+(`REF`, `SPECS`) and a per-row qualifier (`TP`, `HV`, …), and the paired rows are concatenated
+into one record by `CONCAT` — the counterpart of `pandas.concat(axis=1)` aligned on the `ID` key.
 
 **Input table** (task 053, variant 1):
 
@@ -190,7 +192,7 @@ TablePattern pattern = TablePattern.of(
                         SubrowPattern.of(
                                 CellPattern.of(AtomicContentSpec.val(
                                         ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_ROW)),
-                                        ActionSpec.join(0, ProviderSpec.val(1, BELOW_STR)),
+                                        ActionSpec.concat(0, ProviderSpec.val(1, BELOW_STR)),
                                         ActionSpec.avp("ID")
                                 ))
                         ),
@@ -212,7 +214,7 @@ TablePattern pattern = TablePattern.of(
 
 ```rtl
 [ [] [AUX]+ ]
-[ [VAL : ROW*->REC, BW&STR->JOIN(0), 'ID'->AVP]
+[ [VAL : ROW*->REC, BW&STR->CONCAT(0), 'ID'->AVP]
   {[ATTR : AV->PREFIX('_')] [VAL : SR->AVP]}+ ]+
 ```
 
@@ -221,11 +223,12 @@ TablePattern pattern = TablePattern.of(
 - **Header subtable** `[ [] [AUX]+ ]`: skip the corner `[]`, then mark the group-name cells
   (`REF`, `REF`, `SPECS`, `SPECS`) as `AUX` — they are not values, they only supply name prefixes.
 - **Data subtable** `[ … ]+`: one-or-more rows. The anchor cell
-  `[VAL : ROW*->REC, BW&STR->JOIN(0), 'ID'->AVP]` is the `ID` value (`T-1`):
+  `[VAL : ROW*->REC, BW&STR->CONCAT(0), 'ID'->AVP]` is the `ID` value (`T-1`):
   - `ROW*->REC` collects all `VAL` items in the same row into one record.
   - `'ID'->AVP` names the anchor's attribute `ID`.
-  - `BW&STR->JOIN(0)` (`Below` & `SameStr`) merges the next row whose `ID` string is identical below,
-    so `T-1`'s two physical rows fold into a single record.
+  - `BW&STR->CONCAT(0)` (`Below` & `SameStr`) concatenates the record of the next row whose `ID`
+    string is identical below to the anchor's record, so `T-1`'s two physical rows fold into a
+    single wider record; key position `0` (the `ID`) is not repeated.
 - The rest of each row is an **explicit subrow** `{[ATTR] [VAL]}+` repeated per qualifier/value pair:
   - `[ATTR : AV->PREFIX('_')]` — the qualifier cell (`TP`, `HV`, …) becomes an `ATTR`; `AV`
     (`Above`) prepends the group header from the cell above with `'_'`, forming `REF_TP`,
@@ -241,9 +244,21 @@ TablePattern pattern = TablePattern.of(
    `REF_SN=001`, `SPECS_LV=110` (row 2); `REF_TP=D24`, `SPECS_HV=110` (row 3);
    `REF_SN=002`, `SPECS_LV=10` (row 4).
 3. **REC** (one per row): `⟨T-1, D16, 750⟩`, `⟨T-1, 001, 110⟩`, `⟨T-2, D24, 110⟩`, `⟨T-2, 002, 10⟩`.
-4. **JOIN(0)** merges the row below sharing the same `ID`:
+4. **CONCAT(0)** concatenates the record of the row below sharing the same `ID` (its position 0,
+   the second `ID`, is dropped):
    - `⟨T-1, D16, 750, 001, 110⟩`
    - `⟨T-2, D24, 110, 002, 10⟩`
+
+!!! note "CONCAT vs JOIN"
+    `CONCAT` **folds** records: two records become one wider record. `JOIN` **multiplies** them:
+    every record of the anchor is combined with every provided record, and the width stays fixed.
+    Here each `ID` has exactly one row below, so `JOIN(0)` would give the same two records — the
+    two operations coincide whenever a single record is provided. They diverge from two records
+    on: with three rows per `ID`, `CONCAT(0)` yields one record of width 7, `JOIN(0)` yields two
+    records of width 5 (see Example 6). A named attribute shared by the concatenated records
+    (apart from the key) is a conflict: `CONCAT` leaves both records as they are and reports a
+    diagnostic (`TableInterpreter.diagnostics()`); for `JOIN` the same situation is a natural-join
+    condition. Up to jRegTab 0.5.x the folding operation was spelled `JOIN(K)`.
 
 ### Running the test
 
@@ -319,7 +334,7 @@ TablePattern pattern = TablePattern.of(
                         CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.val(
                                 ActionSpec.avp(""),                                       // blank-named attribute
                                 ActionSpec.rec(ProviderSpec.val(ProviderSpec.UNBOUNDED, SAME_SUBROW)),
-                                ActionSpec.join(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
+                                ActionSpec.concat(0, ProviderSpec.val(ProviderSpec.UNBOUNDED, BELOW_STR))
                         )),
                         // Subject cell → ATTR
                         CellPattern.of(NOT_BLANK, Quantifier.one(), AtomicContentSpec.attr()),
@@ -335,18 +350,20 @@ TablePattern pattern = TablePattern.of(
 ### RTL equivalent
 
 ```rtl
-{ [ [!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+ }+
+{ [ [!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->CONCAT(0)] [!BLANK? ATTR] [!BLANK? VAL : SR->AVP] ]+ }+
 ```
 
 ### How it works
 
 - The whole list is matched by one-or-more subtables `{ … }+` of one-or-more three-cell rows `[ … ]+`;
   every cell is **guarded** `!BLANK?` (must be non-blank).
-- Anchor cell `[!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->JOIN(0)]` — the name (`Anna`):
+- Anchor cell `[!BLANK? VAL : ''->AVP, SR*->REC, BW&STR*->CONCAT(0)]` — the name (`Anna`):
   - `''->AVP` binds the name to the **empty-named attribute** (the blank-header name column).
   - `SR*->REC` collects all same-subrow `VAL` items into the record.
-  - `BW&STR*->JOIN(0)` merges every following row whose name string is identical below — `Anna`'s two
-    rows collapse into one record, `Bob`'s two, and so on.
+  - `BW&STR*->CONCAT(0)` concatenates the records of every following row whose name string is
+    identical below — `Anna`'s two rows fold into one record, `Bob`'s two, and so on. This is a
+    fold, not a join: three rows per student would still give one record (see Example 6 for the
+    record product).
 - `[!BLANK? ATTR]` — the subject cell (`Math`) becomes an `ATTR` (a schema attribute name).
 - `[!BLANK? VAL : SR->AVP]` — the score cell (`43`) takes its attribute name from the `ATTR` in the
   same subrow → `Math=43`.
@@ -359,8 +376,9 @@ TablePattern pattern = TablePattern.of(
    (Bob); `English=79` (Joan); `Math=90`, `French=85` (Tom); `English=87`, `French=92` (Rob).
 2. **REC** (one per row, anchored on the name): `⟨Anna,43⟩`, `⟨Anna,78⟩`, `⟨Bob,96⟩`, `⟨Bob,54⟩`,
    `⟨Joan,79⟩`, `⟨Tom,90⟩`, `⟨Tom,85⟩`, `⟨Rob,87⟩`, `⟨Rob,92⟩`.
-3. **JOIN(0)** merges every row whose name repeats directly below, collapsing each student to one
-   record: `⟨Anna, 43, 78⟩`, `⟨Bob, 96, 54⟩`, `⟨Joan, 79⟩`, `⟨Tom, 90, 85⟩`, `⟨Rob, 87, 92⟩`.
+3. **CONCAT(0)** concatenates the records of every row whose name repeats directly below, folding
+   each student into one record: `⟨Anna, 43, 78⟩`, `⟨Bob, 96, 54⟩`, `⟨Joan, 79⟩`, `⟨Tom, 90, 85⟩`,
+   `⟨Rob, 87, 92⟩`.
 
 **Schema-flexible result.** Different students list different subjects, so the records are *ragged*:
 the schema is the union `⟨"", Math, French, English⟩`, but a subject/student combination that never
@@ -576,14 +594,106 @@ mvn test -Dtest="RtlTask051Test"
 
 ---
 
-## Running all examples
+## Example 6 — Record join (product): exploding a delimited key against stacked columns
 
-All five examples above are benchmark tasks (052, 053, 046, 116, 051). The `*Task<NN>Test`
-wildcard runs both the ATP and the RTL test for each:
+Examples 2 and 3 *fold* records with `CONCAT`. This example *multiplies* them with `JOIN` — the
+record product. A key cell lists several identifiers separated by `;`, and the numbers in the row
+apply to each of them; every (identifier, column) combination must become a record of its own.
+
+**Input table** (conformance case `join_product`):
+
+```
+id   | x | y
+a;b  | 1 | 2
+c    | 3 | 4
+```
+
+**Schema:** `⟨id, value, var⟩` — six records, |tokens| × |columns| per row:
+
+```
+id | var | value
+a  | x   | 1
+a  | y   | 2
+b  | x   | 1
+b  | y   | 2
+c  | x   | 3
+c  | y   | 4
+```
+
+### Item roles
+
+|           | col 0                                   | col 1                | col 2                |
+|-----------|-----------------------------------------|----------------------|----------------------|
+| **row 0** | ATTR `id`                               | VAL `x` → var        | VAL `y` → var        |
+| **row 1** | VAL `a` → id, VAL `b` → id *(one cell)* | VAL `1` → value      | VAL `2` → value      |
+| **row 2** | VAL `c` → id                            | VAL `3` → value      | VAL `4` → value      |
+
+The delimited key cell `a;b` yields **two** cell-derived items (`a` at index 0, `b` at index 1);
+each is an anchor of its own.
+
+### RTL pattern
+
+```rtl
+[ [ATTR] [VAL: 'var'->AVP]+ ]
+[ [(VAL: COL->AVP, ()->REC, RT*->JOIN){';'}] [VAL: 'value'->AVP, COL->REC]+ ]+
+```
+
+### How it works
+
+- **Header row** `[ [ATTR] [VAL: 'var'->AVP]+ ]`: `id` is the attribute of the key column; the
+  column names `x`, `y` are *values* named `var` — they will travel into the records.
+- **Data rows** `[ … ]+`: the key cell is **delimited** `(VAL: …){';'}` — one item per token:
+  - `COL->AVP` names each token `id` (the `ATTR` in the same column);
+  - `()->REC` gives each token a record of its own, `⟨id:a⟩`, `⟨id:b⟩`, `⟨id:c⟩`;
+  - `RT*->JOIN` multiplies the token's record by the records of all cells to its right.
+- Each number cell `[VAL: 'value'->AVP, COL->REC]` is named `value` and builds the record
+  `⟨value:1, var:x⟩` with the column name above it (`COL`, cardinality 1, row-major → the header).
+
+### Derivation
+
+1. **AVP**: `var=x`, `var=y`; `id=a`, `id=b`, `id=c`; `value=1`, `value=2`, `value=3`, `value=4`.
+2. **REC**: `rec(a) = ⟨a⟩`, `rec(b) = ⟨b⟩`, `rec(c) = ⟨c⟩`; `rec(1) = ⟨1, x⟩`, `rec(2) = ⟨2, y⟩`,
+   `rec(3) = ⟨3, x⟩`, `rec(4) = ⟨4, y⟩`.
+3. **JOIN** at `a` (providers: cells `1`, `2`): `rec(a) = ⟨⟨a, 1, x⟩, ⟨a, 2, y⟩⟩` — one record per
+   provided record, in nested-loop order; the cells `1` and `2` become *joined-away* anchors.
+4. **JOIN** at `b`: the records of `1` and `2` are still available (joined-away anchors are
+   retired lazily, not removed), so `rec(b) = ⟨⟨b, 1, x⟩, ⟨b, 2, y⟩⟩`. With immediate removal,
+   `b` would have found nothing to join.
+5. **JOIN** at `c`: `rec(c) = ⟨⟨c, 3, x⟩, ⟨c, 4, y⟩⟩`.
+6. Recordset extraction visits the live anchors `a`, `b`, `c` only — six records.
+
+### CONCAT vs JOIN
+
+| | `CONCAT(K)` | `JOIN(K)` |
+|---|---|---|
+| direction | n records → 1 | 1 record → n |
+| what grows | the width of the record | the number of records |
+| SQL counterpart | `GROUP BY` + collect into columns, `pandas.concat(axis=1)` | `CROSS JOIN`, `LATERAL`, `pandas.merge` |
+| key positions `K` | must agree in all records; not repeated | a record pair is combined only if it agrees there; not repeated |
+| shared named attribute | a conflict: no effect + diagnostic | a natural-join condition: kept once if the values agree, pair dropped otherwise |
+| one provided record | one wider record | the same record — the two coincide |
+| two or more provided records | still one record | one record each — the two diverge |
+
+### Running the test
 
 ```bash
-# ATP + RTL tests for the five examples on this page
+mvn test -Dtest="RtlSemanticConformanceTest"        # conformance/semantic/join_product
+mvn test -Dtest="TableInterpreterMultiRecordTest"    # the same table, both schema strategies
+mvn test -Dtest="WorkingStateJoinTest"               # the operation on the working state
+```
+
+---
+
+## Running all examples
+
+Examples 1–5 above are benchmark tasks (052, 053, 046, 116, 051). The `*Task<NN>Test`
+wildcard runs both the ATP and the RTL test for each; Example 6 is a conformance case:
+
+```bash
+# ATP + RTL tests for the five benchmark examples on this page
 mvn test -Dtest="*Task052Test,*Task053Test,*Task046Test,*Task116Test,*Task051Test"
+# Example 6
+mvn test -Dtest="RtlSemanticConformanceTest,TableInterpreterMultiRecordTest"
 ```
 
 To run the whole benchmark suite instead, use the `AtpTask*Test` / `RtlTask*Test` globs.
