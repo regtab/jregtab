@@ -31,9 +31,16 @@ class AtpSpecTest {
     }
 
     @Test
-    void quantifierExactlyRejectsSmallN() {
-        assertThrows(IllegalArgumentException.class, () -> Quantifier.exactly(1));
-        assertThrows(IllegalArgumentException.class, () -> Quantifier.exactly(0));
+    void quantifierExactlyAcceptsSmallN() {
+        assertEquals(1, Quantifier.exactly(1).min());
+        assertEquals(1, Quantifier.exactly(1).max());
+        assertEquals(0, Quantifier.exactly(0).min());
+        assertEquals(0, Quantifier.exactly(0).max());
+    }
+
+    @Test
+    void quantifierExactlyRejectsNegativeN() {
+        assertThrows(IllegalArgumentException.class, () -> Quantifier.exactly(-1));
     }
 
     @Test

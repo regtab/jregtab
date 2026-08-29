@@ -455,8 +455,15 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         if (ctx.zeroOrOne()  != null) return Quantifier.zeroOrOne();
         if (ctx.zeroOrMore() != null) return Quantifier.zeroOrMore();
         if (ctx.oneOrMore()  != null) return Quantifier.oneOrMore();
-        if (ctx.exactly()    != null)
-            return Quantifier.exactly(Integer.parseInt(ctx.exactly().INT().getText()));
+        if (ctx.exactly()    != null) {
+            var tok = ctx.exactly().INT().getSymbol();
+            try {
+                return Quantifier.exactly(Integer.parseInt(tok.getText()));
+            } catch (IllegalArgumentException e) {   // NumberFormatException included
+                throw new RtlCompileException("Invalid quantifier {" + tok.getText() + "}: " + e.getMessage(),
+                        tok.getLine(), tok.getCharPositionInLine());
+            }
+        }
         throw new RtlCompileException("Unknown quantifier");
     }
 

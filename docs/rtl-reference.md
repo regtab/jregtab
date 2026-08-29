@@ -104,10 +104,17 @@ cell patterns:
 | `?` | 0 or 1 |
 | `*` | 0 or more |
 | `+` | 1 or more |
-| `{n}` | exactly *n* |
+| `{n}` | exactly *n* (*n* ≥ 0; `{1}` is the same as no quantifier, `{0}` matches nothing, i.e. an empty match) |
 
 The `+` on the outer row pattern above means "one or more data rows"; the `{2}` means "exactly
 two value cells".
+
+**Empty matches.** An explicit subrow (or subtable) whose children are all optional may
+match zero cells (rows) — for instance `{ [BLANK]* }` in a row without blank cells. Such a
+subrow matches the empty sequence, exactly like `*` in a regular expression: it never fails
+the row, it is tried at the end of the row as well, and a repeated empty match (`{ [BLANK]* }+`,
+`{ [BLANK]* }*`, `{ [BLANK]* }{3}`) counts as a single empty iteration rather than looping.
+An empty subrow covers no cells and therefore never appears in the interpretable table.
 
 **Inherited action specs** — `[acts]` placed at the table, subtable, row, or subrow level are
 inherited by all descendant cells. Inherited actions are merged with any local actions on the

@@ -67,6 +67,22 @@ class RtlCompilerTest {
     }
 
     @Test
+    void parse_quantifierExactlySmallN() {
+        TablePattern p = compile("[ [SKIP]{1} [SKIP]{0} ]");
+        var row = row(p, 0, 0);
+        assertEquals(Quantifier.exactly(1), cell(row, 0, 0).quantifier());
+        assertEquals(Quantifier.exactly(0), cell(row, 0, 1).quantifier());
+    }
+
+    @Test
+    void parse_quantifierExactlyOverflow_isCompileErrorWithPosition() {
+        var e = assertThrows(RtlCompileException.class, () -> compile("[ [SKIP]{99999999999} ]"));
+        assertEquals(1, e.line());
+        assertEquals(9, e.column());
+        assertTrue(e.getMessage().contains("Invalid quantifier {99999999999}"), e.getMessage());
+    }
+
+    @Test
     void parse_ctxProviderAvp() {
         TablePattern p = compile("[ [VAL : 'LABEL'->AVP] ]");
         var actions = assertAtom(cell(row(p, 0, 0), 0, 0)).actions();

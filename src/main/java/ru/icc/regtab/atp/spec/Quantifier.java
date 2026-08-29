@@ -16,7 +16,10 @@ public record Quantifier(Kind kind, int n) {
         ZERO_OR_ONE,
         /** {@code 1} — exactly one occurrence (default). */
         ONE,
-        /** {@code {n}} — exactly n occurrences (n ≥ 2). */
+        /**
+         * {@code {n}} — exactly n occurrences (n ≥ 0): {@code {1}} is equivalent to no
+         * quantifier, {@code {0}} to zero occurrences (an empty match).
+         */
         EXACTLY,
         /** {@code +} — one or more occurrences. */
         ONE_OR_MORE,
@@ -35,8 +38,8 @@ public record Quantifier(Kind kind, int n) {
 
     public Quantifier {
         Objects.requireNonNull(kind, "kind");
-        if (kind == Kind.EXACTLY && n < 2) {
-            throw new IllegalArgumentException("EXACTLY requires n >= 2, got: " + n);
+        if (kind == Kind.EXACTLY && n < 0) {
+            throw new IllegalArgumentException("EXACTLY requires n >= 0, got: " + n);
         }
     }
 

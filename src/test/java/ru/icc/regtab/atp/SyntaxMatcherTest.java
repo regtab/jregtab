@@ -1,6 +1,7 @@
 package ru.icc.regtab.atp;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import ru.icc.regtab.atp.match.MatchResult;
 import ru.icc.regtab.atp.match.SyntaxMatcher;
 import ru.icc.regtab.atp.spec.*;
@@ -147,6 +148,137 @@ class SyntaxMatcherTest {
         MatchResult result = SyntaxMatcher.match(atp, syntax);
         assertTrue(result.success());
         assertEquals(1, result.matchedPairs().size());
+    }
+
+    // ---- zero-width subrows / subtables: empty matches, as `*` in regex ----
+
+    private static final CellMatchCondition BLANK_COND =
+            new CellMatchCondition(CellPredicate.Blank.INSTANCE);
+
+    /** { [BLANK]* } with the given quantifier. */
+    private static SubrowPattern blankStarSubrow(Quantifier q) {
+        return SubrowPattern.of(q, CellPattern.of(BLANK_COND, Quantifier.zeroOrMore(), null));
+    }
+
+    private static SubrowPattern valSubrow() {
+        return SubrowPattern.of(CellPattern.of(AtomicContentSpec.val()));
+    }
+
+    private static TablePattern rowOf(SubrowPattern... subrows) {
+        return TablePattern.of(SubtablePattern.of(RowPattern.of(Quantifier.one(), subrows)));
+    }
+
+    private static long emptySubrows(MatchResult r) {
+        return r.matchedSubrows().stream().filter(m -> m.isEmpty()).count();
+    }
+
+    @Test
+    void emptySubrow_midRow() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.one()), valSubrow());
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(2, result.matchedPairs().size());
+        assertEquals(3, result.matchedSubrows().size());
+        var empty = result.matchedSubrows().get(1);
+        assertTrue(empty.isEmpty());
+        assertEquals(1, empty.colStart());
+        assertEquals(0, empty.width());
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    void emptySubrow_tail() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), valSubrow(), blankStarSubrow(Quantifier.one()));
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        var empty = result.matchedSubrows().get(2);
+        assertTrue(empty.isEmpty());
+        assertEquals(2, empty.colStart());   // == numCols: matched at the end of the row
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    @Timeout(5)
+    void emptySubrow_repeatedPlus_doesNotLoop() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.oneOrMore()), valSubrow(),
+                blankStarSubrow(Quantifier.oneOrMore()));
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(2, emptySubrows(result));   // one empty iteration per `+`, never repeated
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    @Timeout(5)
+    void emptySubrow_repeatedStar_doesNotLoop() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.zeroOrMore()), valSubrow(),
+                blankStarSubrow(Quantifier.zeroOrMore()));
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(2, emptySubrows(result));
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    void emptySubrow_exactlyN_matchesEmptyOnce() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.exactly(3)), valSubrow());
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(1, emptySubrows(result));
+    }
+
+    @Test
+    void emptySubrow_exactlyZero_consumesNothing() {
+        var syntax = table(new String[][]{{"x", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.exactly(0)), valSubrow());
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertEquals(2, result.matchedPairs().size());
+        assertEquals(2, result.matchedSubrows().size());   // {0}: no iteration recorded at all
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    void emptySubrow_stillConsumesBlanksWhenPresent() {
+        var syntax = table(new String[][]{{"x", "", "", "1"}});
+        var atp = rowOf(valSubrow(), blankStarSubrow(Quantifier.oneOrMore()), valSubrow());
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        var blanks = result.matchedSubrows().get(1);
+        assertEquals(1, blanks.colStart());
+        assertEquals(2, blanks.colEnd());
+        assertEquals(1, emptySubrows(result));   // the greedy `+` ends with one empty iteration
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
+    }
+
+    @Test
+    @Timeout(5)
+    void emptySubtable_allRowsOptional() {
+        var syntax = table(new String[][]{{"A"}});
+        var atp = TablePattern.of(
+                SubtablePattern.of(Quantifier.oneOrMore(),
+                        RowPattern.of(Quantifier.zeroOrMore(),
+                                CellPattern.of(BLANK_COND, Quantifier.one(), null))),
+                SubtablePattern.of(RowPattern.of(CellPattern.of(AtomicContentSpec.val())))
+        );
+
+        MatchResult result = SyntaxMatcher.match(atp, syntax);
+        assertTrue(result.success());
+        assertTrue(result.matchedSubtables().get(0).isEmpty());
+        assertEquals(0, result.matchedSubtables().get(0).height());
+        assertTrue(AtpMatcher.match(atp, syntax).isPresent());
     }
 
     @Test

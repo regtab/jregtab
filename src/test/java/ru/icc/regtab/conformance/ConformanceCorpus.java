@@ -58,6 +58,13 @@ public final class ConformanceCorpus {
                     [ [] [] [ATTR]+ ]
                     [ [VAL: RT*->REC, (BW&STR)*->CONCAT("B", 'A', 1, 0)] [VAL] [VAL] [VAL: COL->AVP]{2} ]+
                     [ [VAL: COL->AVP, RT->REC, C2*->JOIN('k')] [VAL: COL->AVP] [VAL: COL->AVP, RT->REC] [VAL: COL->AVP] ]+
+                    """,
+            // Quantifier {n} with n < 2: {1} is equivalent to no quantifier, {0} to zero
+            // occurrences. Both are kept verbatim in the canonical form. Execution of
+            // zero-width subrows is pinned by semantic/subrow_zero_width_* and
+            // semantic/quantifier_exactly_*.
+            "quantifier_small_n", /* language=RTL */ """
+                    [ [VAL]{1} [VAL]{0} { [BLANK]* }{1} ]
                     """
     );
 

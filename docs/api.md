@@ -318,7 +318,7 @@ For custom conditions use `new ItemFilterConditionSpec.Custom("description", (an
 | `zeroOrOne()` | `?` | Zero or one. |
 | `oneOrMore()` | `+` | One or more. |
 | `zeroOrMore()` | `*` | Zero or more. |
-| `exactly(int n)` | `{n}` | Exactly n (n ≥ 2). |
+| `exactly(int n)` | `{n}` | Exactly n (n ≥ 0; `{1}` ≡ no quantifier, `{0}` ≡ empty match). |
 
 ---
 
