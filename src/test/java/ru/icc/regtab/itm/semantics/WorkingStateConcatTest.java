@@ -3,6 +3,7 @@ package ru.icc.regtab.itm.semantics;
 import org.junit.jupiter.api.Test;
 import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.item.Item;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.semantics.item.ItemType;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class WorkingStateConcatTest {
 
-    private final TableSyntax syntax = new TableSyntax(4, 4);
+    private final TableSyntax syntax = new TableSyntax(4, 5);
 
     private CellDerivedItem val(int r, int c, String text) {
         syntax.getCell(r, c).setText(text);
@@ -50,7 +51,7 @@ class WorkingStateConcatTest {
         ws.applyRec(t1a, List.of(d16));
         ws.applyRec(t1b, List.of(s001));
 
-        ws.applyConcat(t1a, List.of(t1b), Set.of(0));
+        ws.applyConcat(t1a, List.of(t1b), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(t1a, d16, s001)), ws.rec(t1a));
         assertFalse(ws.hasRec(t1b), "the concatenated anchor is removed from dom(rec)");
@@ -69,7 +70,7 @@ class WorkingStateConcatTest {
         ws.applyRec(b2, List.of(six));
         ws.applyRec(b3, List.of(seven));
 
-        ws.applyConcat(b1, List.of(b2, b3), Set.of(0));
+        ws.applyConcat(b1, List.of(b2, b3), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(b1, five, six, seven)), ws.rec(b1));
         assertFalse(ws.hasRec(b2));
@@ -89,7 +90,7 @@ class WorkingStateConcatTest {
         ws.applyRec(a1, List.of(five));
         ws.applyRec(a2, List.of(seven));
 
-        ws.applyConcat(a1, List.of(a2), Set.of(0));
+        ws.applyConcat(a1, List.of(a2), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(a1, five)), ws.rec(a1), "anchor record unchanged");
         assertEquals(List.of(List.of(a2, seven)), ws.rec(a2), "the other record is kept: both survive");
@@ -109,7 +110,7 @@ class WorkingStateConcatTest {
         ws.applyRec(x, List.of(five));
         ws.applyRec(y, List.of(seven));
 
-        ws.applyConcat(x, List.of(y), Set.of(0));
+        ws.applyConcat(x, List.of(y), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(x, five)), ws.rec(x));
         assertTrue(ws.hasRec(y));
@@ -129,7 +130,7 @@ class WorkingStateConcatTest {
         ws.applyRec(a2, List.of(seven));
 
         IllegalStateException e = assertThrows(IllegalStateException.class,
-                () -> ws.applyConcat(a1, List.of(a2), Set.of(0)));
+                () -> ws.applyConcat(a1, List.of(a2), RecordKey.positions(0)));
         assertTrue(e.getMessage().contains("Qty"), e.getMessage());
         assertEquals(1, ws.diagnostics().size(), "the diagnostic is recorded before throwing");
     }
@@ -142,9 +143,91 @@ class WorkingStateConcatTest {
         ws.applyRec(b1, List.of(five));
         List<List<Item>> before = ws.rec(b1);
 
-        ws.applyConcat(b1, List.of(stray), Set.of(0));
+        ws.applyConcat(b1, List.of(stray), RecordKey.positions(0));
 
         assertEquals(before, ws.rec(b1));
         assertTrue(ws.diagnostics().isEmpty(), "no record to concatenate is not a violation");
+    }
+
+    // --- Named key: K may name attributes, resolved to a position per record ---
+
+    @Test
+    void namedKey_resolvedPerRecord_evenWhenTheAttributeSitsAtDifferentPositions() {
+        // rec(r1) = <k, c1, a1:A>      A at position 2
+        // rec(r2) = <k, a1:A, c2>      A at position 1
+        CellDerivedItem r1 = val(1, 0, "k"), c1 = val(1, 1, "c1"), a1 = val(1, 2, "a1");
+        CellDerivedItem r2 = val(2, 0, "k"), a1b = val(2, 1, "a1"), c2 = val(2, 2, "c2");
+        WorkingState ws = init(r1, c1, a1, r2, a1b, c2);
+        name(ws, a1, "A"); name(ws, a1b, "A");
+        ws.applyRec(r1, List.of(c1, a1));
+        ws.applyRec(r2, List.of(a1b, c2));
+
+        ws.applyConcat(r1, List.of(r2), RecordKey.of(Set.of(0), Set.of("A")));
+
+        assertEquals(List.of(List.of(r1, c1, a1, c2)), ws.rec(r1),
+                "the anchor keeps its key; A is dropped from the concatenated record at its own position (1, not 2)");
+        assertFalse(ws.hasRec(r2));
+        assertTrue(ws.diagnostics().isEmpty());
+    }
+
+    @Test
+    void namedKey_missingInARecord_noEffectAndDiagnostic() {
+        CellDerivedItem r1 = val(1, 0, "k"), a1 = val(1, 1, "a1");
+        CellDerivedItem r2 = val(2, 0, "k"), c2 = val(2, 1, "c2");
+        WorkingState ws = init(r1, a1, r2, c2);
+        name(ws, a1, "A");
+        ws.applyRec(r1, List.of(a1));
+        ws.applyRec(r2, List.of(c2));
+
+        ws.applyConcat(r1, List.of(r2), RecordKey.names("A"));
+
+        assertEquals(List.of(List.of(r1, a1)), ws.rec(r1));
+        assertTrue(ws.hasRec(r2), "no effect: both records remain");
+        assertEquals(1, ws.diagnostics().size());
+        Diagnostic d = ws.diagnostics().getFirst();
+        assertEquals("CONCAT", d.operation());
+        assertTrue(d.message().contains("key attribute 'A' is missing"), d.message());
+    }
+
+    @Test
+    void namedKey_valuesDiffer_noEffectAndDiagnostic() {
+        CellDerivedItem r1 = val(1, 0, "k"), a1 = val(1, 1, "a1");
+        CellDerivedItem r2 = val(2, 0, "k"), a2 = val(2, 1, "a2");
+        WorkingState ws = init(r1, a1, r2, a2);
+        name(ws, a1, "A"); name(ws, a2, "A");
+        ws.applyRec(r1, List.of(a1));
+        ws.applyRec(r2, List.of(a2));
+
+        ws.applyConcat(r1, List.of(r2), RecordKey.of(Set.of(0), Set.of("A")));
+
+        assertTrue(ws.hasRec(r2));
+        assertEquals(1, ws.diagnostics().size());
+        assertTrue(ws.diagnostics().getFirst().message().contains("key attribute 'A' differs"),
+                ws.diagnostics().getFirst().message());
+    }
+
+    @Test
+    void mixedKey_isEquivalentToThePositionalKey_task098Shape() {
+        // k1 | k11 | a1:A | b1:B | c1        CONCAT(0,1,2,3) == CONCAT(0,1,'A','B')
+        // k1 | k11 | a1:A | b1:B | c2
+        WorkingState[] states = new WorkingState[2];
+        CellDerivedItem[] anchors = new CellDerivedItem[2];
+        CellDerivedItem[][] tails = new CellDerivedItem[2][];
+        for (int v = 0; v < 2; v++) {
+            CellDerivedItem k1 = val(1, 0, "k1"), k11 = val(1, 1, "k11"), a1 = val(1, 2, "a1"), b1 = val(1, 3, "b1"), c1 = val(1, 4, "c1");
+            CellDerivedItem k1b = val(2, 0, "k1"), k11b = val(2, 1, "k11"), a1b = val(2, 2, "a1"), b1b = val(2, 3, "b1"), c2 = val(2, 4, "c2");
+            WorkingState ws = init(k1, k11, a1, b1, c1, k1b, k11b, a1b, b1b, c2);
+            name(ws, a1, "A"); name(ws, b1, "B"); name(ws, a1b, "A"); name(ws, b1b, "B");
+            ws.applyRec(k1, List.of(k11, a1, b1, c1));
+            ws.applyRec(k1b, List.of(k11b, a1b, b1b, c2));
+            RecordKey key = v == 0 ? RecordKey.positions(0, 1, 2, 3) : RecordKey.of(Set.of(0, 1), Set.of("A", "B"));
+            ws.applyConcat(k1, List.of(k1b), key);
+            states[v] = ws; anchors[v] = k1; tails[v] = new CellDerivedItem[]{k11, a1, b1, c1, c2};
+        }
+        for (int v = 0; v < 2; v++) {
+            assertEquals(List.of(List.of(anchors[v], tails[v][0], tails[v][1], tails[v][2], tails[v][3], tails[v][4])),
+                    states[v].rec(anchors[v]));
+            assertTrue(states[v].diagnostics().isEmpty());
+        }
     }
 }

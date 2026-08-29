@@ -1,6 +1,7 @@
 package ru.icc.regtab.atp.spec;
 
 import ru.icc.regtab.itm.semantics.item.ItemType;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.semantics.provider.CellDerivedProviderKind;
 
 import java.util.ArrayList;
@@ -25,7 +26,8 @@ import java.util.Set;
  * @param providers      sequence of item provider specifications ⟨S_prov¹, …, S_provⁿ⟩
  * @param anchorPos      inline anchor position for REC (null = none)
  * @param splitDelimiter inline split delimiter for REC (null = none)
- * @param keyPositions   key positions K for CONCAT/JOIN (empty = K=∅); null treated as empty
+ * @param key            key K for CONCAT/JOIN — key positions and/or key attribute names
+ *                       ({@link RecordKey}); null treated as {@link RecordKey#EMPTY}
  * @param inherited      true if this action was inherited from a parent scope (row/subrow/subtable level),
  *                       false if explicitly specified on the cell's own contSpec
  */
@@ -35,19 +37,27 @@ public record ActionSpec(
         List<ProviderSpec> providers,
         Integer anchorPos,
         String splitDelimiter,
-        Set<Integer> keyPositions,
+        RecordKey key,
         boolean inherited
 ) {
-    /** Backward-compatible constructor: keyPositions=Set.of(), inherited=false. */
+    /** Backward-compatible constructor: key=∅, inherited=false. */
     public ActionSpec(OperationType operationType, String delimiter,
                       List<ProviderSpec> providers, Integer anchorPos, String splitDelimiter) {
-        this(operationType, delimiter, providers, anchorPos, splitDelimiter, Set.of(), false);
+        this(operationType, delimiter, providers, anchorPos, splitDelimiter, RecordKey.EMPTY, false);
+    }
+
+    /** Backward-compatible constructor: the key given as key positions only. */
+    public ActionSpec(OperationType operationType, String delimiter,
+                      List<ProviderSpec> providers, Integer anchorPos, String splitDelimiter,
+                      Set<Integer> keyPositions, boolean inherited) {
+        this(operationType, delimiter, providers, anchorPos, splitDelimiter,
+             RecordKey.positions(keyPositions != null ? keyPositions : Set.of()), inherited);
     }
 
     public ActionSpec {
         Objects.requireNonNull(operationType, "operationType");
         providers = List.copyOf(Objects.requireNonNull(providers, "providers"));
-        keyPositions = Set.copyOf(keyPositions != null ? keyPositions : Set.of());
+        key = key != null ? key : RecordKey.EMPTY;
         for (var p : providers) {
             if (p.isContextLiteral()) {
                 var ctxType = p.contextLiteral().type();
@@ -79,7 +89,12 @@ public record ActionSpec(
     public ActionSpec asInherited() {
         return inherited ? this
                 : new ActionSpec(operationType, delimiter, providers, anchorPos, splitDelimiter,
-                                 keyPositions, true);
+                                 key, true);
+    }
+
+    /** The key positions of {@link #key()} (K ∩ ℕ₀); kept for backward compatibility. */
+    public Set<Integer> keyPositions() {
+        return key.positions();
     }
 
     /** Convenience: REC action with given providers, no inline params. */
@@ -118,7 +133,17 @@ public record ActionSpec(
 
     /** Convenience: CONCAT action with K=∅ — fold the provided records into the anchor's record. */
     public static ActionSpec concat(ProviderSpec... providers) {
-        return new ActionSpec(OperationType.CONCAT, null, List.of(providers), null, null, Set.of(), false);
+        return new ActionSpec(OperationType.CONCAT, null, List.of(providers), null, null, RecordKey.EMPTY, false);
+    }
+
+    /** Convenience: CONCAT^K action with the key K given as positions and/or attribute names (mirrors RTL {@code CONCAT(0, 'A')}). */
+    public static ActionSpec concat(RecordKey key, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, List.of(providers), null, null, key, false);
+    }
+
+    /** Convenience: CONCAT^K action with a single key attribute name (mirrors RTL {@code CONCAT('A')}). */
+    public static ActionSpec concat(String keyName, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, List.of(providers), null, null, RecordKey.names(keyName), false);
     }
 
     /** Convenience: CONCAT^K action with explicit key positions as a Set (mirrors RTL {@code CONCAT(k1,k2,...)}). */
@@ -133,7 +158,17 @@ public record ActionSpec(
 
     /** Convenience: JOIN action with K=∅ — the record product (cross product with the provided records). */
     public static ActionSpec join(ProviderSpec... providers) {
-        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, Set.of(), false);
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, RecordKey.EMPTY, false);
+    }
+
+    /** Convenience: JOIN^K action with the key K given as positions and/or attribute names (mirrors RTL {@code JOIN(0, 'A')}). */
+    public static ActionSpec join(RecordKey key, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, key, false);
+    }
+
+    /** Convenience: JOIN^K action with a single key attribute name (mirrors RTL {@code JOIN('A')}). */
+    public static ActionSpec join(String keyName, ProviderSpec... providers) {
+        return new ActionSpec(OperationType.JOIN, null, List.of(providers), null, null, RecordKey.names(keyName), false);
     }
 
     /** Convenience: JOIN^K action — equi-join on the key positions K (mirrors RTL {@code JOIN(k1,k2,...)}). */

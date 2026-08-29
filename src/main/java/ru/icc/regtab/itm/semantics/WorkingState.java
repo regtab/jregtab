@@ -4,6 +4,7 @@ import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.item.ContextDerivedItem;
 import ru.icc.regtab.itm.semantics.item.Item;
 import ru.icc.regtab.itm.semantics.item.ItemType;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 
 import java.util.*;
 
@@ -181,11 +182,12 @@ public final class WorkingState {
     /**
      * Concatenates the records of the provided anchors to the anchor's record (one wide record)
      * and removes them from dom(rec). Applicable iff (i) the anchor and at least one provided
-     * item have records, (ii) all records agree at the key positions K, and (iii) apart from the
-     * key no named attribute occurs in more than one of the concatenated records; otherwise
-     * the operation has no effect and a {@link Diagnostic} is recorded.
+     * item have records, (ii) all records agree on the key K (key positions and/or key attribute
+     * names, see {@link RecordKey}), and (iii) apart from the key no named attribute occurs in
+     * more than one of the concatenated records; otherwise the operation has no effect and a
+     * {@link Diagnostic} is recorded.
      */
-    public void applyConcat(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
+    public void applyConcat(CellDerivedItem anchor, List<? extends Item> items, RecordKey key) {
         List<List<Item>> anchorRecs = rec.get(anchor);
         if (anchorRecs == null || items.isEmpty()) return;
         List<CellDerivedItem> others = new ArrayList<>();
@@ -200,12 +202,12 @@ public final class WorkingState {
         List<Item> result = new ArrayList<>(anchorRec);
         for (CellDerivedItem other : others) {
             List<Item> otherRec = rec.get(other).getFirst();
-            String problem = keyMismatch(anchorRec, otherRec, keyPositions);   // (ii)
+            String problem = keyMismatch(anchorRec, otherRec, key);            // (ii)
             if (problem != null) {
                 skip(anchor, "CONCAT", problem);
                 return;
             }
-            result.addAll(dropK(otherRec, keyPositions));
+            result.addAll(dropK(otherRec, key));
         }
         String duplicate = duplicateAttribute(result);                  // (iii)
         if (duplicate != null) {
@@ -226,12 +228,13 @@ public final class WorkingState {
 
     /**
      * Multiplies every record of the anchor by every record of the provided anchors
-     * (a cross product for K = ∅, an equi-join on the key positions K otherwise; a named
-     * attribute shared by two records acts as a natural-join condition) and marks the provided
-     * anchors as joined-away. Pairs whose key positions differ or whose shared attributes
-     * disagree are dropped; if no pair survives, the anchor keeps its records (left outer join).
+     * (a cross product for K = ∅, an equi-join on the key K — key positions and/or key attribute
+     * names, see {@link RecordKey} — otherwise; a named attribute shared by two records acts as a
+     * natural-join condition) and marks the provided anchors as joined-away. Pairs whose keys
+     * differ or whose shared attributes disagree are dropped; if no pair survives, the anchor
+     * keeps its records (left outer join).
      */
-    public void applyJoin(CellDerivedItem anchor, List<? extends Item> items, Set<Integer> keyPositions) {
+    public void applyJoin(CellDerivedItem anchor, List<? extends Item> items, RecordKey key) {
         List<List<Item>> anchorRecs = rec.get(anchor);
         if (anchorRecs == null || items.isEmpty()) return;
         List<CellDerivedItem> others = new ArrayList<>();
@@ -248,12 +251,12 @@ public final class WorkingState {
         int dropped = 0;
         for (List<Item> rho : anchorRecs) {
             for (List<Item> rho2 : joinedRecs) {
-                if (keyMismatch(rho, rho2, keyPositions) != null || !agree(rho, rho2)) {
+                if (keyMismatch(rho, rho2, key) != null || !agree(rho, rho2)) {
                     dropped++;
                     continue;
                 }
                 List<Item> combined = new ArrayList<>(rho);
-                combined.addAll(dropK(rho2, keyPositions));
+                combined.addAll(dropK(rho2, key));
                 result.add(dedup(combined));
             }
         }
@@ -266,14 +269,29 @@ public final class WorkingState {
         joined.addAll(others);
     }
 
-    /** drop_K(ρ̄): returns sequence with items at positions k ∈ K removed (0-based). */
-    private static List<Item> dropK(List<Item> sequence, Set<Integer> keyPositions) {
-        if (keyPositions.isEmpty()) return new ArrayList<>(sequence);
+    /**
+     * drop_K(ρ̄): returns the sequence with the key items removed — the items at the key positions
+     * (0-based) and the items carrying a key attribute name; the latter are resolved per record.
+     */
+    private List<Item> dropK(List<Item> sequence, RecordKey key) {
+        if (key.isEmpty()) return new ArrayList<>(sequence);
         List<Item> result = new ArrayList<>(sequence.size());
         for (int i = 0; i < sequence.size(); i++) {
-            if (!keyPositions.contains(i)) result.add(sequence.get(i));
+            Item item = sequence.get(i);
+            if (key.positions().contains(i)) continue;
+            String a = assoc(item);
+            if (a != null && key.names().contains(a)) continue;
+            result.add(item);
         }
         return result;
+    }
+
+    /** The index of the first item of the record carrying the named attribute, or -1. */
+    private int indexOfAttribute(List<Item> sequence, String attribute) {
+        for (int i = 0; i < sequence.size(); i++) {
+            if (attribute.equals(assoc(sequence.get(i)))) return i;
+        }
+        return -1;
     }
 
     /** dedup(ρ̄): keeps first occurrence of each named attribute; items without avp always kept. */
@@ -288,12 +306,13 @@ public final class WorkingState {
     }
 
     /**
-     * compat_K(ρ, ρ'): {@code null} if for every k ∈ K both records are long enough and the items
-     * at k are compatible (both with the same attribute-value pair, or both unnamed with the same
-     * value); otherwise a description of the first mismatch.
+     * compat_K(ρ, ρ'): {@code null} if for every key position k both records are long enough and the
+     * items at k are compatible (both with the same attribute-value pair, or both unnamed with the
+     * same value), and for every key attribute name both records carry the name with the same
+     * attribute-value pair; otherwise a description of the first mismatch.
      */
-    private String keyMismatch(List<Item> rho, List<Item> rho2, Set<Integer> keyPositions) {
-        for (int k : keyPositions) {
+    private String keyMismatch(List<Item> rho, List<Item> rho2, RecordKey key) {
+        for (int k : key.positions()) {
             if (k >= rho.size() || k >= rho2.size()) {
                 return "key position " + k + " is beyond the end of a record";
             }
@@ -307,6 +326,14 @@ public final class WorkingState {
             } else {
                 return "key position " + k + " mixes a named and an unnamed item";
             }
+        }
+        for (String name : key.names()) {
+            int i = indexOfAttribute(rho, name), j = indexOfAttribute(rho2, name);
+            if (i < 0 || j < 0) {
+                return "key attribute '" + name + "' is missing in a record";
+            }
+            AttributeValuePair pa = avp.get(rho.get(i)), pb = avp.get(rho2.get(j));
+            if (!pa.equals(pb)) return "key attribute '" + name + "' differs: " + pa + " vs " + pb;
         }
         return null;
     }

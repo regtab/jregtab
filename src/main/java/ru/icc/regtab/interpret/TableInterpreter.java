@@ -193,8 +193,8 @@ public final class TableInterpreter {
             // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
             case AvpOperation ignored  -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
             case RecOperation ignored  -> ws.applyRec((CellDerivedItem) anchor, items);
-            case ConcatOperation op -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items, op.keyPositions()); }
-            case JoinOperation op   -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.keyPositions()); }
+            case ConcatOperation op -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items, op.key()); }
+            case JoinOperation op   -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.key()); }
         }
     }
 
