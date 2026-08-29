@@ -81,9 +81,11 @@ class RtlSemanticConformanceTest {
                 .orElseThrow(() -> new AssertionError(
                         "pattern did not match " + dir.getFileName() + "/" + INPUT));
 
-        Recordset actual = pattern.transform(new TableInterpreter()
-                .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
-                .interpret(itm));
+        TableInterpreter interpreter = new TableInterpreter()
+                .withStrategy(SchemaConstructionStrategy.RECORD_FIRST);
+        Recordset actual = pattern.transform(interpreter.interpret(itm));
+        assertTrue(interpreter.diagnostics().isEmpty(),
+                () -> dir.getFileName() + ": " + interpreter.diagnostics());
 
         RecordsetMatchOptions opts = loadOptions(dir);
         Path expectedPath = dir.resolve(EXPECTED);

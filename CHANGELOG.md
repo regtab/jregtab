@@ -25,8 +25,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   embedded DSL (`Rtl.concat`, `Rtl.join`).
 - Conformance: curated positive extra `named_key`; semantic cases `concat_named_key` and
   `join_named_key`; negative case `concat_empty_key_name`.
+- **Diagnostics for a forgotten `REC`.** An explicit `CONCAT`/`JOIN` (written on the anchor's own
+  content spec) whose anchor has no record, or none of whose provided items has a record, used to
+  be skipped silently — the anchor just vanished from the recordset. Both cases are now reported
+  through `TableInterpreter.diagnostics()` (`anchor has no record — REC missing?`,
+  `none of the provided items has a record — REC missing on the provider side?`) and raise under
+  `withStrictPreconditions(true)`. Inherited actions (row/subrow/subtable/table-level `actSpecs`)
+  and anchors whose record was folded away by an earlier `CONCAT` are not reported. The semantics
+  of the operations is unchanged: a violated precondition still has no effect.
+- API: `InterpretationAction.inherited()` (new record component; the three-argument constructor is
+  kept and means `inherited = false`); `WorkingState.report(anchor, operation, message)`,
+  `WorkingState.isConcatenated(item)`, `WorkingState.allConcatenated()` — the set `C` of
+  concatenated-away anchors, the counterpart of `J` for `CONCAT`.
+- Tests: the task corpus (`RtlTask*Test`, `AtpTask*Test`) and the semantic conformance runner now
+  assert that interpretation produces no diagnostics.
 
 ### Changed
+- `InterpretationAction` gained a fourth record component `boolean inherited`: positional
+  deconstruction patterns (`instanceof InterpretationAction(var a, var p, var o)`) need a fourth
+  binding; construction through the three-argument constructor is unaffected.
 - `ActionSpec`: the record component `Set<Integer> keyPositions` is replaced by `RecordKey key`;
   `ConcatOperation(RecordKey key)` and `JoinOperation(RecordKey key)` likewise, and
   `WorkingState.applyConcat/applyJoin` take a `RecordKey`. The previous `ActionSpec`

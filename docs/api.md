@@ -370,8 +370,8 @@ Recordset rs = new TableInterpreter()
 | `withMissingValueHandler(MissingValueHandler h)` | Handling of missing attribute values (default: `NULL_HANDLER`). |
 | `withTransformations(List<RecordsetTransformation> t)` | Post-processing transformations. |
 | `withAnonymousAttributeTemplate(String template)` | Name template for unnamed attributes; `%i` → index. Default: `"$a_%i"`. |
-| `withStrictPreconditions(boolean strict)` | A violated `CONCAT`/`JOIN` precondition (e.g. a named attribute shared by two concatenated records) raises an `IllegalStateException` instead of having no effect. Default: `false`. |
-| `List<Diagnostic> diagnostics()` | The `CONCAT`/`JOIN` actions skipped during the most recent `interpret(...)` because a precondition was violated — each with the anchor, the operation and the reason. Empty when nothing was skipped. |
+| `withStrictPreconditions(boolean strict)` | Any diagnostic (a violated `CONCAT`/`JOIN` precondition, e.g. a named attribute shared by two concatenated records, or a missing record — see `diagnostics()`) raises an `IllegalStateException` instead of the action having no effect. Default: `false`. |
+| `List<Diagnostic> diagnostics()` | The `CONCAT`/`JOIN` actions skipped during the most recent `interpret(...)` — each with the anchor, the operation and the reason: a key mismatch, a named attribute shared by two concatenated records, an empty record product, and — for actions written on the anchor's own content spec (`InterpretationAction.inherited() == false`) — `anchor has no record — REC missing?` or `none of the provided items has a record — REC missing on the provider side?`. Inherited actions skip anchors without records silently. Empty when nothing was skipped. |
 
 ---
 

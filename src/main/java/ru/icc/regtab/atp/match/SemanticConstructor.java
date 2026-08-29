@@ -222,7 +222,7 @@ public final class SemanticConstructor {
                 }
                 providers.add(provider);
             }
-            return new InterpretationAction(anchor, providers, operation);
+            return new InterpretationAction(anchor, providers, operation, actionSpec.inherited());
         }
 
         private ItemProvider toItemProvider(ProviderSpec spec, boolean lenient) {

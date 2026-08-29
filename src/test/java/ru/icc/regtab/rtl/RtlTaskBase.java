@@ -45,9 +45,11 @@ public abstract class RtlTaskBase {
                 .orElseThrow(() -> new AssertionError(
                         "RTL Task" + taskId() + " pattern did not match variant " + variantId));
 
-        Recordset actual = pattern.transform(new TableInterpreter()
-                .withStrategy(SchemaConstructionStrategy.RECORD_FIRST)
-                .interpret(itm));
+        TableInterpreter interpreter = new TableInterpreter()
+                .withStrategy(SchemaConstructionStrategy.RECORD_FIRST);
+        Recordset actual = pattern.transform(interpreter.interpret(itm));
+        assertTrue(interpreter.diagnostics().isEmpty(),
+                () -> "RTL Task" + taskId() + " variant " + variantId + ": " + interpreter.diagnostics());
 
         RecordsetMatchOptions matchOpts = TaskMatchOptionsLoader.load(tasksRoot, taskId());
         Path expectedPath = taskDir.resolve("expected_" + variantId + ".csv");
