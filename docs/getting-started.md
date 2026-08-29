@@ -15,14 +15,14 @@ Add jRegTab to your project:
     <dependency>
         <groupId>ru.icc.regtab</groupId>
         <artifactId>regtab</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0</version>
     </dependency>
     ```
 
 === "Gradle"
 
     ```groovy
-    implementation 'ru.icc.regtab:regtab:0.6.0'
+    implementation 'ru.icc.regtab:regtab:0.7.0'
     ```
 
 ## Core concepts
