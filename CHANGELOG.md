@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Named key references in `CONCAT(K)` / `JOIN(K)`.** The key `K` may now list attribute
+  *names* (string literals) besides 0-based positions: `CONCAT(0, 1, 'A', 'B')`, `JOIN('Year')`,
+  mixed in any order. A name is resolved per record — to the position of the item carrying that
+  attribute — so the key no longer depends on the order of the fields (the rows
+  `k1 | k11 | c1 | a1:A | b1:B` need `CONCAT(0,1,3,4)` positionally but `CONCAT(0,1,'A','B')` by
+  name, the same key as for `k1 | k11 | a1:A | b1:B | c1`). A name missing from a record, or
+  carried with a different value, is a key mismatch (`CONCAT`: no effect + diagnostic; `JOIN`: the
+  pair is dropped). The semantics of the operations is unchanged; positional keys behave exactly
+  as before. Canonical form: positions ascending, then names in lexicographic order,
+  single-quoted. `CONCAT('')` is a compile error.
+- API: `RecordKey(positions, names)` (`ru.icc.regtab.itm.semantics.operation`) with
+  `RecordKey.positions(…)`, `RecordKey.names(…)`, `RecordKey.of(…)`, `RecordKey.EMPTY`;
+  `ActionSpec.key()`, `ActionSpec.concat(String keyName, …)`, `ActionSpec.concat(RecordKey, …)`,
+  `ActionSpec.join(String, …)`, `ActionSpec.join(RecordKey, …)`; the same overloads in the
+  embedded DSL (`Rtl.concat`, `Rtl.join`).
+- Conformance: curated positive extra `named_key`; semantic cases `concat_named_key` and
+  `join_named_key`; negative case `concat_empty_key_name`.
+
+### Changed
+- `ActionSpec`: the record component `Set<Integer> keyPositions` is replaced by `RecordKey key`;
+  `ConcatOperation(RecordKey key)` and `JoinOperation(RecordKey key)` likewise, and
+  `WorkingState.applyConcat/applyJoin` take a `RecordKey`. The previous `ActionSpec`
+  constructor taking `Set<Integer> keyPositions`, the accessor `keyPositions()` and the factories
+  `concat(int|Set<Integer>, …)` / `join(int|Set<Integer>, …)` are kept and delegate. Only code
+  constructing `ActionSpec` through the 7-component canonical constructor with a `Set<Integer>`
+  positional argument, or calling `new ConcatOperation(Set.of(…))`, needs to switch to
+  `RecordKey.positions(…)`.
+- Downstream: pyRegTab needs to implement named key references to pass the new conformance cases.
+
 ## [0.6.0] - 2026-08-28
 
 ### Changed (breaking)

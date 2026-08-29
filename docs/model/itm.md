@@ -276,12 +276,19 @@ Seven **working-state update operations** populate or modify the working state:
     | `O_suffix^δ` | `WorkingState.applySuffix(anchor, items, delimiter)` | VAL or ATTR |
     | `O_avp` | `WorkingState.applyAvp(anchor, items)` | VAL |
     | `O_rec` | `WorkingState.applyRec(anchor, items)` | cell-derived VAL |
-    | `O_concat^K` | `WorkingState.applyConcat(anchor, items, keyPositions)` | cell-derived VAL |
-    | `O_join^K` | `WorkingState.applyJoin(anchor, items, keyPositions)` | cell-derived VAL |
+    | `O_concat^K` | `WorkingState.applyConcat(anchor, items, key)` | cell-derived VAL |
+    | `O_join^K` | `WorkingState.applyJoin(anchor, items, key)` | cell-derived VAL |
 
     A violated precondition of `O_concat^K` / `O_join^K` has no effect and is recorded as a
     `Diagnostic` (`WorkingState.diagnostics()`, surfaced as `TableInterpreter.diagnostics()`);
     `new WorkingState(true)` / `TableInterpreter.withStrictPreconditions(true)` raise instead.
+
+    **Implementation note — named keys.** The manuscript defines `K` over positions only
+    (`K ⊆ ℕ₀`). The implementation additionally accepts key *attribute names* (`RecordKey`:
+    positions and/or names; RTL `CONCAT(0, 'A')`, `JOIN('Year')`). A name is resolved per record,
+    through `assoc`, to the position of the item carrying that attribute; `drop_K` and `compat_K`
+    then apply to the resolved positions, so the semantics of the operations is unchanged — a
+    named key is a position-independent way of writing the same `K`.
 
     Consistency predicates:
 
@@ -322,9 +329,9 @@ satisfy the constraints of the chosen operation (Tab. I in the paper):
     | `REC` | `ActionSpec.rec(providers…)` | Anchor item → record; providers supply the remaining fields |
     | `AVP` | `ActionSpec.avp(provider)` | Associates a VAL item (anchor) with an ATTR item from the provider |
     | `CONCAT` | `ActionSpec.concat(providers…)` | Folds the provided records into the anchor's record (K=∅) |
-    | `CONCAT(K)` | `ActionSpec.concat(Set.of(0), providers…)` | Same, key positions K not repeated (e.g. `CONCAT(0)` drops the anchor position of each provided record) |
+    | `CONCAT(K)` | `ActionSpec.concat(Set.of(0), providers…)`, `ActionSpec.concat("A", providers…)`, `ActionSpec.concat(RecordKey.of(…), providers…)` | Same, key K (positions and/or attribute names) not repeated (e.g. `CONCAT(0)` drops the anchor position of each provided record) |
     | `JOIN` | `ActionSpec.join(providers…)` | Record product: one record per (anchor record × provided record) |
-    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)` | Equi-join on the key positions K |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(0), providers…)`, `ActionSpec.join("k", providers…)` | Equi-join on the key K (positions and/or attribute names) |
     | `FILL` | `ActionSpec.fill(delimiter, providers…)` | Fills anchor value using provider values |
     | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | Prepends provider values to the anchor |
     | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | Appends provider values to the anchor |

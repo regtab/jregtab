@@ -669,7 +669,7 @@ each is an anchor of its own.
 | direction | n records → 1 | 1 record → n |
 | what grows | the width of the record | the number of records |
 | SQL counterpart | `GROUP BY` + collect into columns, `pandas.concat(axis=1)` | `CROSS JOIN`, `LATERAL`, `pandas.merge` |
-| key positions `K` | must agree in all records; not repeated | a record pair is combined only if it agrees there; not repeated |
+| key `K` (positions and/or attribute names) | must agree in all records; not repeated | a record pair is combined only if it agrees there; not repeated |
 | shared named attribute | a conflict: no effect + diagnostic | a natural-join condition: kept once if the values agree, pair dropped otherwise |
 | one provided record | one wider record | the same record — the two coincide |
 | two or more provided records | still one record | one record each — the two diverge |

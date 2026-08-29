@@ -236,6 +236,8 @@ Specifies how an item participates in the semantic layer. Actions are attached t
 ActionSpec.rec(ProviderSpec.val(ItemFilterConditionSpec.sameRow()))   // REC
 ActionSpec.avp("AIRLINE")                                             // AVP with literal attribute
 ActionSpec.concat(0, ProviderSpec.val(...))                           // CONCAT(0)
+ActionSpec.concat("A", ProviderSpec.val(...))                         // CONCAT('A')
+ActionSpec.concat(RecordKey.of(Set.of(0), Set.of("A")), ProviderSpec.val(...)) // CONCAT(0, 'A')
 ActionSpec.join(ProviderSpec.val(...))                                // JOIN
 ActionSpec.fill("/", ProviderSpec.val(...))                           // FILL
 ActionSpec.prefix(" ", ProviderSpec.val(...))                         // PREFIX
@@ -250,11 +252,15 @@ ActionSpec.suffix(" ", ProviderSpec.val(...))                         // SUFFIX
 | `avp(String literal)` | AVP with constant attribute name. |
 | `concat(ProviderSpec... providers)` | CONCAT: fold the provided records into the anchor's record (one wider record). |
 | `concat(int keyPosition, ProviderSpec... providers)`, `concat(Set<Integer> keyPositions, ProviderSpec... providers)` | CONCAT with key positions K (must agree, not repeated). Was `join(…)` up to 0.5.x. |
+| `concat(String keyName, ProviderSpec... providers)`, `concat(RecordKey key, ProviderSpec... providers)` | CONCAT with a key attribute name, or with a `RecordKey` of positions and/or names (`RecordKey.of(positions, names)`, `RecordKey.positions(…)`, `RecordKey.names(…)`); names are resolved per record. |
 | `join(ProviderSpec... providers)` | JOIN: the record product — one record per (anchor record × provided record). |
 | `join(int keyPosition, ProviderSpec... providers)`, `join(Set<Integer> keyPositions, ProviderSpec... providers)` | Equi-join on the key positions K. |
+| `join(String keyName, ProviderSpec... providers)`, `join(RecordKey key, ProviderSpec... providers)` | Equi-join on a key attribute name, or on a `RecordKey` of positions and/or names. |
 | `fill(String delimiter, ProviderSpec... providers)` | Fill gap in REC sequence. |
 | `prefix(String delimiter, ProviderSpec... providers)` | Prepend to anchor value. |
 | `suffix(String delimiter, ProviderSpec... providers)` | Append to anchor value. |
+
+The key of a `CONCAT`/`JOIN` action is exposed as `ActionSpec.key()` (a `RecordKey`); `ActionSpec.keyPositions()` returns its positional part and is kept for backward compatibility, as is the constructor taking `Set<Integer> keyPositions`.
 
 ---
 

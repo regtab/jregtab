@@ -336,9 +336,9 @@ chosen operation (see [ITM — Interpretation actions](itm.md#interpretation-act
     | `AVP` | `ActionSpec.avp(provider)` | associates VAL anchor with ATTR item |
     | `AVP "name"` | `ActionSpec.avp("ATTR_NAME")` | context-derived ATTR constant |
     | `CONCAT` | `ActionSpec.concat(providers…)` | folds the provided records into the anchor's record |
-    | `CONCAT(K)` | `ActionSpec.concat(Set.of(k…), providers…)` | same, key positions K not repeated (was `JOIN(K)` up to 0.5.x) |
+    | `CONCAT(K)` | `ActionSpec.concat(Set.of(k…), providers…)`, `ActionSpec.concat("A", providers…)`, `ActionSpec.concat(RecordKey, providers…)` | same, key K not repeated — positions and/or attribute names (was `JOIN(K)` up to 0.5.x) |
     | `JOIN` | `ActionSpec.join(providers…)` | record product: one record per (anchor record × provided record) |
-    | `JOIN(K)` | `ActionSpec.join(Set.of(k…), providers…)` | equi-join on the key positions K |
+    | `JOIN(K)` | `ActionSpec.join(Set.of(k…), providers…)`, `ActionSpec.join("k", providers…)` | equi-join on the key K (positions and/or attribute names) |
     | `FILL` | `ActionSpec.fill(delimiter, providers…)` | fills anchor value from providers |
     | `PREFIX` | `ActionSpec.prefix(delimiter, providers…)` | prepends provider values |
     | `SUFFIX` | `ActionSpec.suffix(delimiter, providers…)` | appends provider values |

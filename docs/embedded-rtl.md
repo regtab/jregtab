@@ -98,8 +98,8 @@ compiler.
 |---|---|
 | `(…)->REC` / `REC(n)` / `REC('s')` | `rec(…)` / `rec(n, …)` / `recSplit("s", …)` |
 | `prov->AVP` / `'NAME'->AVP` | `avp(prov)` / `avp("NAME")` |
-| `(…)->CONCAT` / `CONCAT(k)` | `concat(…)` / `concat(k, …)` |
-| `(…)->JOIN` / `JOIN(k)` | `join(…)` / `join(k, …)` |
+| `(…)->CONCAT` / `CONCAT(k)` / `CONCAT('A')` / `CONCAT(0, 'A')` | `concat(…)` / `concat(k, …)` / `concat("A", …)` / `concat(RecordKey.of(Set.of(0), Set.of("A")), …)` |
+| `(…)->JOIN` / `JOIN(k)` / `JOIN('A')` | `join(…)` / `join(k, …)` / `join("A", …)` |
 | `(…)->FILL('d')`, `PREFIX`, `SUFFIX` | `fill("d", …)`, `prefix(…)`, `suffix(…)` (delimiter optional) |
 | `'EUR'` context literal | `lit("EUR")` (VALUE under REC/CONCAT/JOIN, ATTRIBUTE otherwise — as in the compiler) |
 | `@'K'='V'` | `ctxAvp("K", "V")` |
