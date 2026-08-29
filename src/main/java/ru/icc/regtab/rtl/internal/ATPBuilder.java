@@ -5,6 +5,7 @@ import ru.icc.regtab.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.interpret.DelimitedFieldSplit;
 import ru.icc.regtab.interpret.RecordsetTransformation;
 import ru.icc.regtab.interpret.WhitespaceNormalization;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.syntax.Cell;
 import ru.icc.regtab.rtl.Bindings;
 import ru.icc.regtab.rtl.RTLBaseVisitor;
@@ -343,6 +344,22 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
         return ProviderSpec.ctxAttr(literal);
     }
 
+    /** Key K of CONCAT/JOIN: INT tokens are key positions, STRING literals are key attribute names. */
+    private static RecordKey buildKey(List<RTLParser.KeyRefContext> refs) {
+        Set<Integer> positions = new LinkedHashSet<>();
+        Set<String> names = new LinkedHashSet<>();
+        for (var ref : refs) {
+            if (ref.INT() != null) {
+                positions.add(Integer.parseInt(ref.INT().getText()));
+            } else {
+                String name = StringExtractorFactory.parseStringLiteral(ref.STRING().getText());
+                if (name.isBlank()) throw new RtlCompileException("Key attribute name must not be empty: " + ref.getText());
+                names.add(name);
+            }
+        }
+        return RecordKey.of(positions, names);
+    }
+
     private static ActionSpec buildOp(RTLParser.OpContext ctx, List<ProviderSpec> providers) {
         if (ctx.AVP()    != null) return new ActionSpec(OperationType.AVP,    null, providers, null, null);
         if (ctx.recOp()  != null) {
@@ -352,14 +369,12 @@ public final class ATPBuilder extends RTLBaseVisitor<Object> {
             return new ActionSpec(OperationType.REC, null, providers, anchorPos, splitDelimiter);
         }
         if (ctx.concatOp() != null) {
-            Set<Integer> kp = new LinkedHashSet<>();
-            for (var t : ctx.concatOp().INT()) kp.add(Integer.parseInt(t.getText()));
-            return new ActionSpec(OperationType.CONCAT, null, providers, null, null, Set.copyOf(kp), false);
+            return new ActionSpec(OperationType.CONCAT, null, providers, null, null,
+                    buildKey(ctx.concatOp().keyRef()), false);
         }
         if (ctx.joinOp() != null) {
-            Set<Integer> kp = new LinkedHashSet<>();
-            for (var t : ctx.joinOp().INT()) kp.add(Integer.parseInt(t.getText()));
-            return new ActionSpec(OperationType.JOIN, null, providers, null, null, Set.copyOf(kp), false);
+            return new ActionSpec(OperationType.JOIN, null, providers, null, null,
+                    buildKey(ctx.joinOp().keyRef()), false);
         }
         if (ctx.fillOp() != null) {
             String d = ctx.fillOp().STRING() != null

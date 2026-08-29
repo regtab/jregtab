@@ -6,12 +6,14 @@ import ru.icc.regtab.atp.AtpMatcher;
 import ru.icc.regtab.atp.spec.*;
 import ru.icc.regtab.interpret.SchemaConstructionStrategy;
 import ru.icc.regtab.interpret.TableInterpreter;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 import ru.icc.regtab.recordset.Recordset;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -155,6 +157,38 @@ class RtlCompilerTest {
         compile("[ [VAL : (CL)->PREFIX(' ')] ]");
         compile("[ [VAL : (CL)->SUFFIX(',')] ]");
         compile("[ [VAL : (CL)->CONCAT(0)] ]");
+    }
+
+    @Test
+    void parse_namedRecordKey() {
+        var c = compile("[ [VAL : (CL)->CONCAT('A')] ]");
+        assertEquals(RecordKey.names("A"), firstAction(c).key());
+
+        c = compile("[ [VAL : (CL)->CONCAT(0, 'A', \"B\")] ]");
+        assertEquals(RecordKey.of(Set.of(0), Set.of("A", "B")), firstAction(c).key());
+
+        c = compile("[ [VAL : (CL)->JOIN('k')] ]");
+        assertEquals(RecordKey.names("k"), firstAction(c).key());
+        assertEquals(OperationType.JOIN, firstAction(c).operationType());
+
+        assertThrows(RtlCompileException.class, () -> compile("[ [VAL : (CL)->CONCAT('')] ]"));
+    }
+
+    @Test
+    void serialize_namedRecordKey_canonicalForm() {
+        var c = compile("[ [VAL : (CL)->CONCAT(\"B\", 'A', 1, 0)] ]");
+        String rtl = AtpToRtlSerializer.serialize(c);
+        assertTrue(rtl.contains("CONCAT(0, 1, 'A', 'B')"), rtl);
+        assertEquals(c, RtlCompiler.compile(rtl), "the canonical form compiles back to the same pattern");
+
+        c = compile("[ [VAL : (CL)->JOIN('it''s')] ]");
+        rtl = AtpToRtlSerializer.serialize(c);
+        assertTrue(rtl.contains("JOIN('it''s')"), rtl);
+        assertEquals(c, RtlCompiler.compile(rtl));
+    }
+
+    private static ActionSpec firstAction(TablePattern p) {
+        return assertAtom(cell(row(p, 0, 0), 0, 0)).actions().getFirst();
     }
 
     @Test
