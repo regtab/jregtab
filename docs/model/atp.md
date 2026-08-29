@@ -47,7 +47,7 @@ row pattern, its subtable pattern, and the top-level table pattern.
 |---|---|
 | `?` | zero or one occurrence |
 | `1` (default) | exactly one occurrence |
-| `{n}` | exactly `n` occurrences (`n ≥ 2`) |
+| `{n}` | exactly `n` occurrences (`n ≥ 0`; `{1}` ≡ no quantifier, `{0}` ≡ zero occurrences, i.e. an empty match) |
 | `+` | one or more occurrences |
 | `*` | zero or more occurrences |
 

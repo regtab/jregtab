@@ -24,6 +24,12 @@ import java.util.List;
 
 /**
  * Syntactic layer matching exactly following the formal algorithms from the paper.
+ * <p>
+ * Empty matches: a subrow (or subtable) pattern whose children all matched zero
+ * elements matches the empty sequence, like {@code *} in regular expressions. Such an
+ * iteration is recorded as an empty {@link MatchedSubrow}/{@link MatchedSubtable}, is
+ * never repeated by {@code +}/{@code *}/{@code {n}}, and is tried at the end of the
+ * sequence as well, so a trailing {@code { [BLANK]* }} matches a row without blanks.
  */
 public final class SyntaxMatcher {
 
@@ -52,7 +58,6 @@ public final class SyntaxMatcher {
             int rowIndex) {
 
         int i = elementIndex;
-        int n = elements.size();
 
         for (int j = 0; j < patterns.size(); j++) {
             P pattern = patterns.get(j);
@@ -61,16 +66,24 @@ public final class SyntaxMatcher {
             int max = quantifier.max();
             Deque<StackEntry> stack = new ArrayDeque<>();
 
-            while (stack.size() < max && i < n) {
+            // No "i < n" guard: a pattern that can match empty (a subrow/subtable whose
+            // children are all optional) must be tried at the end of the sequence too;
+            // cell and row dispatchers fail on their own when i >= n.
+            while (stack.size() < max) {
                 MatchSnapshot saved = state.snapshot();
                 MatchOutcome dispatched = dispatchPattern(pattern, elements, i, state, structureKind, rowIndex);
-                if (dispatched.success()) {
-                    stack.push(new StackEntry(i, saved));
-                    i = dispatched.nextIndex();
-                } else {
+                if (!dispatched.success()) {
                     state.restore(saved);
                     break;
                 }
+                stack.push(new StackEntry(i, saved));
+                if (dispatched.nextIndex() == i) {
+                    // Empty iteration: as in regex engines, an empty match is never repeated
+                    // and satisfies any remaining lower bound ((a*)+ and (a*){3} match "").
+                    min = 0;
+                    break;
+                }
+                i = dispatched.nextIndex();
             }
 
             if (stack.size() < min) {
@@ -143,7 +156,9 @@ public final class SyntaxMatcher {
             return MatchOutcome.failure(rowIndex);
         }
 
-        state.matchedSubtables.add(new MatchedSubtable(pattern, rowIndex, inner.nextIndex() - 1));
+        state.matchedSubtables.add(inner.nextIndex() == rowIndex
+                ? MatchedSubtable.empty(pattern, rowIndex)
+                : new MatchedSubtable(pattern, rowIndex, inner.nextIndex() - 1));
         return inner;
     }
 
@@ -192,11 +207,18 @@ public final class SyntaxMatcher {
             return MatchOutcome.failure(cellIndex);
         }
 
-        state.matchedSubrows.add(new MatchedSubrow(
-                pattern,
-                rowIndex,
-                cells.get(cellIndex).col(),
-                cells.get(inner.nextIndex() - 1).col()));
+        int next = inner.nextIndex();
+        if (next == cellIndex) {
+            // Zero-width subrow: record where it matched (cells.size() at the end of the row).
+            int col = cellIndex < cells.size() ? cells.get(cellIndex).col() : cells.size();
+            state.matchedSubrows.add(MatchedSubrow.empty(pattern, rowIndex, col));
+        } else {
+            state.matchedSubrows.add(new MatchedSubrow(
+                    pattern,
+                    rowIndex,
+                    cells.get(cellIndex).col(),
+                    cells.get(next - 1).col()));
+        }
         return inner;
     }
 

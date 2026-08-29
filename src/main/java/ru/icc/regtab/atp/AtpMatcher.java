@@ -87,7 +87,9 @@ public final class AtpMatcher {
     }
 
     private static void applyMatchedStructure(TableSyntax syntax, MatchResult result) {
+        // Empty (zero-width) matches are not materialized: they cover no cells.
         int[] starts = result.matchedSubtables().stream()
+                .filter(m -> !m.isEmpty())
                 .mapToInt(m -> m.rowStart())
                 .distinct()
                 .sorted()
@@ -97,6 +99,7 @@ public final class AtpMatcher {
         }
 
         result.matchedSubrows().stream()
+                .filter(m -> !m.isEmpty())
                 .sorted(Comparator.comparingInt(MatchedSubrow::rowIndex)
                         .thenComparingInt(MatchedSubrow::colStart))
                 .forEach(m -> syntax.defineSubrow(m.rowIndex(), m.colStart(), m.colEnd()));

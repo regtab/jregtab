@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Zero-width subrows no longer break the matcher.** An explicit subrow `{…}` whose cell
+  patterns all matched zero cells (e.g. `{ [BLANK]* }` in a row without blank cells) used to
+  throw `IllegalArgumentException: colEnd must be >= colStart` in the middle of a row and to
+  silently fail ("pattern did not match") at the end of a row, because a trailing pattern was
+  never attempted once the row was exhausted. Such a subrow now matches the empty sequence,
+  as `*` does in regular expressions: it is tried at the end of the row as well, a repeated
+  empty match (`{ [BLANK]* }+`, `{ [BLANK]* }*`, `{ [BLANK]* }{n}`) counts as a single empty
+  iteration and never loops, and an empty subrow is not materialized in the interpretable
+  table (it covers no cells, so the spatial index of 0.5.2 is unaffected). The same applies to
+  a subtable whose row patterns are all optional. Found while evaluating RTL on ATBench
+  (regtab-eval-on-atbench, `reports/full-run.md` §5); the workaround
+  `{ [BLANK]* [!BLANK ? VAL: COL->AVP] [BLANK]* }+` keeps its outcome, and the natural form
+  `{ [!BLANK ? VAL: COL->AVP] }+ { [BLANK]* }` now works.
+- **`{1}` and `{0}` quantifiers are accepted.** `Quantifier.exactly(n)` required `n ≥ 2` and
+  the RTL compiler let the raw `IllegalArgumentException: EXACTLY requires n >= 2` escape.
+  `{1}` is now equivalent to no quantifier and `{0}` to zero occurrences (an empty match);
+  only a negative `n` is rejected. An invalid `{n}` (negative, or out of `int` range) is
+  reported as an `RtlCompileException` with the source position instead of a runtime exception.
+- API: `MatchedSubrow` / `MatchedSubtable` allow an empty interval (`colEnd == colStart - 1`,
+  `rowEnd == rowStart - 1`) and gain `empty(...)`, `isEmpty()`, `width()` / `height()`;
+  `Quantifier.exactly(n)` accepts `n ≥ 0`.
+- Conformance: semantic cases `subrow_zero_width_mid`, `subrow_zero_width_tail`,
+  `subrow_zero_width_repeated` (`+`), `subrow_zero_width_repeated_star` (`*`),
+  `quantifier_exactly_one`, `quantifier_exactly_zero`; negative case
+  `quantifier_exactly_negative`; curated positive case `quantifier_small_n`.
+
 ## [0.7.0] - 2026-08-29
 
 ### Added
