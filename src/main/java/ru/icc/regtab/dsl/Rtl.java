@@ -10,6 +10,7 @@ import ru.icc.regtab.atp.spec.ContentSpec;
 import ru.icc.regtab.atp.spec.FilterTerm;
 import ru.icc.regtab.atp.spec.ItemDerivationDirective;
 import ru.icc.regtab.atp.spec.OperationType;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.atp.spec.ProviderSpec;
 import ru.icc.regtab.atp.spec.Quantifier;
 import ru.icc.regtab.atp.spec.RowPattern;
@@ -521,6 +522,17 @@ public final class Rtl {
                 null, null, keyPositions, false);
     }
 
+    /** RTL {@code (…)->CONCAT('A')} — with a key attribute name. */
+    public static ActionSpec concat(String keyName, ProvArg... providers) {
+        return concat(RecordKey.names(keyName), providers);
+    }
+
+    /** RTL {@code (…)->CONCAT(0, 'A')} — with a key of positions and/or attribute names. */
+    public static ActionSpec concat(RecordKey key, ProvArg... providers) {
+        return new ActionSpec(OperationType.CONCAT, null, resolve(providers, OperationType.CONCAT),
+                null, null, key, false);
+    }
+
     /** RTL {@code (…)->JOIN} — the record product (cross product with the provided records). */
     public static ActionSpec join(ProvArg... providers) {
         return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
@@ -537,6 +549,17 @@ public final class Rtl {
     public static ActionSpec join(Set<Integer> keyPositions, ProvArg... providers) {
         return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
                 null, null, keyPositions, false);
+    }
+
+    /** RTL {@code (…)->JOIN('A')} — equi-join on a key attribute name. */
+    public static ActionSpec join(String keyName, ProvArg... providers) {
+        return join(RecordKey.names(keyName), providers);
+    }
+
+    /** RTL {@code (…)->JOIN(0, 'A')} — equi-join on a key of positions and/or attribute names. */
+    public static ActionSpec join(RecordKey key, ProvArg... providers) {
+        return new ActionSpec(OperationType.JOIN, null, resolve(providers, OperationType.JOIN),
+                null, null, key, false);
     }
 
     /** RTL {@code (…)->FILL}. */

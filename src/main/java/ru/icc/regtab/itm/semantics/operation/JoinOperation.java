@@ -1,11 +1,10 @@
 package ru.icc.regtab.itm.semantics.operation;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * O_join^K: the record product. Every record of the anchor is combined with every record of the
- * provided anchors — a cross product for K = ∅, an equi-join on the key positions K otherwise;
+ * provided anchors — a cross product for K = ∅, an equi-join on the key K otherwise;
  * the key items of the joined record are dropped, and a named attribute shared by the two
  * records acts as a natural-join condition (the pair is kept only if the values agree, and the
  * attribute occurs once in the result). The provided anchors are marked as joined-away and are
@@ -17,11 +16,12 @@ import java.util.Set;
  * {@code CROSS JOIN} / {@code LATERAL}. The folding operation that was called {@code JOIN(K)}
  * up to jRegTab 0.5.x is now {@link ConcatOperation} ({@code CONCAT(K)}).
  *
- * @param keyPositions K ⊆ ℕ₀; positions at which a record pair must agree, dropped from the
- *                     joined record. Empty set means a cross product.
+ * @param key K — key positions and/or key attribute names ({@link RecordKey}) at which a record
+ *            pair must agree, dropped from the joined record. {@link RecordKey#EMPTY} means a
+ *            cross product.
  */
-public record JoinOperation(Set<Integer> keyPositions) implements WorkingStateOperation {
+public record JoinOperation(RecordKey key) implements WorkingStateOperation {
     public JoinOperation {
-        keyPositions = Set.copyOf(Objects.requireNonNull(keyPositions, "keyPositions"));
+        Objects.requireNonNull(key, "key");
     }
 }

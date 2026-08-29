@@ -410,9 +410,9 @@ provSpecs -> op
 | `REC('s')` | `prov->REC('s')` | Same + split field values by delimiter *s* |
 | `AVP` | `prov->AVP` | Associate anchor (VAL) with an attribute from the provider (ATTR) |
 | `CONCAT` | `prov->CONCAT` | Concatenate the provided records to the anchor's record — one wide record, the provided anchors are removed (K=∅: all items included) |
-| `CONCAT(K)` | `prov->CONCAT(0)` | Same, with the key positions K not repeated: dropped from each concatenated record, and all records must agree there (e.g. `CONCAT(0)` drops the anchor of each concatenated record). A named attribute shared by two records (apart from the key) is an error: the action has no effect and a diagnostic is reported |
+| `CONCAT(K)` | `prov->CONCAT(0)`, `prov->CONCAT(0, 'A')` | Same, with the key K not repeated: dropped from each concatenated record, and all records must agree there (e.g. `CONCAT(0)` drops the anchor of each concatenated record). K lists key **positions** (0-based) and/or key **attribute names** (string literals, resolved per record). A named attribute shared by two records (apart from the key) is an error: the action has no effect and a diagnostic is reported |
 | `JOIN` | `prov->JOIN` | Record product: every record of the anchor is combined with every provided record (cross product); the provided anchors are joined-away. A named attribute shared by two records acts as a natural-join condition |
-| `JOIN(K)` | `prov->JOIN(0)` | Equi-join on the key positions K: a record pair is combined only if it agrees at K, the key of the joined record is not repeated |
+| `JOIN(K)` | `prov->JOIN(0)`, `prov->JOIN('Year')` | Equi-join on the key K (positions and/or attribute names): a record pair is combined only if it agrees at K, the key of the joined record is not repeated |
 | `FILL('s')` | `prov->FILL('/')` | Fill anchor value forward from provider, separated by *s* |
 | `PREFIX('s')` | `prov->PREFIX(' ')` | Prepend provider value to anchor, separated by *s* |
 | `SUFFIX('s')` | `prov->SUFFIX(' ')` | Append provider value to anchor, separated by *s* |
@@ -432,9 +432,21 @@ across the group. With rows `k1 | k11 | a1:A | b1:B | c1` and `k1 | k11 | a1:A |
 is four positions, `CONCAT(0,1,2,3)`, not two: `A` and `B` repeat exactly like `k1` and `k11`
 (`CONCAT(0,1)` would report the shared attribute `A` and leave both rows unfolded). A row whose
 `A` differs within the group is then rejected with a diagnostic instead of being folded silently.
-`K = ∅` is right only when the records share nothing, not even the anchor (task 069). `K` names
-positions, not attributes — if the repeated fields sit to the right of the varying ones, the
-positions shift accordingly (`CONCAT(0,1,4,5)`).
+`K = ∅` is right only when the records share nothing, not even the anchor (task 069).
+
+**Naming the key.** A key field that carries a named attribute may be listed by that name
+instead of its position: `CONCAT(0,1,'A','B')` is the same key as `CONCAT(0,1,2,3)` for the rows
+above. The name is resolved to a position **per record** — the item whose attribute is `A`, wherever
+it sits — so the pattern no longer depends on the order of the fields: if the repeated fields sit to
+the right of the varying one (`k1 | k11 | c1 | a1:A | b1:B`), the positional key becomes
+`CONCAT(0,1,3,4)` while the named key stays `CONCAT(0,1,'A','B')`. Positions and names may be
+mixed; a name missing from one of the records, or carried with a different value, is a key
+mismatch (no effect, diagnostic). Names are compared exactly (case-sensitive). For `JOIN` a shared
+named attribute is already a natural-join condition, so `JOIN('A')` differs from the bare `JOIN`
+only in dropping the pairs where one side lacks `A`; the named key matters mostly for `CONCAT`,
+where a shared attribute outside the key is a conflict rather than a condition. The canonical
+form (serializer) lists positions in ascending order, then names in lexicographic order,
+single-quoted: `CONCAT(0, 1, 'A', 'B')`.
 
 Examples by operation:
 
@@ -443,6 +455,7 @@ Examples by operation:
 [VAL : SR->REC(1)]{2}                   // REC(1), name the record by attribute at position 1 (Task 03)
 [VAL: 'AIRLINE'->AVP]                   // AVP with a literal attribute (Illustrative example)
 [VAL : RT->REC, BW&STR*->CONCAT(0)]     // CONCAT(0): fold the rows below with the same key into one record (Task 16)
+[VAL : RT*->REC, BW&STR*->CONCAT(0,'A')] // CONCAT(0,'A'): the same, with the field named A as part of the key (concat_named_key)
 [(VAL: COL->AVP, RT*->JOIN){';'}]       // JOIN: one record per token × per cell to the right (Example 6)
 [VAL: -AV->PREFIX(', ')]                // PREFIX: prepend the value above, separator ", " (Task 116)
 [BLANK ? VAL#'H': -LT&!BLANK->FILL | …] // FILL: copy the nearest non-blank cell to the left (Task 107)

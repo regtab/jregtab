@@ -3,6 +3,7 @@ package ru.icc.regtab.itm.semantics;
 import org.junit.jupiter.api.Test;
 import ru.icc.regtab.itm.semantics.item.CellDerivedItem;
 import ru.icc.regtab.itm.semantics.item.Item;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.semantics.item.ItemType;
 import ru.icc.regtab.itm.syntax.TableSyntax;
 
@@ -64,7 +65,7 @@ class WorkingStateJoinTest {
     void crossProduct_oneRecordPerJoinedRecord_inNestedLoopOrder() {
         WorkingState ws = explodeStack();
 
-        ws.applyJoin(a, List.of(c1, c2), Set.of());
+        ws.applyJoin(a, List.of(c1, c2), RecordKey.EMPTY);
 
         assertEquals(List.of(List.of(a, c1, hx), List.of(a, c2, hy)), ws.rec(a));
         assertTrue(ws.isJoined(c1));
@@ -79,8 +80,8 @@ class WorkingStateJoinTest {
     void lazyConsumption_secondAnchorJoinsTheSameRecords() {
         WorkingState ws = explodeStack();
 
-        ws.applyJoin(a, List.of(c1, c2), Set.of());
-        ws.applyJoin(b, List.of(c1, c2), Set.of());
+        ws.applyJoin(a, List.of(c1, c2), RecordKey.EMPTY);
+        ws.applyJoin(b, List.of(c1, c2), RecordKey.EMPTY);
 
         assertEquals(2, ws.rec(a).size());
         assertEquals(List.of(List.of(b, c1, hx), List.of(b, c2, hy)), ws.rec(b));
@@ -96,8 +97,8 @@ class WorkingStateJoinTest {
         ws.applyRec(d1, List.of());
         ws.applyRec(d2, List.of());
 
-        ws.applyJoin(a, List.of(c1, c2), Set.of());
-        ws.applyJoin(a, List.of(d1, d2), Set.of());
+        ws.applyJoin(a, List.of(c1, c2), RecordKey.EMPTY);
+        ws.applyJoin(a, List.of(d1, d2), RecordKey.EMPTY);
 
         assertEquals(List.of(
                 List.of(a, c1, hx, d1), List.of(a, c1, hx, d2),
@@ -116,7 +117,7 @@ class WorkingStateJoinTest {
         ws.applyRec(q1, List.of(kg));
         ws.applyRec(q2, List.of(pc));
 
-        ws.applyJoin(p1, List.of(q1, q2), Set.of(0));
+        ws.applyJoin(p1, List.of(q1, q2), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(p1, qty, kg)), ws.rec(p1));
         assertTrue(ws.diagnostics().isEmpty());
@@ -131,7 +132,7 @@ class WorkingStateJoinTest {
         ws.applyRec(p2, List.of(qty));
         ws.applyRec(q1, List.of(kg));
 
-        ws.applyJoin(p2, List.of(q1), Set.of(0));
+        ws.applyJoin(p2, List.of(q1), RecordKey.positions(0));
 
         assertEquals(List.of(List.of(p2, qty)), ws.rec(p2));
         assertTrue(ws.isJoined(q1), "J is still extended");
@@ -153,7 +154,7 @@ class WorkingStateJoinTest {
         ws.applyRec(s1, List.of(sales10));
         ws.applyRec(s2, List.of(sales12));
 
-        ws.applyJoin(r1, List.of(s1, s2), Set.of());
+        ws.applyJoin(r1, List.of(s1, s2), RecordKey.EMPTY);
 
         List<List<Item>> records = ws.rec(r1);
         assertEquals(1, records.size(), "the 2025 pair disagrees on Year and is dropped");
@@ -167,10 +168,31 @@ class WorkingStateJoinTest {
         CellDerivedItem stray = val(3, 0, "z");
         ws.initVal(stray, "z");
 
-        ws.applyJoin(a, List.of(stray), Set.of());
+        ws.applyJoin(a, List.of(stray), RecordKey.EMPTY);
 
         assertEquals(List.of(List.of(a)), ws.rec(a));
         assertTrue(ws.allJoined().isEmpty());
         assertTrue(ws.diagnostics().isEmpty());
+    }
+
+    // --- Named key ---
+
+    @Test
+    void namedKey_pairWithoutTheAttributeIsDropped_unlikeTheBareJoin() {
+        // rec(p) = <x, 2024:Year>; rec(s1) = <y, 2024:Year, 10:Sales>; rec(s2) = <z, 12:Sales> (no Year)
+        CellDerivedItem p = val(1, 0, "x"), py = val(1, 1, "2024");
+        CellDerivedItem s1 = val(2, 0, "y"), s1y = val(2, 1, "2024"), s1s = val(2, 2, "10");
+        CellDerivedItem s2 = val(3, 0, "z"), s2s = val(3, 2, "12");
+        WorkingState ws = init(p, py, s1, s1y, s1s, s2, s2s);
+        name(ws, py, "Year"); name(ws, s1y, "Year"); name(ws, s1s, "Sales"); name(ws, s2s, "Sales");
+        ws.applyRec(p, List.of(py));
+        ws.applyRec(s1, List.of(s1y, s1s));
+        ws.applyRec(s2, List.of(s2s));
+
+        ws.applyJoin(p, List.of(s1, s2), RecordKey.names("Year"));
+
+        assertEquals(List.of(List.of(p, py, s1, s1s)), ws.rec(p),
+                "only the pair carrying Year on both sides survives; the joined key is not repeated");
+        assertEquals(Set.of(s1, s2), ws.allJoined());
     }
 }

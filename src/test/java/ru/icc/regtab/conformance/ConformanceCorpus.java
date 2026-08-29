@@ -50,6 +50,14 @@ public final class ConformanceCorpus {
             // "=TRIM" form opts into trimming. See "Semantics of S_delim" in README.md.
             "delim_raw", /* language=RTL */ """
                     [ [(VAL : CL*->REC){','}] [(VAL=TRIM : CL*->REC){','}] ]
+                    """,
+            // Key K of CONCAT/JOIN given as positions and attribute names in any order and
+            // with either quote style; the canonical form sorts positions, then names, and
+            // uses single quotes. See semantic/concat_named_key and semantic/join_named_key.
+            "named_key", /* language=RTL */ """
+                    [ [] [] [ATTR]+ ]
+                    [ [VAL: RT*->REC, (BW&STR)*->CONCAT("B", 'A', 1, 0)] [VAL] [VAL] [VAL: COL->AVP]{2} ]+
+                    [ [VAL: COL->AVP, RT->REC, C2*->JOIN('k')] [VAL: COL->AVP] [VAL: COL->AVP, RT->REC] [VAL: COL->AVP] ]+
                     """
     );
 

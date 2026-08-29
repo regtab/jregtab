@@ -5,8 +5,10 @@ import ru.icc.regtab.interpret.AnchorAttributeAtPosition;
 import ru.icc.regtab.interpret.DelimitedFieldSplit;
 import ru.icc.regtab.interpret.RecordsetTransformation;
 import ru.icc.regtab.interpret.WhitespaceNormalization;
+import ru.icc.regtab.itm.semantics.operation.RecordKey;
 import ru.icc.regtab.itm.semantics.provider.TraversalOrder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -237,6 +239,17 @@ public final class AtpToRtlSerializer {
         return order + cond + card;
     }
 
+    /**
+     * Canonical form of the key K: positions in ascending order, then attribute names in
+     * lexicographic order, single-quoted; empty string for K = ∅.
+     */
+    private static String serializeKey(RecordKey key) {
+        List<String> args = new ArrayList<>();
+        key.positions().stream().sorted().forEach(k -> args.add(k.toString()));
+        key.names().stream().sorted().forEach(a -> args.add("'" + escapeSQ(a) + "'"));
+        return String.join(", ", args);
+    }
+
     private static String serializeOp(ActionSpec as) {
         return switch (as.operationType()) {
             case AVP    -> "AVP";
@@ -246,16 +259,12 @@ public final class AtpToRtlSerializer {
                 yield "REC";
             }
             case CONCAT -> {
-                Set<Integer> kp = as.keyPositions();
-                if (kp.isEmpty()) yield "CONCAT";
-                String args = kp.stream().sorted().map(Object::toString).collect(Collectors.joining(", "));
-                yield "CONCAT(" + args + ")";
+                String args = serializeKey(as.key());
+                yield args.isEmpty() ? "CONCAT" : "CONCAT(" + args + ")";
             }
             case JOIN -> {
-                Set<Integer> kp = as.keyPositions();
-                if (kp.isEmpty()) yield "JOIN";
-                String args = kp.stream().sorted().map(Object::toString).collect(Collectors.joining(", "));
-                yield "JOIN(" + args + ")";
+                String args = serializeKey(as.key());
+                yield args.isEmpty() ? "JOIN" : "JOIN(" + args + ")";
             }
             case FILL   -> as.delimiter().isEmpty() ? "FILL" : "FILL(\"" + escapeString(as.delimiter()) + "\")";
             case PREFIX -> as.delimiter().isEmpty() ? "PREFIX" : "PREFIX(\"" + escapeString(as.delimiter()) + "\")";
