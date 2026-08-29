@@ -644,7 +644,10 @@ each is an anchor of its own.
   column names `x`, `y` are *values* named `var` — they will travel into the records.
 - **Data rows** `[ … ]+`: the key cell is **delimited** `(VAL: …){';'}` — one item per token:
   - `COL->AVP` names each token `id` (the `ATTR` in the same column);
-  - `()->REC` gives each token a record of its own, `⟨id:a⟩`, `⟨id:b⟩`, `⟨id:c⟩`;
+  - `()->REC` gives each token a record of its own, `⟨id:a⟩`, `⟨id:b⟩`, `⟨id:c⟩` — `JOIN` multiplies
+    *records*, so without it the token has nothing to multiply, drops out of the recordset, and
+    the interpreter reports `JOIN skipped at …: anchor has no record — REC missing?` through
+    `TableInterpreter.diagnostics()`;
   - `RT*->JOIN` multiplies the token's record by the records of all cells to its right.
 - Each number cell `[VAL: 'value'->AVP, COL->REC]` is named `value` and builds the record
   `⟨value:1, var:x⟩` with the column name above it (`COL`, cardinality 1, row-major → the header).

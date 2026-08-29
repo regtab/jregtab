@@ -20,6 +20,10 @@ import java.util.*;
  * have been consumed by a join; they stay in {@code rec} (a later join may consume the same
  * records again, irrespective of action order) but are excluded from recordset extraction.
  * {@link #allRec()} therefore returns the <em>live</em> anchors {@code dom(rec) \ J} only.
+ * {@code C} — the <em>concatenated-away anchors</em> — are items whose records have been folded
+ * into another anchor's record by a concatenation and removed from {@code rec}; the set is kept
+ * only so that a later action on such an anchor can be told apart from an anchor that never had
+ * a record (see {@link #isConcatenated(CellDerivedItem)}).
  */
 public final class WorkingState {
 
@@ -32,6 +36,8 @@ public final class WorkingState {
     private final Map<CellDerivedItem, List<List<Item>>> rec = new LinkedHashMap<>();
     /** J: joined-away anchors (identity semantics, like the items themselves). */
     private final Set<CellDerivedItem> joined = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** C: anchors whose records were folded into another record by O_concat and removed from rec. */
+    private final Set<CellDerivedItem> concatenated = Collections.newSetFromMap(new IdentityHashMap<>());
     /** Preconditions violated during completion; the operations had no effect. */
     private final List<Diagnostic> diagnostics = new ArrayList<>();
     private final boolean strictPreconditions;
@@ -67,6 +73,8 @@ public final class WorkingState {
     public boolean hasRec(CellDerivedItem item) { return rec.containsKey(item); }
     /** ι ∈ J. */
     public boolean isJoined(CellDerivedItem item) { return joined.contains(item); }
+    /** ι ∈ C: the anchor's record was concatenated into another anchor's record and removed. */
+    public boolean isConcatenated(CellDerivedItem item) { return concatenated.contains(item); }
 
     public Map<Item, String> allVal() { return Collections.unmodifiableMap(val); }
     public Map<Item, String> allAttr() { return Collections.unmodifiableMap(attr); }
@@ -89,8 +97,24 @@ public final class WorkingState {
     /** J: the joined-away anchors. */
     public Set<CellDerivedItem> allJoined() { return Collections.unmodifiableSet(joined); }
 
+    /** C: the concatenated-away anchors. */
+    public Set<CellDerivedItem> allConcatenated() { return Collections.unmodifiableSet(concatenated); }
+
     /** Preconditions violated so far (the corresponding operations had no effect). */
     public List<Diagnostic> diagnostics() { return Collections.unmodifiableList(diagnostics); }
+
+    /**
+     * Records that an operation is not applicable to its anchor and has no effect: adds a
+     * {@link Diagnostic}; under strict preconditions raises an {@link IllegalStateException}
+     * with the same text instead. Used by the operations themselves and by the interpreter
+     * for checks that depend on information the working state does not have (e.g. whether an
+     * action is explicit or inherited).
+     */
+    public void report(CellDerivedItem anchor, String operation, String message) {
+        Diagnostic d = new Diagnostic(anchor, operation, message);
+        diagnostics.add(d);
+        if (strictPreconditions) throw new IllegalStateException(d.toString());
+    }
 
     /**
      * Derived function: assoc(iota) = a iff avp(iota) = (a, v).
@@ -204,14 +228,14 @@ public final class WorkingState {
             List<Item> otherRec = rec.get(other).getFirst();
             String problem = keyMismatch(anchorRec, otherRec, key);            // (ii)
             if (problem != null) {
-                skip(anchor, "CONCAT", problem);
+                report(anchor, "CONCAT", problem);
                 return;
             }
             result.addAll(dropK(otherRec, key));
         }
         String duplicate = duplicateAttribute(result);                  // (iii)
         if (duplicate != null) {
-            skip(anchor, "CONCAT", "named attribute '" + duplicate
+            report(anchor, "CONCAT", "named attribute '" + duplicate
                     + "' occurs in more than one of the concatenated records");
             return;
         }
@@ -221,6 +245,7 @@ public final class WorkingState {
         for (CellDerivedItem other : others) {
             rec.remove(other);
             joined.remove(other);
+            concatenated.add(other);
         }
     }
 
@@ -261,7 +286,7 @@ public final class WorkingState {
             }
         }
         if (result.isEmpty()) {
-            skip(anchor, "JOIN", "none of the " + dropped + " record pairs satisfies the key/attribute conditions; "
+            report(anchor, "JOIN", "none of the " + dropped + " record pairs satisfies the key/attribute conditions; "
                     + "the anchor keeps its records");
         } else {
             rec.put(anchor, result);
@@ -362,12 +387,6 @@ public final class WorkingState {
             if (a != null && !seen.add(a)) return a;
         }
         return null;
-    }
-
-    private void skip(CellDerivedItem anchor, String operation, String message) {
-        Diagnostic d = new Diagnostic(anchor, operation, message);
-        diagnostics.add(d);
-        if (strictPreconditions) throw new IllegalStateException(d.toString());
     }
 
     // --- Consistency checks ---

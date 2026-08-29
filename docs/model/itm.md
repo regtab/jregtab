@@ -282,6 +282,14 @@ Seven **working-state update operations** populate or modify the working state:
     A violated precondition of `O_concat^K` / `O_join^K` has no effect and is recorded as a
     `Diagnostic` (`WorkingState.diagnostics()`, surfaced as `TableInterpreter.diagnostics()`);
     `new WorkingState(true)` / `TableInterpreter.withStrictPreconditions(true)` raise instead.
+    The interpreter also reports, through the same channel, the "not applicable" cases of an
+    *explicit* `CONCAT`/`JOIN` — one written on the anchor's own content spec: an anchor without a
+    record (`anchor has no record — REC missing?`) and provided items none of which has a record.
+    Inherited actions (`actSpecs` of a table/subtable/row/subrow/cell scope) reach anchors that were
+    never meant to carry records, so for them these cases are routine and stay silent. An anchor
+    whose record was folded away by an earlier concatenation is routine as well: the working state
+    keeps such anchors in the set `C` (`WorkingState.isConcatenated`, `allConcatenated`), the
+    counterpart of `J` for `O_concat`.
 
     **Implementation note — named keys.** The manuscript defines `K` over positions only
     (`K ⊆ ℕ₀`). The implementation additionally accepts key *attribute names* (`RecordKey`:

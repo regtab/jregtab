@@ -422,6 +422,14 @@ they diverge — `CONCAT` yields one wider record, `JOIN` yields one record per 
 (see Examples 2 and 6). Up to jRegTab 0.5.x the folding operation was spelled `JOIN(K)`; a pattern
 written for 0.5.x must replace `JOIN(K)` by `CONCAT(K)`.
 
+Both operate on *records*: a `CONCAT`/`JOIN` on an anchor that has no `REC` has no effect — the
+anchor simply does not reach the recordset — and is reported through
+`TableInterpreter.diagnostics()` (`anchor has no record — REC missing?`), as is an explicit
+`CONCAT`/`JOIN` none of whose provided items has a record. Add `()->REC` when the anchor's own
+value is the whole record (Example 6). Only actions written on the anchor's own content spec are
+reported; actions inherited from a row/subrow/subtable/table level are applied to every cell and
+skip such anchors silently.
+
 **Choosing the key positions `K`.** `K` is any number of 0-based positions in the item-based
 record — `0` is the anchor, the following positions are the items in the order the `REC`
 providers supplied them. At every position in `K` all records being concatenated must agree, and
@@ -456,7 +464,7 @@ Examples by operation:
 [VAL: 'AIRLINE'->AVP]                   // AVP with a literal attribute (Illustrative example)
 [VAL : RT->REC, BW&STR*->CONCAT(0)]     // CONCAT(0): fold the rows below with the same key into one record (Task 16)
 [VAL : RT*->REC, BW&STR*->CONCAT(0,'A')] // CONCAT(0,'A'): the same, with the field named A as part of the key (concat_named_key)
-[(VAL: COL->AVP, RT*->JOIN){';'}]       // JOIN: one record per token × per cell to the right (Example 6)
+[(VAL: COL->AVP, ()->REC, RT*->JOIN){';'}] // JOIN: one record per token × per cell to the right (Example 6)
 [VAL: -AV->PREFIX(', ')]                // PREFIX: prepend the value above, separator ", " (Task 116)
 [BLANK ? VAL#'H': -LT&!BLANK->FILL | …] // FILL: copy the nearest non-blank cell to the left (Task 107)
 ```

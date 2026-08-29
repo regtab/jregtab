@@ -108,6 +108,78 @@ class TableInterpreterMultiRecordTest {
         assertTrue(e.getMessage().contains("CONCAT"), e.getMessage());
     }
 
+    // --- anchors without records: explicit CONCAT/JOIN are reported, inherited ones are not ---
+
+    private static TableSyntax table(String[][] rows) {
+        TableSyntax s = new TableSyntax(rows.length, rows[0].length);
+        for (int r = 0; r < rows.length; r++)
+            for (int c = 0; c < rows[r].length; c++) s.getCell(r, c).setText(rows[r][c]);
+        return s;
+    }
+
+    private static final TableSyntax PQ = table(new String[][]{{"p", "q"}});
+
+    @Test
+    void explicitJoin_anchorWithoutRecord_reported() {
+        TableInterpreter interpreter = new TableInterpreter();
+        Recordset rs = run(interpreter, "[ [VAL: RT*->JOIN] [VAL] ]", PQ);
+
+        assertEquals(0, rs.size(), "the anchor has no record, so nothing is extracted");
+        assertEquals(1, interpreter.diagnostics().size());
+        Diagnostic d = interpreter.diagnostics().getFirst();
+        assertEquals("JOIN", d.operation());
+        assertEquals("p", d.anchor().str());
+        assertTrue(d.message().contains("REC missing"), d.message());
+    }
+
+    @Test
+    void explicitJoin_withOwnRec_notReported() {
+        TableInterpreter interpreter = new TableInterpreter();
+        Recordset rs = run(interpreter, JOIN_PRODUCT, explodeStack());
+
+        assertEquals(6, rs.size());
+        assertTrue(interpreter.diagnostics().isEmpty(), "()->REC gives the token its record (Example 6)");
+    }
+
+    @Test
+    void inheritedJoin_anchorWithoutRecord_notReported() {
+        TableInterpreter interpreter = new TableInterpreter();
+        run(interpreter, "[ RT*->JOIN [VAL] [VAL] ]", PQ);
+
+        assertTrue(interpreter.diagnostics().isEmpty(), "row-level JOIN reaches cells without records routinely");
+    }
+
+    @Test
+    void explicitConcat_concatenatedAwayAnchors_notReported() {
+        TableInterpreter interpreter = new TableInterpreter();
+        Recordset rs = run(interpreter, "[ [VAL: RT->REC, BW&STR*->CONCAT(0)] [VAL] ]+",
+                table(new String[][]{{"A", "5"}, {"A", "7"}, {"A", "9"}}));
+
+        assertEquals(1, rs.size(), "the three rows fold into one record");
+        assertTrue(interpreter.diagnostics().isEmpty(),
+                "the CONCAT of a folded-away anchor (ι ∈ C) is not an anchor without REC");
+    }
+
+    @Test
+    void explicitJoin_noProvidedItemHasRecord_reported() {
+        TableInterpreter interpreter = new TableInterpreter();
+        Recordset rs = run(interpreter, "[ [VAL: ()->REC, RT*->JOIN] [VAL] ]", PQ);
+
+        assertEquals(1, rs.size(), "the anchor keeps its single-field record");
+        assertEquals(1, interpreter.diagnostics().size());
+        Diagnostic d = interpreter.diagnostics().getFirst();
+        assertEquals("JOIN", d.operation());
+        assertTrue(d.message().contains("provider side"), d.message());
+    }
+
+    @Test
+    void explicitJoin_anchorWithoutRecord_strictPreconditions_throws() {
+        TableInterpreter interpreter = new TableInterpreter().withStrictPreconditions(true);
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> run(interpreter, "[ [VAL: RT*->JOIN] [VAL] ]", PQ));
+        assertTrue(e.getMessage().contains("REC missing"), e.getMessage());
+    }
+
     @Test
     void diagnosticsAreResetPerInterpretation() {
         TableInterpreter interpreter = new TableInterpreter();

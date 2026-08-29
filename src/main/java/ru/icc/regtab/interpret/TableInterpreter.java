@@ -87,7 +87,10 @@ public final class TableInterpreter {
 
     /**
      * Diagnostics of the most recent {@link #interpret(InterpretableTable)} call: every
-     * {@code CONCAT} / {@code JOIN} action that was skipped because its precondition was violated.
+     * {@code CONCAT} / {@code JOIN} action that had no effect — a violated precondition (key
+     * mismatch, a named attribute shared by two concatenated records, an empty record product),
+     * or, for actions written on the anchor's own content spec (not inherited), an anchor without
+     * a record or provided items none of which has a record ({@code REC} missing).
      * Empty if nothing was skipped (or before the first call).
      */
     public List<Diagnostic> diagnostics() {
@@ -193,9 +196,43 @@ public final class TableInterpreter {
             // Empty items (e.g. lenient inherited provider on incompatible anchor) → skip
             case AvpOperation ignored  -> { if (!items.isEmpty()) ws.applyAvp(anchor, items); }
             case RecOperation ignored  -> ws.applyRec((CellDerivedItem) anchor, items);
-            case ConcatOperation op -> { if (!items.isEmpty()) ws.applyConcat((CellDerivedItem) anchor, items, op.key()); }
-            case JoinOperation op   -> { if (!items.isEmpty()) ws.applyJoin((CellDerivedItem) anchor, items, op.key()); }
+            case ConcatOperation op -> {
+                if (items.isEmpty()) break;
+                checkRecords(ws, action, items, "CONCAT");
+                ws.applyConcat((CellDerivedItem) anchor, items, op.key());
+            }
+            case JoinOperation op -> {
+                if (items.isEmpty()) break;
+                checkRecords(ws, action, items, "JOIN");
+                ws.applyJoin((CellDerivedItem) anchor, items, op.key());
+            }
         }
+    }
+
+    /**
+     * Makes the silent "not applicable" cases of {@code CONCAT}/{@code JOIN} visible for
+     * <em>explicit</em> actions: an anchor without a record, or provided items none of which has
+     * a record — both usually a forgotten {@code REC}. Inherited actions reach anchors that were
+     * never meant to carry records, so for them these cases are routine and not reported. An
+     * anchor whose record was folded away by an earlier {@code CONCAT} (ι ∈ C) is routine as well:
+     * its own {@code CONCAT} is applied after the one that consumed it.
+     */
+    private static void checkRecords(WorkingState ws, InterpretationAction action,
+                                     List<? extends Item> items, String operation) {
+        if (action.inherited()) return;
+        CellDerivedItem anchor = (CellDerivedItem) action.anchor();
+        if (!ws.hasRec(anchor)) {
+            if (!ws.isConcatenated(anchor)) {
+                ws.report(anchor, operation, "anchor has no record — REC missing?");
+            }
+            return;
+        }
+        for (Item item : items) {
+            if (item instanceof CellDerivedItem c && c != anchor && (ws.hasRec(c) || ws.isConcatenated(c))) {
+                return;
+            }
+        }
+        ws.report(anchor, operation, "none of the provided items has a record — REC missing on the provider side?");
     }
 
     // --- Phase 3: Recordset extraction ---
