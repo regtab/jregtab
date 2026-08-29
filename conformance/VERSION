@@ -1,5 +1,5 @@
-generated: 2026-08-28
+generated: 2026-08-29
 sources: RtlTask001..150 + curated extras
-note: CONCAT(K) reintroduced (the former JOIN(K)); JOIN(K) redefined as the record product;
-      semantic cases concat_by_key, join_product, join_equi_key added; task_098 lists its full
-      group key CONCAT(0,1,2,3)
+note: key K of CONCAT(K)/JOIN(K) may name attributes (CONCAT(0, 1, 'A', 'B'), JOIN('k')), resolved per record;
+      canonical form sorts positions, then names, single-quoted; curated extra named_key and
+      semantic cases concat_named_key, join_named_key, negative concat_empty_key_name added
